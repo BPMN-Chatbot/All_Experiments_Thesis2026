@@ -1,4 +1,4 @@
-# All Experiments - Thesis 2025
+# All Experiments - LLM‑Based Conversational Modeling of BPMN Collaboration Diagrams with Data
 
 This repository contains all experiments and datasets for the thesis research on LLM‑Based Conversational Modeling of BPMN Collaboration Diagrams with Data.
 
