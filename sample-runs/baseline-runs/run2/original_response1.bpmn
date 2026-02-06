@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:tns="http://example.com/bpmn" targetNamespace="http://example.com/bpmn" exporter="Camunda Modeler" exporterVersion="5.34.0">
+  <process id="BankAccountOpeningProcess" isExecutable="true">
+    <laneSet>
+      <lane id="CustomerLane" name="Customer">
+        <flowNodeRef>CustomerApplicationSubmitted</flowNodeRef>
+        <flowNodeRef>CustomerSendsApplication</flowNodeRef>
+      </lane>
+      <lane id="BackOfficeLane" name="Bank Back Office">
+        <flowNodeRef>BankCatchApplication</flowNodeRef>
+        <flowNodeRef>EvaluateApplication</flowNodeRef>
+        <flowNodeRef>DecisionGateway</flowNodeRef>
+        <flowNodeRef>NotifyRejection</flowNodeRef>
+        <flowNodeRef>CreateBankAccount</flowNodeRef>
+        <flowNodeRef>ParallelPackGateway</flowNodeRef>
+        <flowNodeRef>SendWelcomePack</flowNodeRef>
+        <flowNodeRef>SendBankCard</flowNodeRef>
+        <flowNodeRef>SendPinNumber</flowNodeRef>
+        <flowNodeRef>BankCardSent</flowNodeRef>
+        <flowNodeRef>PinSent</flowNodeRef>
+        <flowNodeRef>MergeParallelEnd</flowNodeRef>
+        <flowNodeRef>ApprovedEnd</flowNodeRef>
+        <flowNodeRef>SendRejectionToCustomer</flowNodeRef>
+        <flowNodeRef>RejectedEnd</flowNodeRef>
+        <flowNodeRef>WelcomePackSent</flowNodeRef>
+      </lane>
+    </laneSet>
+    <startEvent id="BankReceiveApplication" name="Receive Application">
+      <outgoing>flow_eval</outgoing>
+    </startEvent>
+    <startEvent id="CustomerApplicationSubmitted" name="Submit Application">
+      <outgoing>flow_customer_submit</outgoing>
+    </startEvent>
+    <intermediateThrowEvent id="CustomerSendsApplication" name="Send Application">
+      <incoming>flow_customer_submit</incoming>
+      <incoming>Flow_1cpnfvj</incoming>
+      <incoming>Flow_1acpn76</incoming>
+      <incoming>Flow_0yswhfd</incoming>
+      <incoming>Flow_0ygg6w1</incoming>
+      <outgoing>flow_to_bank</outgoing>
+      <outgoing>Flow_1dmoe17</outgoing>
+      <messageEventDefinition />
+    </intermediateThrowEvent>
+    <intermediateCatchEvent id="BankCatchApplication" name="Receive Application Message">
+      <incoming>flow_to_bank</incoming>
+      <incoming>Flow_1dmoe17</incoming>
+      <outgoing>flow_eval</outgoing>
+      <messageEventDefinition />
+    </intermediateCatchEvent>
+    <task id="EvaluateApplication" name="Evaluate Application">
+      <incoming>flow_eval</incoming>
+      <outgoing>flow_decide</outgoing>
+    </task>
+    <exclusiveGateway id="DecisionGateway" name="Application Approved?">
+      <incoming>flow_decide</incoming>
+      <outgoing>flow_approved</outgoing>
+      <outgoing>flow_rejected</outgoing>
+    </exclusiveGateway>
+    <task id="NotifyRejection" name="Notify Rejection by Email">
+      <incoming>flow_rejected</incoming>
+      <outgoing>flow_notify_customer</outgoing>
+    </task>
+    <task id="CreateBankAccount" name="Create Bank Account">
+      <incoming>flow_approved</incoming>
+      <outgoing>flow_parallel_pack</outgoing>
+    </task>
+    <parallelGateway id="ParallelPackGateway" name="Send Welcome Pack, Card, PIN">
+      <incoming>flow_parallel_pack</incoming>
+      <outgoing>flow_pack</outgoing>
+      <outgoing>flow_card</outgoing>
+      <outgoing>flow_pin</outgoing>
+    </parallelGateway>
+    <task id="SendWelcomePack" name="Send Welcome Pack Letter">
+      <incoming>flow_pack</incoming>
+      <outgoing>flow_welc_pack_msg</outgoing>
+    </task>
+    <task id="SendBankCard" name="Send Bank Card Letter">
+      <incoming>flow_card</incoming>
+      <outgoing>flow_card_msg</outgoing>
+    </task>
+    <task id="SendPinNumber" name="Send PIN Number Letter">
+      <incoming>flow_pin</incoming>
+      <outgoing>flow_pin_msg</outgoing>
+    </task>
+    <intermediateThrowEvent id="BankCardSent" name="Send Bank Card">
+      <incoming>flow_card_msg</incoming>
+      <outgoing>flow_merge_end</outgoing>
+      <outgoing>Flow_1acpn76</outgoing>
+      <messageEventDefinition />
+    </intermediateThrowEvent>
+    <intermediateThrowEvent id="PinSent" name="Send PIN Number">
+      <incoming>flow_pin_msg</incoming>
+      <outgoing>flow_merge_end</outgoing>
+      <outgoing>Flow_1cpnfvj</outgoing>
+      <messageEventDefinition />
+    </intermediateThrowEvent>
+    <parallelGateway id="MergeParallelEnd" name="Merge Letters">
+      <incoming>flow_merge_end</incoming>
+      <incoming>flow_merge_end</incoming>
+      <incoming>flow_merge_end</incoming>
+      <outgoing>flow_final_finish</outgoing>
+    </parallelGateway>
+    <endEvent id="ApprovedEnd" name="End (Approved)">
+      <incoming>flow_final_finish</incoming>
+    </endEvent>
+    <intermediateThrowEvent id="SendRejectionToCustomer" name="Send Rejection Notification">
+      <incoming>flow_notify_customer</incoming>
+      <outgoing>flow_reject_end</outgoing>
+      <outgoing>Flow_0ygg6w1</outgoing>
+      <messageEventDefinition />
+    </intermediateThrowEvent>
+    <endEvent id="RejectedEnd" name="End (Rejected)">
+      <incoming>flow_reject_end</incoming>
+    </endEvent>
+    <intermediateThrowEvent id="WelcomePackSent" name="Send Welcome Pack">
+      <incoming>flow_welc_pack_msg</incoming>
+      <outgoing>flow_merge_end</outgoing>
+      <outgoing>Flow_0yswhfd</outgoing>
+      <messageEventDefinition />
+    </intermediateThrowEvent>
+    <sequenceFlow id="flow_customer_submit" sourceRef="CustomerApplicationSubmitted" targetRef="CustomerSendsApplication" />
+    <sequenceFlow id="Flow_1cpnfvj" sourceRef="PinSent" targetRef="CustomerSendsApplication" />
+    <sequenceFlow id="Flow_1acpn76" sourceRef="BankCardSent" targetRef="CustomerSendsApplication" />
+    <sequenceFlow id="Flow_0yswhfd" sourceRef="WelcomePackSent" targetRef="CustomerSendsApplication" />
+    <sequenceFlow id="Flow_0ygg6w1" sourceRef="SendRejectionToCustomer" targetRef="CustomerSendsApplication" />
+    <sequenceFlow id="flow_to_bank" sourceRef="CustomerSendsApplication" targetRef="BankCatchApplication" />
+    <sequenceFlow id="Flow_1dmoe17" sourceRef="CustomerSendsApplication" targetRef="BankCatchApplication" />
+    <sequenceFlow id="flow_eval" sourceRef="BankCatchApplication" targetRef="EvaluateApplication" />
+    <sequenceFlow id="flow_decide" sourceRef="EvaluateApplication" targetRef="DecisionGateway" />
+    <sequenceFlow id="flow_rejected" name="No" sourceRef="DecisionGateway" targetRef="NotifyRejection" />
+    <sequenceFlow id="flow_approved" name="Yes" sourceRef="DecisionGateway" targetRef="CreateBankAccount" />
+    <sequenceFlow id="flow_notify_customer" sourceRef="NotifyRejection" targetRef="SendRejectionToCustomer" />
+    <sequenceFlow id="flow_parallel_pack" sourceRef="CreateBankAccount" targetRef="ParallelPackGateway" />
+    <sequenceFlow id="flow_pack" sourceRef="ParallelPackGateway" targetRef="SendWelcomePack" />
+    <sequenceFlow id="flow_card" sourceRef="ParallelPackGateway" targetRef="SendBankCard" />
+    <sequenceFlow id="flow_pin" sourceRef="ParallelPackGateway" targetRef="SendPinNumber" />
+    <sequenceFlow id="flow_welc_pack_msg" sourceRef="SendWelcomePack" targetRef="WelcomePackSent" />
+    <sequenceFlow id="flow_card_msg" sourceRef="SendBankCard" targetRef="BankCardSent" />
+    <sequenceFlow id="flow_pin_msg" sourceRef="SendPinNumber" targetRef="PinSent" />
+    <sequenceFlow id="flow_merge_end_2" sourceRef="BankCardSent" targetRef="MergeParallelEnd" />
+    <sequenceFlow id="flow_merge_end_3" sourceRef="PinSent" targetRef="MergeParallelEnd" />
+    <sequenceFlow id="flow_merge_end" sourceRef="WelcomePackSent" targetRef="MergeParallelEnd" />
+    <sequenceFlow id="flow_final_finish" sourceRef="MergeParallelEnd" targetRef="ApprovedEnd" />
+    <sequenceFlow id="flow_reject_end" sourceRef="SendRejectionToCustomer" targetRef="RejectedEnd" />
+  </process>
+  <collaboration id="BankAccountOpeningCollaboration">
+    <participant id="CustomerPool" name="Customer" processRef="BankAccountOpeningProcess" />
+    <participant id="BankPool" name="Bank" processRef="BankAccountOpeningProcess" />
+  </collaboration>
+  
+</definitions>

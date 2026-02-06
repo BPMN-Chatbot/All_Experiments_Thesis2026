@@ -1,0 +1,337 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:modeler="http://camunda.org/schema/modeler/1.0" xmlns:custom="http://www.example.org/custom" id="Definitions_0tfrzsr" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.21.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.20.0">
+  <bpmn:collaboration id="Collaboration_1">
+    <bpmn:participant id="Participant_pool_0" name="Company" processRef="Process_pool_0" />
+  </bpmn:collaboration>
+  <bpmn:process id="Process_pool_0">
+    <bpmn:laneSet id="LaneSet_0">
+      <bpmn:lane id="lane_0_0" name="Management">
+        <bpmn:flowNodeRef>node_1</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_2</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_3</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>node_10</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="lane_0_1" name="Accountant">
+        <bpmn:flowNodeRef>task_4</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>xor_5</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_7</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>xor_9</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_6</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="node_1" name="Start Cash-out Report Request">
+      <bpmn:extensionElements />
+      <bpmn:outgoing>Flow_node_1_task_2</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:task id="task_2" name="Specify Year and Month">
+      <bpmn:extensionElements>
+        <camunda:executionListener expression="execution.setVariable(&#34;Year_and_Month&#34;, &#34;Value_0_task_2_0&#34;)" event="start" />
+        <custom:parallelBlockIndex parallelBlockIndex="0" />
+        <custom:branchNesting branchNesting="0" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_node_1_task_2</bpmn:incoming>
+      <bpmn:outgoing>Flow_task_2_task_3</bpmn:outgoing>
+      <bpmn:dataOutputAssociation id="DataOutputAssociation_0_task_2_0">
+        <bpmn:targetRef>DataReference_0_0</bpmn:targetRef>
+      </bpmn:dataOutputAssociation>
+    </bpmn:task>
+    <bpmn:task id="task_3" name="Order Cash-out Report">
+      <bpmn:extensionElements>
+        <camunda:executionListener expression="${Year_and_Month}" event="end" />
+        <custom:parallelBlockIndex parallelBlockIndex="0" />
+        <custom:branchNesting branchNesting="0" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_task_2_task_3</bpmn:incoming>
+      <bpmn:outgoing>Flow_task_3_task_4</bpmn:outgoing>
+      <bpmn:property id="Property_0_task_3_0" name="__targetRef_placeholder" />
+      <bpmn:dataInputAssociation id="DataInputAssociation_0_task_3_0">
+        <bpmn:sourceRef>DataReference_0_0</bpmn:sourceRef>
+        <bpmn:targetRef>Property_0_task_3_0</bpmn:targetRef>
+      </bpmn:dataInputAssociation>
+    </bpmn:task>
+    <bpmn:task id="task_4" name="Filter Cash Transactions">
+      <bpmn:extensionElements>
+        <camunda:executionListener expression="execution.setVariable(&#34;Cash_Transactions&#34;, &#34;Value_0_task_4_2&#34;)" event="start" />
+        <camunda:executionListener expression="${Year_and_Month}" event="end" />
+        <custom:parallelBlockIndex parallelBlockIndex="0" />
+        <custom:branchNesting branchNesting="0" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_task_3_task_4</bpmn:incoming>
+      <bpmn:outgoing>Flow_task_4_xor_5</bpmn:outgoing>
+      <bpmn:property id="Property_0_task_4_0" name="__targetRef_placeholder" />
+      <bpmn:property id="Property_0_task_4_1" name="__targetRef_placeholder" />
+      <bpmn:dataInputAssociation id="DataInputAssociation_0_task_4_0">
+        <bpmn:sourceRef>DataReference_0_0</bpmn:sourceRef>
+        <bpmn:targetRef>Property_0_task_4_0</bpmn:targetRef>
+      </bpmn:dataInputAssociation>
+      <bpmn:dataInputAssociation id="DataInputAssociation_0_task_4_1">
+        <bpmn:sourceRef>DataReference_0_1</bpmn:sourceRef>
+        <bpmn:targetRef>Property_0_task_4_1</bpmn:targetRef>
+      </bpmn:dataInputAssociation>
+      <bpmn:dataOutputAssociation id="DataOutputAssociation_0_task_4_2">
+        <bpmn:targetRef>DataReference_0_2</bpmn:targetRef>
+      </bpmn:dataOutputAssociation>
+    </bpmn:task>
+    <bpmn:exclusiveGateway id="xor_5" name="Cash Transactions Found?">
+      <bpmn:incoming>Flow_task_4_xor_5</bpmn:incoming>
+      <bpmn:outgoing>Flow_xor_5_task_6</bpmn:outgoing>
+      <bpmn:outgoing>Flow_xor_5_xor_9</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:task id="task_7" name="Give Report to Management">
+      <bpmn:extensionElements>
+        <camunda:executionListener expression="${Cash-out_Report}" event="end" />
+        <custom:parallelBlockIndex parallelBlockIndex="0" />
+        <custom:branchNesting branchNesting="0" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_task_6_task_7</bpmn:incoming>
+      <bpmn:outgoing>Flow_task_7_xor_9</bpmn:outgoing>
+      <bpmn:property id="Property_0_task_7_3" name="__targetRef_placeholder" />
+      <bpmn:dataInputAssociation id="DataInputAssociation_0_task_7_3">
+        <bpmn:sourceRef>DataReference_0_3</bpmn:sourceRef>
+        <bpmn:targetRef>Property_0_task_7_3</bpmn:targetRef>
+      </bpmn:dataInputAssociation>
+    </bpmn:task>
+    <bpmn:exclusiveGateway id="xor_9">
+      <bpmn:incoming>Flow_task_7_xor_9</bpmn:incoming>
+      <bpmn:incoming>Flow_xor_5_xor_9</bpmn:incoming>
+      <bpmn:outgoing>Flow_xor_9_node_10</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:endEvent id="node_10" name="Cash-out Process Completed">
+      <bpmn:extensionElements />
+      <bpmn:incoming>Flow_xor_9_node_10</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_node_1_task_2" sourceRef="node_1" targetRef="task_2" />
+    <bpmn:sequenceFlow id="Flow_task_2_task_3" sourceRef="task_2" targetRef="task_3" />
+    <bpmn:sequenceFlow id="Flow_task_3_task_4" sourceRef="task_3" targetRef="task_4" />
+    <bpmn:sequenceFlow id="Flow_task_4_xor_5" sourceRef="task_4" targetRef="xor_5" />
+    <bpmn:sequenceFlow id="Flow_xor_5_task_6" name="Yes" sourceRef="xor_5" targetRef="task_6" />
+    <bpmn:sequenceFlow id="Flow_task_6_task_7" sourceRef="task_6" targetRef="task_7" />
+    <bpmn:sequenceFlow id="Flow_task_7_xor_9" sourceRef="task_7" targetRef="xor_9" />
+    <bpmn:sequenceFlow id="Flow_xor_5_xor_9" name="No" sourceRef="xor_5" targetRef="xor_9" />
+    <bpmn:sequenceFlow id="Flow_xor_9_node_10" sourceRef="xor_9" targetRef="node_10" />
+    <bpmn:dataObjectReference id="DataReference_0_0" name="Year and Month" dataObjectRef="DataObject_0_0" />
+    <bpmn:dataObject id="DataObject_0_0" />
+    <bpmn:dataStoreReference id="DataReference_0_1" name="Cash Database" />
+    <bpmn:dataObjectReference id="DataReference_0_2" name="Cash Transactions" dataObjectRef="DataObject_0_2" />
+    <bpmn:dataObject id="DataObject_0_2" />
+    <bpmn:dataObjectReference id="DataReference_0_3" name="Cash-out Report" dataObjectRef="DataObject_0_3" />
+    <bpmn:dataObject id="DataObject_0_3" />
+    <bpmn:task id="task_6" name="Print Cash-out Report">
+      <bpmn:extensionElements>
+        <camunda:executionListener expression="execution.setVariable(&#34;Cash-out_Report&#34;, &#34;Value_0_task_6_3&#34;)" event="start" />
+        <camunda:executionListener expression="${Cash_Transactions}" event="end" />
+        <custom:parallelBlockIndex parallelBlockIndex="0" />
+        <custom:branchNesting branchNesting="0" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_xor_5_task_6</bpmn:incoming>
+      <bpmn:outgoing>Flow_task_6_task_7</bpmn:outgoing>
+      <bpmn:property id="Property_0_task_6_2" name="__targetRef_placeholder" />
+      <bpmn:dataInputAssociation id="DataInputAssociation_0_task_6_2">
+        <bpmn:sourceRef>DataReference_0_2</bpmn:sourceRef>
+        <bpmn:targetRef>Property_0_task_6_2</bpmn:targetRef>
+      </bpmn:dataInputAssociation>
+      <bpmn:dataOutputAssociation id="DataOutputAssociation_0_task_6_3">
+        <bpmn:targetRef>DataReference_0_3</bpmn:targetRef>
+      </bpmn:dataOutputAssociation>
+    </bpmn:task>
+    <bpmn:textAnnotation id="TextAnnotation_task_2">
+      <bpmn:text>Write to: Year and Month</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="Association_task_2" associationDirection="None" sourceRef="task_2" targetRef="TextAnnotation_task_2" />
+    <bpmn:textAnnotation id="TextAnnotation_task_3">
+      <bpmn:text>Read from: Year and Month</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="Association_task_3" associationDirection="None" sourceRef="task_3" targetRef="TextAnnotation_task_3" />
+    <bpmn:textAnnotation id="TextAnnotation_task_4">
+      <bpmn:text>Write to: Cash Transactions
+
+Read from: Year and Month, Cash Database</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="Association_task_4" associationDirection="None" sourceRef="task_4" targetRef="TextAnnotation_task_4" />
+    <bpmn:textAnnotation id="TextAnnotation_task_6">
+      <bpmn:text>Write to: Cash-out Report
+
+Read from: Cash Transactions</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:textAnnotation id="TextAnnotation_task_7">
+      <bpmn:text>Read from: Cash-out Report</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="Association_task_7" associationDirection="None" sourceRef="task_7" targetRef="TextAnnotation_task_7" />
+    <bpmn:association id="Association_task_6" associationDirection="None" sourceRef="task_6" targetRef="TextAnnotation_task_6" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_1">
+      <bpmndi:BPMNShape id="Participant_pool_0_di" bpmnElement="Participant_pool_0" isHorizontal="true">
+        <dc:Bounds x="95" y="95" width="1773" height="864" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="lane_0_1_di" bpmnElement="lane_0_1" isHorizontal="true">
+        <dc:Bounds x="125" y="412" width="1743" height="547" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="lane_0_0_di" bpmnElement="lane_0_0" isHorizontal="true">
+        <dc:Bounds x="125" y="95" width="1743" height="317" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_node_1" bpmnElement="node_1">
+        <dc:Bounds x="235" y="172" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_task_2" bpmnElement="task_2">
+        <dc:Bounds x="341" y="142.5" width="120" height="95" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_task_3" bpmnElement="task_3">
+        <dc:Bounds x="531" y="142.5" width="120" height="95" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_task_4" bpmnElement="task_4">
+        <dc:Bounds x="721" y="459.5" width="120" height="95" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_xor_5" bpmnElement="xor_5" isMarkerVisible="true">
+        <dc:Bounds x="911" y="489" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="898" y="525" width="63" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_task_6" bpmnElement="task_6">
+        <dc:Bounds x="1052" y="460" width="120" height="95" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_task_7" bpmnElement="task_7">
+        <dc:Bounds x="1242" y="459.5" width="120" height="95" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_xor_9" bpmnElement="xor_9" isMarkerVisible="true">
+        <dc:Bounds x="1432" y="489" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="_BPMNShape_node_10" bpmnElement="node_10">
+        <dc:Bounds x="1538" y="172" width="36" height="36" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataReference_0_0_di" bpmnElement="DataReference_0_0">
+        <dc:Bounds x="1714" y="472" width="35" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1714" y="530" width="19" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataReference_0_1_di" bpmnElement="DataReference_0_1">
+        <dc:Bounds x="1714" y="582" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1714" y="640" width="19" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataReference_0_2_di" bpmnElement="DataReference_0_2">
+        <dc:Bounds x="1714" y="692" width="35" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1714" y="750" width="19" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataReference_0_3_di" bpmnElement="DataReference_0_3">
+        <dc:Bounds x="1714" y="802" width="35" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1714" y="860" width="19" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TextAnnotation_task_2_di" bpmnElement="TextAnnotation_task_2">
+        <dc:Bounds x="341" y="280" width="172.5" height="21" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TextAnnotation_task_3_di" bpmnElement="TextAnnotation_task_3">
+        <dc:Bounds x="531" y="280" width="139" height="40" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TextAnnotation_task_4_di" bpmnElement="TextAnnotation_task_4">
+        <dc:Bounds x="721" y="597" width="172.5" height="69" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TextAnnotation_task_6_di" bpmnElement="TextAnnotation_task_6">
+        <dc:Bounds x="1052" y="597" width="168" height="69" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TextAnnotation_task_7_di" bpmnElement="TextAnnotation_task_7">
+        <dc:Bounds x="1242" y="597" width="172.5" height="21" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_node_1_task_2_di" bpmnElement="Flow_node_1_task_2">
+        <di:waypoint x="271" y="190" />
+        <di:waypoint x="341" y="190" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="286" y="175" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_task_2_task_3_di" bpmnElement="Flow_task_2_task_3">
+        <di:waypoint x="461" y="190" />
+        <di:waypoint x="531" y="190" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="476" y="175" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_task_3_task_4_di" bpmnElement="Flow_task_3_task_4">
+        <di:waypoint x="651" y="190" />
+        <di:waypoint x="661" y="190" />
+        <di:waypoint x="701" y="507" />
+        <di:waypoint x="721" y="507" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="666" y="492" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_task_4_xor_5_di" bpmnElement="Flow_task_4_xor_5">
+        <di:waypoint x="841" y="507" />
+        <di:waypoint x="911" y="507" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="856" y="492" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_xor_5_task_6_di" bpmnElement="Flow_xor_5_task_6">
+        <di:waypoint x="947" y="507" />
+        <di:waypoint x="1052" y="507" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="978" y="492" width="18" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_task_6_task_7_di" bpmnElement="Flow_task_6_task_7">
+        <di:waypoint x="1172" y="507" />
+        <di:waypoint x="1242" y="507" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1187" y="492" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_task_7_xor_9_di" bpmnElement="Flow_task_7_xor_9">
+        <di:waypoint x="1362" y="507" />
+        <di:waypoint x="1432" y="507" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1377" y="492" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_xor_5_xor_9_di" bpmnElement="Flow_xor_5_xor_9">
+        <di:waypoint x="929" y="525" />
+        <di:waypoint x="929" y="789" />
+        <di:waypoint x="1450" y="789" />
+        <di:waypoint x="1450" y="525" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="944" y="774" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_xor_9_node_10_di" bpmnElement="Flow_xor_9_node_10">
+        <di:waypoint x="1468" y="507" />
+        <di:waypoint x="1478" y="507" />
+        <di:waypoint x="1518" y="190" />
+        <di:waypoint x="1538" y="190" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1483" y="175" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Association_task_2_di" bpmnElement="Association_task_2">
+        <di:waypoint x="401" y="237.5" />
+        <di:waypoint x="341" y="280" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Association_task_3_di" bpmnElement="Association_task_3">
+        <di:waypoint x="591" y="238" />
+        <di:waypoint x="530" y="280" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Association_task_4_di" bpmnElement="Association_task_4">
+        <di:waypoint x="781" y="554.5" />
+        <di:waypoint x="721" y="597" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Association_task_6_di" bpmnElement="Association_task_6">
+        <di:waypoint x="1112" y="555" />
+        <di:waypoint x="1080" y="590" />
+        <di:waypoint x="1071" y="597" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Association_task_7_di" bpmnElement="Association_task_7">
+        <di:waypoint x="1302" y="554.5" />
+        <di:waypoint x="1242" y="597" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

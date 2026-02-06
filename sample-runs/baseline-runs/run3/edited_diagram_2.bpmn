@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8"?> <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://bpmn.io/schema/bpmn"> 
+  <collaboration id="Collaboration_1">
+    <participant id="ManagementPool" name="Management" processRef="cashOutReportProcess"/> 
+    <!-- Message Flows (between pools) --> <messageFlow id="MsgFlow_OrderReport" name="Report Order" sourceRef="MessageThrow_OrderReport" targetRef="MessageCatch_ReportOrder"/> <messageFlow id="MsgFlow_Report" name="Cash-Out Report" sourceRef="MessageThrow_SendReport" targetRef="MessageCatch_ReceiveReport"/>
+  </collaboration>
+  <process id="cashOutReportProcess" isExecutable="true"> 
+  <!-- Pools and Lanes --> <laneSet> <lane id="ManagementLane" name="Management" /> </laneSet> <laneSet> <lane id="AccountantLane" name="Accountant" /> </laneSet> <!-- Management Process Flow --> <startEvent id="StartEvent_Management" name="Start"> <outgoing>Flow_Mgmt_Start_ToOrder</outgoing> </startEvent> <task id="Task_OrderReport" name="Order Cash-Out Report"> <dataOutputAssociation id="assoc_orderreport_dates">  <targetRef>DataRef_YearMonth</targetRef> </dataOutputAssociation>  <incoming>Flow_Mgmt_Start_ToOrder</incoming> <outgoing>Flow_Mgmt_Order_ToSend</outgoing> </task> 
+
+    
+    <dataObject id="Data_YearMonth" name="Year and Month" /> 
+    <bpmn:dataObjectReference id="DataRef_YearMonth" dataObjectRef="Data_YearMonth" name="Year and Month" />
+
+    <intermediateThrowEvent id="MessageThrow_OrderReport" name="Send Report Order"> <incoming>Flow_Mgmt_Order_ToSend</incoming> <outgoing>Flow_Mgmt_Send_ToEndEventOrder</outgoing> <messageEventDefinition id="MsgDef_OrderReport"/> </intermediateThrowEvent> <endEvent id="EndEvent_OrderSent" name="End Ordering"> <incoming>Flow_Mgmt_Send_ToEndEventOrder</incoming> </endEvent> <!-- Management receives report --> <intermediateCatchEvent id="MessageCatch_ReceiveReport" name="Receive Cash-Out Report"> <messageEventDefinition id="MsgDef_CashOutReport"/> <outgoing>Flow_Mgmt_ReceiveReport_ToEnd</outgoing> </intermediateCatchEvent> <endEvent id="EndEvent_Received" name="Report Received"> <incoming>Flow_Mgmt_ReceiveReport_ToEnd</incoming> </endEvent> <!-- Sequence Flows (Management) --> <sequenceFlow id="Flow_Mgmt_Start_ToOrder" sourceRef="StartEvent_Management" targetRef="Task_OrderReport"/> <sequenceFlow id="Flow_Mgmt_Order_ToSend" sourceRef="Task_OrderReport" targetRef="MessageThrow_OrderReport"/> <sequenceFlow id="Flow_Mgmt_Send_ToEndEventOrder" sourceRef="MessageThrow_OrderReport" targetRef="EndEvent_OrderSent"/> <sequenceFlow id="Flow_Mgmt_ReceiveReport_ToEnd" sourceRef="MessageCatch_ReceiveReport" targetRef="EndEvent_Received"/> <!-- Accountant Process Flow --> <startEvent id="StartEvent_Accountant" name="Start"> <outgoing>Flow_Acc_Start_ToWait</outgoing> </startEvent> <intermediateCatchEvent id="MessageCatch_ReportOrder" name="Wait for Report Order"> <incoming>Flow_Acc_Start_ToWait</incoming> <outgoing>Flow_Acc_Wait_ToFilter</outgoing> <messageEventDefinition id="MsgDef_OrderReport_Catch"/> </intermediateCatchEvent> <task id="Task_FilterCashTransactions" name="Filter Cash Transactions"> 
+    <dataInputAssociation id="assoc_task_filter_db"> <sourceRef>DataStore_CashDatabase</sourceRef>  </dataInputAssociation> 
+    <dataOutputAssociation id="assoc_filter_transactions"> <sourceRef>Task_FilterCashTransactions</sourceRef> <targetRef>DataRef_FilteredTransactions</targetRef> </dataOutputAssociation>
+    <incoming>Flow_Acc_Wait_ToFilter</incoming> <outgoing>Flow_Acc_Filter_ToXOR</outgoing> </task> 
+    <dataObject id="Data_FilteredTransactions" /> 
+    <bpmn:dataObjectReference id="DataRef_FilteredTransactions" dataObjectRef="Data_FilteredTransactions" name="Filtered Transactions"  />
+
+    
+    <bpmn:dataObject id="DataStore_CashDB" />
+    <dataStoreReference id="DataStore_CashDatabase" dataStoreRef="DataStore_CashDB" name="Cash Database"/> <exclusiveGateway id="XOR_IsQueryEmpty" name="Is Query Empty?"> <incoming>Flow_Acc_Filter_ToXOR</incoming> <outgoing>Flow_Acc_XOR_ToPrint</outgoing> <outgoing>Flow_Acc_XOR_ToNoReport</outgoing> </exclusiveGateway> <task id="Task_PrintReport" name="Print Cash-Out Report"> 
+      <dataOutputAssociation id="assoc_print_report">  <targetRef>DataRef_CashOutReport</targetRef> </dataOutputAssociation>
+      <incoming>Flow_Acc_XOR_ToPrint</incoming> <outgoing>Flow_Acc_Print_ToSend</outgoing> </task> 
+    
+    <dataObject id="Data_CashOutReport" />
+    <bpmn:dataObjectReference id="DataRef_CashOutReport" dataObjectRef="Data_CashOutReport" name="Cash-Out Report" />
+
+     <intermediateThrowEvent id="MessageThrow_SendReport" name="Send Report"> <incoming>Flow_Acc_Print_ToSend</incoming> <outgoing>Flow_Acc_Send_ToEnd_Sent</outgoing> <messageEventDefinition id="MsgDef_CashOutReport_Send"/> </intermediateThrowEvent> <endEvent id="EndEvent_ReportSent" name="End Report Sent"> <incoming>Flow_Acc_Send_ToEnd_Sent</incoming> </endEvent> <endEvent id="EndEvent_NoReport" name="No Cash-Out"> <incoming>Flow_Acc_XOR_ToNoReport</incoming> </endEvent> <!-- Sequence Flows (Accountant) --> <sequenceFlow id="Flow_Acc_Start_ToWait" sourceRef="StartEvent_Accountant" targetRef="MessageCatch_ReportOrder"/> <sequenceFlow id="Flow_Acc_Wait_ToFilter" sourceRef="MessageCatch_ReportOrder" targetRef="Task_FilterCashTransactions"/> <sequenceFlow id="Flow_Acc_Filter_ToXOR" sourceRef="Task_FilterCashTransactions" targetRef="XOR_IsQueryEmpty"/> <sequenceFlow id="Flow_Acc_XOR_ToPrint" sourceRef="XOR_IsQueryEmpty" targetRef="Task_PrintReport"> <conditionExpression xsi:type="tFormalExpression"><![CDATA[queryNotEmpty]]></conditionExpression> </sequenceFlow> <sequenceFlow id="Flow_Acc_Print_ToSend" sourceRef="Task_PrintReport" targetRef="MessageThrow_SendReport"/> <sequenceFlow id="Flow_Acc_Send_ToEnd_Sent" sourceRef="MessageThrow_SendReport" targetRef="EndEvent_ReportSent"/> <sequenceFlow id="Flow_Acc_XOR_ToNoReport" sourceRef="XOR_IsQueryEmpty" targetRef="EndEvent_NoReport"> <conditionExpression xsi:type="tFormalExpression"><![CDATA[queryEmpty]]></conditionExpression> </sequenceFlow>  </process> 
+
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_1">
+      <bpmndi:BPMNShape id="ParticipantShape_Management" bpmnElement="ManagementPool" isHorizontal="true">
+        <omgdc:Bounds x="160" y="100" width="1220" height="608" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="LaneShape_AccountantLane" bpmnElement="AccountantLane" isHorizontal="true">
+        <omgdc:Bounds x="180" y="420" width="1200" height="320" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="LaneShape_ManagementLane" bpmnElement="ManagementLane" isHorizontal="true">
+        <omgdc:Bounds x="180" y="120" width="1200" height="588" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_StartEvent_Management" bpmnElement="StartEvent_Management">
+        <omgdc:Bounds x="230" y="230" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="236" y="266" width="24" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Task_OrderReport" bpmnElement="Task_OrderReport">
+        <omgdc:Bounds x="330" y="220" width="100" height="56" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_MessageThrow_OrderReport" bpmnElement="MessageThrow_OrderReport">
+        <omgdc:Bounds x="480" y="230" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="467" y="266" width="63" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_MessageCatch_ReceiveReport" bpmnElement="MessageCatch_ReceiveReport">
+        <omgdc:Bounds x="860" y="230" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="842" y="266" width="73" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_StartEvent_Accountant" bpmnElement="StartEvent_Accountant">
+        <omgdc:Bounds x="230" y="515" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="236" y="551" width="24" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_MessageCatch_ReportOrder" bpmnElement="MessageCatch_ReportOrder">
+        <omgdc:Bounds x="330" y="515" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="311" y="551" width="74" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Task_FilterCashTransactions" bpmnElement="Task_FilterCashTransactions">
+        <omgdc:Bounds x="430" y="500" width="120" height="56" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_XOR_IsQueryEmpty" bpmnElement="XOR_IsQueryEmpty" isMarkerVisible="true">
+        <omgdc:Bounds x="620" y="520" width="40" height="40" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="599" y="496" width="82" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Task_PrintReport" bpmnElement="Task_PrintReport">
+        <omgdc:Bounds x="710" y="500" width="120" height="56" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_MessageThrow_SendReport" bpmnElement="MessageThrow_SendReport">
+        <omgdc:Bounds x="880" y="515" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="867" y="551" width="63" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_DataRef_YearMonth" bpmnElement="DataRef_YearMonth" isExpanded="true">
+        <omgdc:Bounds x="360" y="152" width="40" height="36" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="341" y="128" width="77" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_EndEvent_OrderSent" bpmnElement="EndEvent_OrderSent">
+        <omgdc:Bounds x="580" y="226" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="565" y="262" width="66" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_EndEvent_Received" bpmnElement="EndEvent_Received">
+        <omgdc:Bounds x="960" y="226" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="937" y="262" width="82" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_EndEvent_NoReport" bpmnElement="EndEvent_NoReport">
+        <omgdc:Bounds x="722" y="612" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="708" y="648" width="65" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_DataRef_CashOutReport" bpmnElement="DataRef_CashOutReport" isExpanded="true">
+        <omgdc:Bounds x="820" y="592" width="60" height="36" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="808" y="628" width="84" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_DataRef_FilteredTransactions" bpmnElement="DataRef_FilteredTransactions" isExpanded="true">
+        <omgdc:Bounds x="520" y="592" width="60" height="36" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="518" y="628" width="64" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_EndEvent_ReportSent" bpmnElement="EndEvent_ReportSent">
+        <omgdc:Bounds x="1000" y="513" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="977" y="549" width="82" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Edge_Flow_Mgmt_Start_ToOrder" bpmnElement="Flow_Mgmt_Start_ToOrder">
+        <omgdi:waypoint x="266" y="248" />
+        <omgdi:waypoint x="330" y="248" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_Mgmt_Order_ToSend" bpmnElement="Flow_Mgmt_Order_ToSend">
+        <omgdi:waypoint x="430" y="248" />
+        <omgdi:waypoint x="480" y="248" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_Mgmt_Send_ToEndEventOrder" bpmnElement="Flow_Mgmt_Send_ToEndEventOrder">
+        <omgdi:waypoint x="516" y="246" />
+        <omgdi:waypoint x="580" y="246" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_Mgmt_ReceiveReport_ToEnd" bpmnElement="Flow_Mgmt_ReceiveReport_ToEnd">
+        <omgdi:waypoint x="896" y="246" />
+        <omgdi:waypoint x="960" y="246" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_Acc_Start_ToWait" bpmnElement="Flow_Acc_Start_ToWait">
+        <omgdi:waypoint x="266" y="533" />
+        <omgdi:waypoint x="330" y="533" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_Acc_Wait_ToFilter" bpmnElement="Flow_Acc_Wait_ToFilter">
+        <omgdi:waypoint x="366" y="533" />
+        <omgdi:waypoint x="430" y="528" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_Acc_Filter_ToXOR" bpmnElement="Flow_Acc_Filter_ToXOR">
+        <omgdi:waypoint x="550" y="528" />
+        <omgdi:waypoint x="620" y="540" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_Acc_XOR_ToPrint" bpmnElement="Flow_Acc_XOR_ToPrint">
+        <omgdi:waypoint x="660" y="540" />
+        <omgdi:waypoint x="710" y="528" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_Acc_Print_ToSend" bpmnElement="Flow_Acc_Print_ToSend">
+        <omgdi:waypoint x="830" y="528" />
+        <omgdi:waypoint x="880" y="533" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_Acc_Send_ToEnd_Sent" bpmnElement="Flow_Acc_Send_ToEnd_Sent">
+        <omgdi:waypoint x="916" y="532" />
+        <omgdi:waypoint x="1000" y="532" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_Acc_XOR_ToNoReport" bpmnElement="Flow_Acc_XOR_ToNoReport">
+        <omgdi:waypoint x="640" y="560" />
+        <omgdi:waypoint x="640" y="637" />
+        <omgdi:waypoint x="723" y="637" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Shape_DataStore_CashDatabase" bpmnElement="DataStore_CashDatabase" isExpanded="true">
+        <omgdc:Bounds x="400" y="620" width="50" height="36" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="387" y="656" width="77" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Edge_assoc_orderreport_dates" bpmnElement="assoc_orderreport_dates">
+        <omgdi:waypoint x="359" y="220" />
+        <omgdi:waypoint x="380" y="200" />
+        <omgdi:waypoint x="380" y="188" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_assoc_task_filter_db" bpmnElement="assoc_task_filter_db">
+        <omgdi:waypoint x="430" y="556" />
+        <omgdi:waypoint x="425" y="620" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_assoc_filter_transactions" bpmnElement="assoc_filter_transactions">
+        <omgdi:waypoint x="499" y="556" />
+        <omgdi:waypoint x="550" y="592" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_assoc_print_report" bpmnElement="assoc_print_report">
+        <omgdi:waypoint x="777" y="556" />
+        <omgdi:waypoint x="820" y="595" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0l6fyci_di" bpmnElement="Flow_0l6fyci">
+        <omgdi:waypoint x="483" y="258" />
+        <omgdi:waypoint x="348" y="515" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_030v8t8_di" bpmnElement="Flow_030v8t8">
+        <omgdi:waypoint x="898" y="515" />
+        <omgdi:waypoint x="880" y="266" />
+      </bpmndi:BPMNEdge>
+       <!-- Message Flows Between Pools --> <bpmndi:BPMNEdge id="Edge_MsgFlow_OrderReport" bpmnElement="MsgFlow_OrderReport"> <omgdi:waypoint x="488" y="230"/> <omgdi:waypoint x="338" y="515"/> </bpmndi:BPMNEdge> <bpmndi:BPMNEdge id="Edge_MsgFlow_Report" bpmnElement="MsgFlow_Report"> <omgdi:waypoint x="888" y="515"/> <omgdi:waypoint x="868" y="230"/> </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

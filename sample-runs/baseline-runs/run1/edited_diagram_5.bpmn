@@ -1,0 +1,306 @@
+<bpmn:definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_1" targetNamespace="http://example.com/bpmn" exporter="Camunda Modeler" exporterVersion="5.34.0" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd">
+    <message id="FeesNoticeMessage" name="Fees Notice"/>
+  <message id="FeePaymentMessage" name="Proof of Payment"/>
+  <bpmn:collaboration id="Collaboration_1">
+    <bpmn:participant id="OwnerParticipant" name="Owner" processRef="OwnerProcess"/>
+    <bpmn:participant id="TribunalParticipant" name="Tribunal" processRef="TribunalProcess"/>
+    <bpmn:messageFlow id="msg_OwnerToTribunal" name="Compensation Request" sourceRef="SendCompRequest" targetRef="TribunalStart"/>
+    <bpmn:messageFlow id="msg_TribunalToOwner_Fees" name="Fees Notice" sourceRef="SendFeesNotice" targetRef="ReceiveFeesNotice"/>
+    <bpmn:messageFlow id="msg_OwnerToTribunal_Payment" name="Proof of Payment" sourceRef="SendFeePayment" targetRef="ReceiveFeePayment"/>
+  </bpmn:collaboration>
+  <bpmn:process id="OwnerProcess" isExecutable="true">
+    <bpmn:laneSet>
+      <bpmn:lane id="OwnerLane" name="Owner">
+        <flowNodeRef>OwnerStart</flowNodeRef>
+        <flowNodeRef>PrepareRequest</flowNodeRef>
+        <flowNodeRef>OwnerEnd</flowNodeRef>
+        <flowNodeRef>SendCompRequest</flowNodeRef>
+        <flowNodeRef>ReceiveFeesNotice</flowNodeRef>
+        <flowNodeRef>PayFees</flowNodeRef>
+        <flowNodeRef>SendFeePayment</flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="OwnerStart" name="Submit Compensation Request"/>
+    <bpmn:task id="PrepareRequest" name="Prepare Compensation Request"/>
+    <bpmn:endEvent id="OwnerEnd" name="Wait for Tribunal Processing"/>
+    <intermediateThrowEvent id="SendCompRequest" name="Send Request to Tribunal">
+      <bpmn:messageEventDefinition id="MessageEventDefinition1" messageRef="CompensationRequestMessage"/>
+    </intermediateThrowEvent>
+    <bpmn:intermediateCatchEvent id="ReceiveFeesNotice" name="Receive Fees Notice">
+      <bpmn:messageEventDefinition id="MessageEventDefinition_ReceiveFeesNotice" messageRef="FeesNoticeMessage"/>
+    </bpmn:intermediateCatchEvent>
+    <bpmn:task id="PayFees" name="Pay Fees"/>
+    <intermediateThrowEvent id="SendFeePayment" name="Send Proof of Payment to Tribunal">
+      <bpmn:messageEventDefinition id="MessageEventDefinition_SendFeePayment" messageRef="FeePaymentMessage"/>
+    </intermediateThrowEvent>
+    <dataObjectReference id="CompensationRequestObjRef" name="Compensation Request"/>
+    <bpmn:sequenceFlow id="flowO1" sourceRef="OwnerStart" targetRef="PrepareRequest"/>
+    <bpmn:sequenceFlow id="flowO2" sourceRef="PrepareRequest" targetRef="SendCompRequest"/>
+    <bpmn:sequenceFlow id="flowO3" sourceRef="SendCompRequest" targetRef="OwnerEnd"/>
+    <bpmn:sequenceFlow id="flowO5" sourceRef="ReceiveFeesNotice" targetRef="PayFees"/>
+    <bpmn:sequenceFlow id="flowO6" sourceRef="PayFees" targetRef="SendFeePayment"/>
+  </bpmn:process>
+  <bpmn:process id="TribunalProcess" isExecutable="true">
+    <bpmn:laneSet>
+      <bpmn:lane id="CashierLane" name="Cashier">
+        <flowNodeRef>TribunalStart</flowNodeRef>
+        <flowNodeRef>RetrieveFile</flowNodeRef>
+        <flowNodeRef>CheckAcceptability</flowNodeRef>
+        <flowNodeRef>CheckCompliance</flowNodeRef>
+        <flowNodeRef>FeesPaidGateway</flowNodeRef>
+        <flowNodeRef>AllocateHearing</flowNodeRef>
+        <flowNodeRef>TribunalEnd</flowNodeRef>
+        <flowNodeRef>ProduceFeesNotice</flowNodeRef>
+        <flowNodeRef>SendFeesNotice</flowNodeRef>
+        <flowNodeRef>ReceiveFeePayment</flowNodeRef>
+        <flowNodeRef>ReCheckCompliance</flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="TribunalStart" name="Receive Compensation Request">
+      <bpmn:dataOutputAssociation id="InputAssoc_TribunalStart">
+        <bpmn:targetRef>CompensationRequestObjRef_T</bpmn:targetRef>
+      </bpmn:dataOutputAssociation>
+      <bpmn:messageEventDefinition id="MessageEventDefinition2" messageRef="CompensationRequestMessage"/>
+    </bpmn:startEvent>
+    <bpmn:task id="RetrieveFile" name="Retrieve Premises File">
+      <property id="Input_PremisesFile_RF" name="__targetRef_placeholder1"/>
+      <bpmn:dataInputAssociation id="InputAssoc_RetrieveFile">
+        <bpmn:sourceRef>Input_PremisesFile_RF</bpmn:sourceRef>
+      </bpmn:dataInputAssociation>
+    </bpmn:task>
+    <bpmn:task id="CheckAcceptability" name="Check Request Acceptability"/>
+    <dataObjectReference id="CompensationRequestObjRef_T" name="Compensation Request"/>
+    <dataStoreReference id="PremisesFile" dataStoreRef="PremisesFileStore"/>
+    <bpmn:task id="CheckCompliance" name="Check Compliance with File">
+      <property id="Input_PremisesFile" name="__targetRef_placeholder"/>
+      <bpmn:dataInputAssociation id="InputAssoc_CheckCompliance">
+        <bpmn:sourceRef>Input_PremisesFile</bpmn:sourceRef>
+      </bpmn:dataInputAssociation>
+    </bpmn:task>
+    <gateway id="FeesPaidGateway" name="Fees Paid?" gatewayDirection="Diverging"/>
+    <bpmn:task id="AllocateHearing" name="Allocate Hearing Date"/>
+    <bpmn:endEvent id="TribunalEnd" name="Finish Processing"/>
+    <bpmn:task id="ProduceFeesNotice" name="Produce Fees Notice"/>
+    <intermediateThrowEvent id="SendFeesNotice" name="Send Fees Notice to Owner">
+      <bpmn:messageEventDefinition id="MessageEventDefinition3" messageRef="FeesNoticeMessage"/>
+    </intermediateThrowEvent>
+    <bpmn:intermediateCatchEvent id="ReceiveFeePayment" name="Receive Proof of Payment">
+      <bpmn:messageEventDefinition id="MessageEventDefinition4" messageRef="FeePaymentMessage"/>
+    </bpmn:intermediateCatchEvent>
+    <bpmn:task id="ReCheckCompliance" name="Reassess Document Compliance"/>
+    <bpmn:sequenceFlow id="t_flow1" sourceRef="TribunalStart" targetRef="RetrieveFile"/>
+    <bpmn:sequenceFlow id="t_flow2" sourceRef="RetrieveFile" targetRef="CheckAcceptability"/>
+    <bpmn:sequenceFlow id="t_data1" sourceRef="CheckAcceptability" targetRef="CheckCompliance"/>
+    <bpmn:sequenceFlow id="t_flow3" sourceRef="CheckCompliance" targetRef="FeesPaidGateway"/>
+    <bpmn:sequenceFlow id="t_flowN4" sourceRef="ReCheckCompliance" targetRef="FeesPaidGateway"/>
+    <bpmn:sequenceFlow id="t_flowPaid" sourceRef="FeesPaidGateway" targetRef="AllocateHearing">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">Owner has paid</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="t_flowUnpaid" sourceRef="FeesPaidGateway" targetRef="ProduceFeesNotice">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">Owner has NOT paid</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="t_flowPaid2" sourceRef="AllocateHearing" targetRef="TribunalEnd"/>
+    <bpmn:sequenceFlow id="t_flowN1" sourceRef="ProduceFeesNotice" targetRef="SendFeesNotice"/>
+    <bpmn:sequenceFlow id="t_flowN2" sourceRef="SendFeesNotice" targetRef="ReceiveFeePayment"/>
+    <bpmn:sequenceFlow id="t_flowN3" sourceRef="ReceiveFeePayment" targetRef="ReCheckCompliance"/>
+      <dataObject id="PremisesFileStore" />
+  <dataStoreReference id="dataStoreReference_f1333a5d" name="Premises File Store" dataStoreRef="PremisesFileStore"/>
+  </bpmn:process>
+
+<message id="CompensationRequestMessage" name="Compensation Request"/>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_1">
+      <bpmndi:BPMNShape id="OwnerParticipant_di" bpmnElement="OwnerParticipant" isHorizontal="true">
+        <dc:Bounds x="140" y="100" width="1540" height="350" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="OwnerLane_di" bpmnElement="OwnerLane" isHorizontal="true">
+        <dc:Bounds x="140" y="100" width="1540" height="350" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="OwnerStart_di" bpmnElement="OwnerStart">
+        <dc:Bounds x="200" y="250" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="PrepareRequest_di" bpmnElement="PrepareRequest">
+        <dc:Bounds x="300" y="240" width="100" height="56" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="OwnerEnd_di" bpmnElement="OwnerEnd">
+        <dc:Bounds x="540" y="250" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="SendCompRequest_di" bpmnElement="SendCompRequest">
+        <dc:Bounds x="450" y="245" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ReceiveFeesNotice_di" bpmnElement="ReceiveFeesNotice">
+        <dc:Bounds x="700" y="245" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="684" y="207.5" width="68" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="PayFees_di" bpmnElement="PayFees">
+        <dc:Bounds x="800" y="240" width="100" height="56" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="SendFeePayment_di" bpmnElement="SendFeePayment">
+        <dc:Bounds x="950" y="245" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="933" y="195" width="69" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CompensationRequestObjRef_di" bpmnElement="CompensationRequestObjRef">
+        <dc:Bounds x="310" y="350" width="36" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="flowO1_di" bpmnElement="flowO1">
+        <di:waypoint x="236" y="268" />
+        <di:waypoint x="300" y="268" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flowO2_di" bpmnElement="flowO2">
+        <di:waypoint x="400" y="268" />
+        <di:waypoint x="450" y="263" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flowO3_di" bpmnElement="flowO3">
+        <di:waypoint x="486" y="263" />
+        <di:waypoint x="540" y="268" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flowO5_di" bpmnElement="flowO5">
+        <di:waypoint x="736" y="263" />
+        <di:waypoint x="800" y="268" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flowO6_di" bpmnElement="flowO6">
+        <di:waypoint x="900" y="268" />
+        <di:waypoint x="950" y="263" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="TribunalParticipant_di" bpmnElement="TribunalParticipant" isHorizontal="true">
+        <dc:Bounds x="110" y="520" width="1570" height="420" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CashierLane_di" bpmnElement="CashierLane" isHorizontal="true">
+        <dc:Bounds x="140" y="520" width="1540" height="420" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TribunalStart_di" bpmnElement="TribunalStart">
+        <dc:Bounds x="200" y="700" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="RetrieveFile_di" bpmnElement="RetrieveFile">
+        <dc:Bounds x="300" y="695" width="100" height="56" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CheckAcceptability_di" bpmnElement="CheckAcceptability">
+        <dc:Bounds x="440" y="695" width="100" height="56" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CheckCompliance_di" bpmnElement="CheckCompliance">
+        <dc:Bounds x="580" y="695" width="120" height="56" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="FeesPaidGateway_di" bpmnElement="FeesPaidGateway">
+        <dc:Bounds x="740" y="708" width="40" height="40" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="674" y="721" width="56" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ReCheckCompliance_di" bpmnElement="ReCheckCompliance">
+        <dc:Bounds x="1200" y="805" width="120" height="56" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CompensationRequestObjRef_T_di" bpmnElement="CompensationRequestObjRef_T">
+        <dc:Bounds x="322" y="803" width="36" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="305" y="853" width="71" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="AllocateHearing_di" bpmnElement="AllocateHearing">
+        <dc:Bounds x="835" y="632" width="110" height="56" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ReceiveFeePayment_di" bpmnElement="ReceiveFeePayment">
+        <dc:Bounds x="1122" y="810" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1099" y="846" width="83" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="SendFeesNotice_di" bpmnElement="SendFeesNotice">
+        <dc:Bounds x="992" y="810" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="966" y="846" width="88" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ProduceFeesNotice_di" bpmnElement="ProduceFeesNotice">
+        <dc:Bounds x="830" y="800" width="120" height="56" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TribunalEnd_di" bpmnElement="TribunalEnd">
+        <dc:Bounds x="1052" y="630" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1027" y="666" width="87" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="t_flow1_di" bpmnElement="t_flow1">
+        <di:waypoint x="236" y="718" />
+        <di:waypoint x="300" y="723" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="t_flow2_di" bpmnElement="t_flow2">
+        <di:waypoint x="400" y="723" />
+        <di:waypoint x="440" y="723" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="t_data1_di" bpmnElement="t_data1">
+        <di:waypoint x="540" y="723" />
+        <di:waypoint x="580" y="723" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="t_flow3_di" bpmnElement="t_flow3">
+        <di:waypoint x="700" y="723" />
+        <di:waypoint x="740" y="728" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="t_flowN4_di" bpmnElement="t_flowN4">
+        <di:waypoint x="1260" y="805" />
+        <di:waypoint x="1260" y="730" />
+        <di:waypoint x="780" y="728" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="t_flowPaid_di" bpmnElement="t_flowPaid">
+        <di:waypoint x="760" y="708" />
+        <di:waypoint x="760" y="666" />
+        <di:waypoint x="835" y="666" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="t_flowUnpaid_di" bpmnElement="t_flowUnpaid">
+        <di:waypoint x="760" y="748" />
+        <di:waypoint x="760" y="828" />
+        <di:waypoint x="830" y="828" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="t_flowPaid2_di" bpmnElement="t_flowPaid2">
+        <di:waypoint x="945" y="651" />
+        <di:waypoint x="1052" y="651" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="t_flowN1_di" bpmnElement="t_flowN1">
+        <di:waypoint x="950" y="828" />
+        <di:waypoint x="992" y="828" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="t_flowN2_di" bpmnElement="t_flowN2">
+        <di:waypoint x="1028" y="828" />
+        <di:waypoint x="1122" y="828" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="t_flowN3_di" bpmnElement="t_flowN3">
+        <di:waypoint x="1158" y="827" />
+        <di:waypoint x="1179" y="827" />
+        <di:waypoint x="1179" y="835" />
+        <di:waypoint x="1200" y="835" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="InputAssoc_TribunalStart_di" bpmnElement="InputAssoc_TribunalStart">
+        <di:waypoint x="234" y="726" />
+        <di:waypoint x="327" y="803" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="msg_OwnerToTribunal_di" bpmnElement="msg_OwnerToTribunal">
+        <di:waypoint x="468" y="245" />
+        <di:waypoint x="217" y="718" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="274" y="545" width="71" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="msg_TribunalToOwner_Fees_di" bpmnElement="msg_TribunalToOwner_Fees">
+        <di:waypoint x="992" y="828" />
+        <di:waypoint x="960" y="828" />
+        <di:waypoint x="960" y="546" />
+        <di:waypoint x="718" y="546" />
+        <di:waypoint x="718" y="281" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="930" y="697" width="60" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="msg_OwnerToTribunal_Payment_di" bpmnElement="msg_OwnerToTribunal_Payment">
+        <di:waypoint x="986" y="263" />
+        <di:waypoint x="1140" y="263" />
+        <di:waypoint x="1140" y="810" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1093" y="552" width="86" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

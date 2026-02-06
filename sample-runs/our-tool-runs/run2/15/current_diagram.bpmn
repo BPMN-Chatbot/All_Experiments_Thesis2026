@@ -1,0 +1,2511 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:color="http://www.omg.org/spec/BPMN/non-normative/color/1.0" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:modeler="http://camunda.org/schema/modeler/1.0" xmlns:custom="http://www.example.org/custom" id="Definitions_0tfrzsr" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.21.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.20.0">
+  <bpmn:collaboration id="Collaboration_1">
+    <bpmn:participant id="Participant_pool_0" name="Customer" processRef="Process_pool_0" />
+    <bpmn:participant id="Participant_pool_1" name="TELECO" processRef="Process_pool_1" />
+    <bpmn:participant id="Participant_pool_2" name="Service Management" processRef="Process_pool_2" />
+    <bpmn:participant id="Participant_pool_3" name="Resource Provisioning" processRef="Process_pool_3" />
+    <bpmn:messageFlow id="MessageFlow_0_event_3_ext_node_1" sourceRef="event_3" targetRef="ext_node_1" />
+    <bpmn:messageFlow id="MessageFlow_1_event_15_ext_node_2" sourceRef="event_15" targetRef="ext_node_2" />
+    <bpmn:messageFlow id="MessageFlow_2_event_23_ext_node_5" sourceRef="event_23" targetRef="ext_node_5" />
+    <bpmn:messageFlow id="MessageFlow_3_event_30_ext_node_10" sourceRef="event_30" targetRef="ext_node_10" />
+    <bpmn:messageFlow id="MessageFlow_4_event_35_ext_node_10" sourceRef="event_35" targetRef="ext_node_10" />
+    <bpmn:messageFlow id="MessageFlow_5_event_41_ext_node_3" sourceRef="event_41" targetRef="ext_node_3" />
+    <bpmn:messageFlow id="MessageFlow_6_event_46_ext_node_7" sourceRef="event_46" targetRef="ext_node_7" />
+    <bpmn:messageFlow id="MessageFlow_7_event_47_ext_node_11" sourceRef="event_47" targetRef="ext_node_11" />
+    <bpmn:messageFlow id="MessageFlow_8_event_49_ext_node_9" sourceRef="event_49" targetRef="ext_node_9" />
+    <bpmn:messageFlow id="MessageFlow_9_event_57_ext_node_4" sourceRef="event_57" targetRef="ext_node_4" />
+    <bpmn:messageFlow id="MessageFlow_10_event_62_ext_node_12" sourceRef="event_62" targetRef="ext_node_12" />
+  </bpmn:collaboration>
+  <bpmn:process id="Process_pool_0">
+    <bpmn:laneSet id="LaneSet_0">
+      <bpmn:lane id="lane_0_0" name="Customer">
+        <bpmn:flowNodeRef>node_1</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_2</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>event_3</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ext_node_10</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>node_4</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:dataObject id="DataObject_0_0" />
+    <bpmn:dataObject id="DataObject_0_1" />
+    <bpmn:startEvent id="node_1" name="Perceive Service Degradation">
+      <bpmn:extensionElements />
+      <bpmn:outgoing>Flow_node_1_task_2</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:dataObjectReference id="DataRef_0_0_task_2" name="Problem Parameters" dataObjectRef="DataObject_0_0" />
+    <bpmn:task id="task_2" name="Identify Problem Parameters">
+      <bpmn:extensionElements>
+        <camunda:executionListener expression="execution.setVariable(&#34;Problem_Parameters_0&#34;, &#34;Value_0_task_2_0&#34;)" event="start" />
+        <custom:parallelBlockIndex parallelBlockIndex="0" />
+        <custom:branchNesting branchNesting="0" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_node_1_task_2</bpmn:incoming>
+      <bpmn:outgoing>Flow_task_2_event_3</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:dataObjectReference id="DataRef_0_0_event_3" name="Problem Parameters" dataObjectRef="DataObject_0_0" />
+    <bpmn:intermediateThrowEvent id="event_3" name="Send Problem Parameters to Customer Service">
+      <bpmn:extensionElements>
+        <camunda:executionListener expression="${Problem_Parameters_0}" event="end" />
+        <custom:parallelBlockIndex parallelBlockIndex="0" />
+        <custom:branchNesting branchNesting="0" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_task_2_event_3</bpmn:incoming>
+      <bpmn:outgoing>Flow_event_3_ext_node_10</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_event_3" messageRef="msg_0" />
+    </bpmn:intermediateThrowEvent>
+    <bpmn:dataObjectReference id="DataRef_0_1_ext_node_10" name="Service Performance Report" dataObjectRef="DataObject_0_1" />
+    <bpmn:intermediateCatchEvent id="ext_node_10" name="Receive Service Performance and Resolution Report">
+      <bpmn:extensionElements>
+        <camunda:executionListener expression="execution.setVariable(&#34;Service_Performance_Report_0&#34;, &#34;Value_0_ext_node_10_1&#34;)" event="start" />
+        <custom:parallelBlockIndex parallelBlockIndex="0" />
+        <custom:branchNesting branchNesting="0" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_event_3_ext_node_10</bpmn:incoming>
+      <bpmn:outgoing>Flow_ext_node_10_node_4</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_ext_node_10" messageRef="msg_3" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:sequenceFlow id="Flow_node_1_task_2" sourceRef="node_1" targetRef="task_2" />
+    <bpmn:sequenceFlow id="Flow_task_2_event_3" sourceRef="task_2" targetRef="event_3" />
+    <bpmn:sequenceFlow id="Flow_event_3_ext_node_10" sourceRef="event_3" targetRef="ext_node_10" />
+    <bpmn:sequenceFlow id="Flow_ext_node_10_node_4" sourceRef="ext_node_10" targetRef="node_4" />
+    <bpmn:endEvent id="node_4" name="Process Ends at Customer">
+      <bpmn:extensionElements>
+        <camunda:executionListener expression="execution.removeVariable(&#34;Service_Performance_Report_0&#34;)" event="end" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_ext_node_10_node_4</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:association id="DataAssociation_0_task_2_0_write" associationDirection="One" sourceRef="task_2" targetRef="DataRef_0_0_task_2" />
+    <bpmn:association id="DataAssociation_0_event_3_0_read" associationDirection="One" sourceRef="DataRef_0_0_event_3" targetRef="event_3" />
+    <bpmn:association id="DataAssociation_0_ext_node_10_1_write" associationDirection="One" sourceRef="ext_node_10" targetRef="DataRef_0_1_ext_node_10" />
+  </bpmn:process>
+  <bpmn:process id="Process_pool_1">
+    <bpmn:laneSet id="LaneSet_1">
+      <bpmn:lane id="lane_1_0" name="Customer Service">
+        <bpmn:flowNodeRef>ext_node_1</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_5</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_6</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_7</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_8</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>xor_9</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_10</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_11</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>xor_13</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_14</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>event_15</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ext_node_7</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>events-gateway_27</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ext_node_8</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>parallel_28</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_29</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>event_30</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>parallel_32</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ext_node_9</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>parallel_33</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_34</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>event_35</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>parallel_37</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>xor_38</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>node_39</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="lane_1_1" name="Service Management">
+        <bpmn:flowNodeRef>task_16</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>xor_17</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>event_18</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_19</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_20</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>event_21</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_22</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>event_23</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ext_node_6</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_24</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>event_25</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>xor_26</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="lane_1_2" name="Billing &#38; Collections">
+        <bpmn:flowNodeRef>task_31</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_36</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:dataObject id="DataObject_1_0" />
+    <bpmn:dataObject id="DataObject_1_1" />
+    <bpmn:dataObject id="DataObject_1_2" />
+    <bpmn:dataObject id="DataObject_1_3" />
+    <bpmn:dataObject id="DataObject_1_4" />
+    <bpmn:dataObject id="DataObject_1_5" />
+    <bpmn:dataObject id="DataObject_1_6" />
+    <bpmn:dataObject id="DataObject_1_7" />
+    <bpmn:dataObject id="DataObject_1_8" />
+    <bpmn:dataObject id="DataObject_1_9" />
+    <bpmn:dataObject id="DataObject_1_10" />
+    <bpmn:dataObjectReference id="DataRef_1_0_ext_node_1" name="Problem Parameters" dataObjectRef="DataObject_1_0" />
+    <bpmn:startEvent id="ext_node_1" name="Receive Problem Parameters from Customer">
+      <bpmn:extensionElements>
+        <camunda:executionListener expression="execution.setVariable(&#34;Problem_Parameters_1&#34;, &#34;Value_1_ext_node_1_0&#34;)" event="start" />
+      </bpmn:extensionElements>
+      <bpmn:outgoing>Flow_ext_node_1_task_5</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_ext_node_1" messageRef="msg_0" />
+    </bpmn:startEvent>
+    <bpmn:dataObjectReference id="DataRef_1_1_task_5" name="Problem Report" dataObjectRef="DataObject_1_1" />
+    <bpmn:dataObjectReference id="DataRef_1_0_task_5" name="Problem Parameters" dataObjectRef="DataObject_1_0" />
+    <bpmn:task id="task_5" name="Enter Problem Report into System T">
+      <bpmn:extensionElements>
+        <camunda:executionListener expression="execution.setVariable(&#34;Problem_Report_1&#34;, &#34;Value_1_task_5_1&#34;)" event="start" />
+        <camunda:executionListener expression="${Problem_Parameters_1}" event="end" />
+        <custom:parallelBlockIndex parallelBlockIndex="0" />
+        <custom:branchNesting branchNesting="0" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_ext_node_1_task_5</bpmn:incoming>
+      <bpmn:outgoing>Flow_task_5_task_6</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:dataObjectReference id="DataRef_1_1_task_6" name="Problem Report" dataObjectRef="DataObject_1_1" />
+    <bpmn:dataObjectReference id="DataRef_1_2_task_6" name="Customer SLA" dataObjectRef="DataObject_1_2" />
+    <bpmn:task id="task_6" name="Compare Problem Report to SLA">
+      <bpmn:extensionElements>
+        <camunda:executionListener expression="${Problem_Report_1}" event="end" />
+        <camunda:executionListener expression="${Customer_SLA_1}" event="end" />
+        <custom:parallelBlockIndex parallelBlockIndex="0" />
+        <custom:branchNesting branchNesting="0" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_task_5_task_6</bpmn:incoming>
+      <bpmn:outgoing>Flow_task_6_task_7</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:dataObjectReference id="DataRef_1_3_task_7" name="Counter Measures" dataObjectRef="DataObject_1_3" />
+    <bpmn:task id="task_7" name="Determine Counter Measures and Priorities">
+      <bpmn:extensionElements>
+        <camunda:executionListener expression="execution.setVariable(&#34;Counter_Measures_1&#34;, &#34;Value_1_task_7_3&#34;)" event="start" />
+        <custom:parallelBlockIndex parallelBlockIndex="0" />
+        <custom:branchNesting branchNesting="0" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_task_6_task_7</bpmn:incoming>
+      <bpmn:outgoing>Flow_task_7_task_8</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:dataObjectReference id="DataRef_1_4_task_8" name="Customer Significance" dataObjectRef="DataObject_1_4" />
+    <bpmn:serviceTask id="task_8" name="Determine Customer Significance">
+      <bpmn:extensionElements>
+        <camunda:executionListener expression="execution.setVariable(&#34;Customer_Significance_1&#34;, &#34;Value_1_task_8_4&#34;)" event="start" />
+        <custom:parallelBlockIndex parallelBlockIndex="0" />
+        <custom:branchNesting branchNesting="0" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_task_7_task_8</bpmn:incoming>
+      <bpmn:outgoing>Flow_task_8_xor_9</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="xor_9" name="Customer is Premium or Significant">
+      <bpmn:extensionElements>
+        <custom:parallelBlockIndex parallelBlockIndex="0" />
+        <custom:branchNesting branchNesting="0" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_task_8_xor_9</bpmn:incoming>
+      <bpmn:outgoing>Flow_xor_9_task_10</bpmn:outgoing>
+      <bpmn:outgoing>Flow_xor_9_task_11</bpmn:outgoing>
+      <bpmn:outgoing>Flow_xor_9_xor_13</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:task id="task_10" name="Link to Extra Problem Fix Process">
+      <bpmn:extensionElements>
+        <custom:parallelBlockIndex parallelBlockIndex="0" />
+        <custom:branchNesting branchNesting="0" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_xor_9_task_10</bpmn:incoming>
+      <bpmn:outgoing>Flow_task_10_xor_13</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:dataObjectReference id="DataRef_1_3_task_11" name="Counter Measures" dataObjectRef="DataObject_1_3" />
+    <bpmn:dataObjectReference id="DataRef_1_4_task_11" name="Customer Significance" dataObjectRef="DataObject_1_4" />
+    <bpmn:task id="task_11" name="Re-prioritize Counter Measures">
+      <bpmn:extensionElements>
+        <camunda:executionListener expression="execution.setVariable(&#34;Counter_Measures_1&#34;, &#34;Value_1_task_11_3&#34;)" event="start" />
+        <camunda:executionListener expression="${Counter_Measures_1}" event="end" />
+        <camunda:executionListener expression="${Customer_Significance_1}" event="end" />
+        <custom:parallelBlockIndex parallelBlockIndex="0" />
+        <custom:branchNesting branchNesting="0" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_xor_9_task_11</bpmn:incoming>
+      <bpmn:outgoing>Flow_task_11_xor_13</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:exclusiveGateway id="xor_13">
+      <bpmn:extensionElements>
+        <custom:parallelBlockIndex parallelBlockIndex="0" />
+        <custom:branchNesting branchNesting="0" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_task_10_xor_13</bpmn:incoming>
+      <bpmn:incoming>Flow_task_11_xor_13</bpmn:incoming>
+      <bpmn:incoming>Flow_xor_9_xor_13</bpmn:incoming>
+      <bpmn:outgoing>Flow_xor_13_task_14</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:dataObjectReference id="DataRef_1_5_task_14" name="Detailed Problem Report" dataObjectRef="DataObject_1_5" />
+    <bpmn:dataObjectReference id="DataRef_1_2_task_14" name="Customer SLA" dataObjectRef="DataObject_1_2" />
+    <bpmn:dataObjectReference id="DataRef_1_3_task_14" name="Counter Measures" dataObjectRef="DataObject_1_3" />
+    <bpmn:task id="task_14" name="Create Detailed Problem Report">
+      <bpmn:extensionElements>
+        <camunda:executionListener expression="execution.setVariable(&#34;Detailed_Problem_Report_1&#34;, &#34;Value_1_task_14_5&#34;)" event="start" />
+        <camunda:executionListener expression="${Customer_SLA_1}" event="end" />
+        <camunda:executionListener expression="${Counter_Measures_1}" event="end" />
+        <custom:parallelBlockIndex parallelBlockIndex="0" />
+        <custom:branchNesting branchNesting="0" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_xor_13_task_14</bpmn:incoming>
+      <bpmn:outgoing>Flow_task_14_event_15</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:dataObjectReference id="DataRef_1_5_event_15" name="Detailed Problem Report" dataObjectRef="DataObject_1_5" />
+    <bpmn:intermediateThrowEvent id="event_15" name="Send Detailed Problem Report to Service Management">
+      <bpmn:extensionElements>
+        <camunda:executionListener expression="${Detailed_Problem_Report_1}" event="end" />
+        <custom:parallelBlockIndex parallelBlockIndex="0" />
+        <custom:branchNesting branchNesting="0" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_task_14_event_15</bpmn:incoming>
+      <bpmn:outgoing>Flow_event_15_ext_node_7</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_event_15" messageRef="msg_1" />
+    </bpmn:intermediateThrowEvent>
+    <bpmn:dataObjectReference id="DataRef_1_7_ext_node_7" name="Status Report" dataObjectRef="DataObject_1_7" />
+    <bpmn:intermediateCatchEvent id="ext_node_7" name="Receive Status Report from Service Management">
+      <bpmn:extensionElements>
+        <camunda:executionListener expression="execution.setVariable(&#34;Status_Report_1&#34;, &#34;Value_1_ext_node_7_7&#34;)" event="start" />
+        <custom:parallelBlockIndex parallelBlockIndex="0" />
+        <custom:branchNesting branchNesting="0" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_event_15_ext_node_7</bpmn:incoming>
+      <bpmn:outgoing>Flow_ext_node_7_task_16</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_ext_node_7" messageRef="msg_6" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:dataObjectReference id="DataRef_1_8_task_16" name="Final Status Report" dataObjectRef="DataObject_1_8" />
+    <bpmn:dataObjectReference id="DataRef_1_7_task_16" name="Status Report" dataObjectRef="DataObject_1_7" />
+    <bpmn:task id="task_16" name="Prepare Final Status Report">
+      <bpmn:extensionElements>
+        <camunda:executionListener expression="execution.setVariable(&#34;Final_Status_Report_1&#34;, &#34;Value_1_task_16_8&#34;)" event="start" />
+        <camunda:executionListener expression="${Status_Report_1}" event="end" />
+        <custom:parallelBlockIndex parallelBlockIndex="0" />
+        <custom:branchNesting branchNesting="0" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_ext_node_7_task_16</bpmn:incoming>
+      <bpmn:outgoing>Flow_task_16_xor_17</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:exclusiveGateway id="xor_17" name="Counter Measure Path">
+      <bpmn:extensionElements>
+        <custom:parallelBlockIndex parallelBlockIndex="0" />
+        <custom:branchNesting branchNesting="0" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_task_16_xor_17</bpmn:incoming>
+      <bpmn:outgoing>Flow_xor_17_event_18</bpmn:outgoing>
+      <bpmn:outgoing>Flow_xor_17_task_19</bpmn:outgoing>
+      <bpmn:outgoing>Flow_xor_17_task_22</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:dataObjectReference id="DataRef_1_8_event_18" name="Final Status Report" dataObjectRef="DataObject_1_8" />
+    <bpmn:intermediateThrowEvent id="event_18" name="Send Actual Service Performance to Customer Service">
+      <bpmn:extensionElements>
+        <camunda:executionListener expression="${Final_Status_Report_1}" event="end" />
+        <custom:parallelBlockIndex parallelBlockIndex="0" />
+        <custom:branchNesting branchNesting="0" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_xor_17_event_18</bpmn:incoming>
+      <bpmn:outgoing>Flow_event_18_xor_26</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_event_18" />
+    </bpmn:intermediateThrowEvent>
+    <bpmn:task id="task_19" name="Undertake Corrective Actions">
+      <bpmn:extensionElements>
+        <custom:parallelBlockIndex parallelBlockIndex="0" />
+        <custom:branchNesting branchNesting="0" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_xor_17_task_19</bpmn:incoming>
+      <bpmn:outgoing>Flow_task_19_task_20</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:dataObjectReference id="DataRef_1_9_task_20" name="Problem Resolution Report" dataObjectRef="DataObject_1_9" />
+    <bpmn:task id="task_20" name="Create Problem Resolution Report">
+      <bpmn:extensionElements>
+        <camunda:executionListener expression="execution.setVariable(&#34;Problem_Resolution_Report_1&#34;, &#34;Value_1_task_20_9&#34;)" event="start" />
+        <custom:parallelBlockIndex parallelBlockIndex="0" />
+        <custom:branchNesting branchNesting="0" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_task_19_task_20</bpmn:incoming>
+      <bpmn:outgoing>Flow_task_20_event_21</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:dataObjectReference id="DataRef_1_9_event_21" name="Problem Resolution Report" dataObjectRef="DataObject_1_9" />
+    <bpmn:intermediateThrowEvent id="event_21" name="Send Problem Resolution Report to Customer Service">
+      <bpmn:extensionElements>
+        <camunda:executionListener expression="${Problem_Resolution_Report_1}" event="end" />
+        <custom:parallelBlockIndex parallelBlockIndex="0" />
+        <custom:branchNesting branchNesting="0" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_task_20_event_21</bpmn:incoming>
+      <bpmn:outgoing>Flow_event_21_xor_26</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_event_21" />
+    </bpmn:intermediateThrowEvent>
+    <bpmn:task id="task_22" name="Create Restoration Request">
+      <bpmn:extensionElements>
+        <custom:parallelBlockIndex parallelBlockIndex="0" />
+        <custom:branchNesting branchNesting="0" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_xor_17_task_22</bpmn:incoming>
+      <bpmn:outgoing>Flow_task_22_event_23</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:intermediateThrowEvent id="event_23" name="Send Restoration Request to Resource Provisioning">
+      <bpmn:extensionElements>
+        <custom:parallelBlockIndex parallelBlockIndex="0" />
+        <custom:branchNesting branchNesting="0" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_task_22_event_23</bpmn:incoming>
+      <bpmn:outgoing>Flow_event_23_ext_node_6</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_event_23" messageRef="msg_2" />
+    </bpmn:intermediateThrowEvent>
+    <bpmn:dataObjectReference id="DataRef_1_6_ext_node_6" name="Trouble Report" dataObjectRef="DataObject_1_6" />
+    <bpmn:intermediateCatchEvent id="ext_node_6" name="Receive Trouble-Shooting Report from Resource Provisioning">
+      <bpmn:extensionElements>
+        <camunda:executionListener expression="execution.setVariable(&#34;Trouble_Report_1&#34;, &#34;Value_1_ext_node_6_6&#34;)" event="start" />
+        <custom:parallelBlockIndex parallelBlockIndex="0" />
+        <custom:branchNesting branchNesting="0" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_event_23_ext_node_6</bpmn:incoming>
+      <bpmn:outgoing>Flow_ext_node_6_task_24</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_ext_node_6" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:dataObjectReference id="DataRef_1_9_task_24" name="Problem Resolution Report" dataObjectRef="DataObject_1_9" />
+    <bpmn:dataObjectReference id="DataRef_1_6_task_24" name="Trouble Report" dataObjectRef="DataObject_1_6" />
+    <bpmn:task id="task_24" name="Create Problem Resolution Report (from Trouble-Shooting Report)">
+      <bpmn:extensionElements>
+        <camunda:executionListener expression="execution.setVariable(&#34;Problem_Resolution_Report_1&#34;, &#34;Value_1_task_24_9&#34;)" event="start" />
+        <camunda:executionListener expression="${Trouble_Report_1}" event="end" />
+        <custom:parallelBlockIndex parallelBlockIndex="0" />
+        <custom:branchNesting branchNesting="0" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_ext_node_6_task_24</bpmn:incoming>
+      <bpmn:outgoing>Flow_task_24_event_25</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:dataObjectReference id="DataRef_1_9_event_25" name="Problem Resolution Report" dataObjectRef="DataObject_1_9" />
+    <bpmn:intermediateThrowEvent id="event_25" name="Send Problem Resolution Report to Customer Service">
+      <bpmn:extensionElements>
+        <camunda:executionListener expression="${Problem_Resolution_Report_1}" event="end" />
+        <custom:parallelBlockIndex parallelBlockIndex="0" />
+        <custom:branchNesting branchNesting="0" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_task_24_event_25</bpmn:incoming>
+      <bpmn:outgoing>Flow_event_25_xor_26</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_event_25" />
+    </bpmn:intermediateThrowEvent>
+    <bpmn:exclusiveGateway id="xor_26">
+      <bpmn:extensionElements>
+        <custom:parallelBlockIndex parallelBlockIndex="0" />
+        <custom:branchNesting branchNesting="0" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_event_18_xor_26</bpmn:incoming>
+      <bpmn:incoming>Flow_event_21_xor_26</bpmn:incoming>
+      <bpmn:incoming>Flow_event_25_xor_26</bpmn:incoming>
+      <bpmn:outgoing>Flow_xor_26_events-gateway_27</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:eventBasedGateway id="events-gateway_27">
+      <bpmn:extensionElements>
+        <custom:parallelBlockIndex parallelBlockIndex="0" />
+        <custom:branchNesting branchNesting="0" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_xor_26_events-gateway_27</bpmn:incoming>
+      <bpmn:outgoing>Flow_events-gateway_27_ext_node_8</bpmn:outgoing>
+      <bpmn:outgoing>Flow_events-gateway_27_ext_node_9</bpmn:outgoing>
+    </bpmn:eventBasedGateway>
+    <bpmn:dataObjectReference id="DataRef_1_8_ext_node_8" name="Final Status Report" dataObjectRef="DataObject_1_8" />
+    <bpmn:intermediateCatchEvent id="ext_node_8" name="Receive Actual Service Performance from Service Management">
+      <bpmn:extensionElements>
+        <camunda:executionListener expression="execution.setVariable(&#34;Final_Status_Report_1&#34;, &#34;Value_1_ext_node_8_8&#34;)" event="start" />
+        <custom:parallelBlockIndex parallelBlockIndex="0" />
+        <custom:branchNesting branchNesting="0" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_events-gateway_27_ext_node_8</bpmn:incoming>
+      <bpmn:outgoing>Flow_ext_node_8_parallel_28</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_ext_node_8" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:parallelGateway id="parallel_28">
+      <bpmn:extensionElements>
+        <custom:parallelBlockIndex parallelBlockIndex="0" />
+        <custom:branchNesting branchNesting="0" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_ext_node_8_parallel_28</bpmn:incoming>
+      <bpmn:outgoing>Flow_parallel_28_task_29</bpmn:outgoing>
+      <bpmn:outgoing>Flow_parallel_28_task_31</bpmn:outgoing>
+    </bpmn:parallelGateway>
+    <bpmn:dataObjectReference id="DataRef_1_8_task_29" name="Final Status Report" dataObjectRef="DataObject_1_8" />
+    <bpmn:task id="task_29" name="Create Report for Customer">
+      <bpmn:extensionElements>
+        <camunda:executionListener expression="${Final_Status_Report_1}" event="end" />
+        <custom:parallelBlockIndex parallelBlockIndex="0" />
+        <custom:branchNesting branchNesting="0.1" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_parallel_28_task_29</bpmn:incoming>
+      <bpmn:outgoing>Flow_task_29_event_30</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:dataObjectReference id="DataRef_1_8_event_30" name="Final Status Report" dataObjectRef="DataObject_1_8" />
+    <bpmn:intermediateThrowEvent id="event_30" name="Send Service Performance and Resolution Report to Customer">
+      <bpmn:extensionElements>
+        <camunda:executionListener expression="${Final_Status_Report_1}" event="end" />
+        <custom:parallelBlockIndex parallelBlockIndex="0" />
+        <custom:branchNesting branchNesting="0.1" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_task_29_event_30</bpmn:incoming>
+      <bpmn:outgoing>Flow_event_30_parallel_32</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_event_30" messageRef="msg_3" />
+    </bpmn:intermediateThrowEvent>
+    <bpmn:dataObjectReference id="DataRef_1_10_task_31" name="SLA Violation Rebate" dataObjectRef="DataObject_1_10" />
+    <bpmn:task id="task_31" name="Report SLA Violation Rebate to Billing &#38; Collections">
+      <bpmn:extensionElements>
+        <camunda:executionListener expression="execution.setVariable(&#34;SLA_Violation_Rebate_1&#34;, &#34;Value_1_task_31_10&#34;)" event="start" />
+        <custom:parallelBlockIndex parallelBlockIndex="0" />
+        <custom:branchNesting branchNesting="0.2" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_parallel_28_task_31</bpmn:incoming>
+      <bpmn:outgoing>Flow_task_31_parallel_32</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:parallelGateway id="parallel_32">
+      <bpmn:extensionElements>
+        <custom:parallelBlockIndex parallelBlockIndex="0" />
+        <custom:branchNesting branchNesting="0" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_event_30_parallel_32</bpmn:incoming>
+      <bpmn:incoming>Flow_task_31_parallel_32</bpmn:incoming>
+      <bpmn:outgoing>Flow_parallel_32_xor_38</bpmn:outgoing>
+    </bpmn:parallelGateway>
+    <bpmn:dataObjectReference id="DataRef_1_9_ext_node_9" name="Problem Resolution Report" dataObjectRef="DataObject_1_9" />
+    <bpmn:intermediateCatchEvent id="ext_node_9" name="Receive Problem Resolution Report from Service Management">
+      <bpmn:extensionElements>
+        <camunda:executionListener expression="execution.setVariable(&#34;Problem_Resolution_Report_1&#34;, &#34;Value_1_ext_node_9_9&#34;)" event="start" />
+        <custom:parallelBlockIndex parallelBlockIndex="0" />
+        <custom:branchNesting branchNesting="0" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_events-gateway_27_ext_node_9</bpmn:incoming>
+      <bpmn:outgoing>Flow_ext_node_9_parallel_33</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_ext_node_9" messageRef="msg_8" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:parallelGateway id="parallel_33">
+      <bpmn:extensionElements>
+        <custom:parallelBlockIndex parallelBlockIndex="0" />
+        <custom:branchNesting branchNesting="0" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_ext_node_9_parallel_33</bpmn:incoming>
+      <bpmn:outgoing>Flow_parallel_33_task_34</bpmn:outgoing>
+      <bpmn:outgoing>Flow_parallel_33_task_36</bpmn:outgoing>
+    </bpmn:parallelGateway>
+    <bpmn:dataObjectReference id="DataRef_1_9_task_34" name="Problem Resolution Report" dataObjectRef="DataObject_1_9" />
+    <bpmn:task id="task_34" name="Create Report for Customer (with Resolution)">
+      <bpmn:extensionElements>
+        <camunda:executionListener expression="${Problem_Resolution_Report_1}" event="end" />
+        <custom:parallelBlockIndex parallelBlockIndex="0" />
+        <custom:branchNesting branchNesting="0.1" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_parallel_33_task_34</bpmn:incoming>
+      <bpmn:outgoing>Flow_task_34_event_35</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:dataObjectReference id="DataRef_1_9_event_35" name="Problem Resolution Report" dataObjectRef="DataObject_1_9" />
+    <bpmn:intermediateThrowEvent id="event_35" name="Send Service Performance and Resolution Report to Customer">
+      <bpmn:extensionElements>
+        <camunda:executionListener expression="${Problem_Resolution_Report_1}" event="end" />
+        <custom:parallelBlockIndex parallelBlockIndex="0" />
+        <custom:branchNesting branchNesting="0.1" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_task_34_event_35</bpmn:incoming>
+      <bpmn:outgoing>Flow_event_35_parallel_37</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_event_35" messageRef="msg_4" />
+    </bpmn:intermediateThrowEvent>
+    <bpmn:dataObjectReference id="DataRef_1_10_task_36" name="SLA Violation Rebate" dataObjectRef="DataObject_1_10" />
+    <bpmn:task id="task_36" name="Report SLA Violation Rebate to Billing &#38; Collections">
+      <bpmn:extensionElements>
+        <camunda:executionListener expression="execution.setVariable(&#34;SLA_Violation_Rebate_1&#34;, &#34;Value_1_task_36_10&#34;)" event="start" />
+        <custom:parallelBlockIndex parallelBlockIndex="0" />
+        <custom:branchNesting branchNesting="0.2" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_parallel_33_task_36</bpmn:incoming>
+      <bpmn:outgoing>Flow_task_36_parallel_37</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:parallelGateway id="parallel_37">
+      <bpmn:extensionElements>
+        <custom:parallelBlockIndex parallelBlockIndex="0" />
+        <custom:branchNesting branchNesting="0" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_event_35_parallel_37</bpmn:incoming>
+      <bpmn:incoming>Flow_task_36_parallel_37</bpmn:incoming>
+      <bpmn:outgoing>Flow_parallel_37_xor_38</bpmn:outgoing>
+    </bpmn:parallelGateway>
+    <bpmn:exclusiveGateway id="xor_38">
+      <bpmn:extensionElements>
+        <custom:parallelBlockIndex parallelBlockIndex="0" />
+        <custom:branchNesting branchNesting="0" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_parallel_32_xor_38</bpmn:incoming>
+      <bpmn:incoming>Flow_parallel_37_xor_38</bpmn:incoming>
+      <bpmn:outgoing>Flow_xor_38_node_39</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_ext_node_1_task_5" sourceRef="ext_node_1" targetRef="task_5" />
+    <bpmn:sequenceFlow id="Flow_task_5_task_6" sourceRef="task_5" targetRef="task_6" />
+    <bpmn:sequenceFlow id="Flow_task_6_task_7" sourceRef="task_6" targetRef="task_7" />
+    <bpmn:sequenceFlow id="Flow_task_7_task_8" sourceRef="task_7" targetRef="task_8" />
+    <bpmn:sequenceFlow id="Flow_task_8_xor_9" sourceRef="task_8" targetRef="xor_9" />
+    <bpmn:sequenceFlow id="Flow_xor_9_task_10" name="Premium" sourceRef="xor_9" targetRef="task_10" />
+    <bpmn:sequenceFlow id="Flow_task_10_xor_13" sourceRef="task_10" targetRef="xor_13" />
+    <bpmn:sequenceFlow id="Flow_xor_9_task_11" name="Significance Affects Counter Measures" sourceRef="xor_9" targetRef="task_11" />
+    <bpmn:sequenceFlow id="Flow_task_11_xor_13" sourceRef="task_11" targetRef="xor_13" />
+    <bpmn:sequenceFlow id="Flow_xor_9_xor_13" name="Continue" sourceRef="xor_9" targetRef="xor_13" />
+    <bpmn:sequenceFlow id="Flow_xor_13_task_14" sourceRef="xor_13" targetRef="task_14" />
+    <bpmn:sequenceFlow id="Flow_task_14_event_15" sourceRef="task_14" targetRef="event_15" />
+    <bpmn:sequenceFlow id="Flow_event_15_ext_node_7" sourceRef="event_15" targetRef="ext_node_7" />
+    <bpmn:sequenceFlow id="Flow_ext_node_7_task_16" sourceRef="ext_node_7" targetRef="task_16" />
+    <bpmn:sequenceFlow id="Flow_task_16_xor_17" sourceRef="task_16" targetRef="xor_17" />
+    <bpmn:sequenceFlow id="Flow_xor_17_event_18" name="No Problem Detected" sourceRef="xor_17" targetRef="event_18" />
+    <bpmn:sequenceFlow id="Flow_event_18_xor_26" sourceRef="event_18" targetRef="xor_26" />
+    <bpmn:sequenceFlow id="Flow_xor_17_task_19" name="Minor Corrective Actions" sourceRef="xor_17" targetRef="task_19" />
+    <bpmn:sequenceFlow id="Flow_task_19_task_20" sourceRef="task_19" targetRef="task_20" />
+    <bpmn:sequenceFlow id="Flow_task_20_event_21" sourceRef="task_20" targetRef="event_21" />
+    <bpmn:sequenceFlow id="Flow_event_21_xor_26" sourceRef="event_21" targetRef="xor_26" />
+    <bpmn:sequenceFlow id="Flow_xor_17_task_22" name="Automatic Resource Restoration Required" sourceRef="xor_17" targetRef="task_22" />
+    <bpmn:sequenceFlow id="Flow_task_22_event_23" sourceRef="task_22" targetRef="event_23" />
+    <bpmn:sequenceFlow id="Flow_event_23_ext_node_6" sourceRef="event_23" targetRef="ext_node_6" />
+    <bpmn:sequenceFlow id="Flow_ext_node_6_task_24" sourceRef="ext_node_6" targetRef="task_24" />
+    <bpmn:sequenceFlow id="Flow_task_24_event_25" sourceRef="task_24" targetRef="event_25" />
+    <bpmn:sequenceFlow id="Flow_event_25_xor_26" sourceRef="event_25" targetRef="xor_26" />
+    <bpmn:sequenceFlow id="Flow_xor_26_events-gateway_27" sourceRef="xor_26" targetRef="events-gateway_27" />
+    <bpmn:sequenceFlow id="Flow_events-gateway_27_ext_node_8" sourceRef="events-gateway_27" targetRef="ext_node_8" />
+    <bpmn:sequenceFlow id="Flow_ext_node_8_parallel_28" sourceRef="ext_node_8" targetRef="parallel_28" />
+    <bpmn:sequenceFlow id="Flow_parallel_28_task_29" sourceRef="parallel_28" targetRef="task_29" />
+    <bpmn:sequenceFlow id="Flow_task_29_event_30" sourceRef="task_29" targetRef="event_30" />
+    <bpmn:sequenceFlow id="Flow_event_30_parallel_32" sourceRef="event_30" targetRef="parallel_32" />
+    <bpmn:sequenceFlow id="Flow_parallel_28_task_31" sourceRef="parallel_28" targetRef="task_31" />
+    <bpmn:sequenceFlow id="Flow_task_31_parallel_32" sourceRef="task_31" targetRef="parallel_32" />
+    <bpmn:sequenceFlow id="Flow_parallel_32_xor_38" sourceRef="parallel_32" targetRef="xor_38" />
+    <bpmn:sequenceFlow id="Flow_events-gateway_27_ext_node_9" sourceRef="events-gateway_27" targetRef="ext_node_9" />
+    <bpmn:sequenceFlow id="Flow_ext_node_9_parallel_33" sourceRef="ext_node_9" targetRef="parallel_33" />
+    <bpmn:sequenceFlow id="Flow_parallel_33_task_34" sourceRef="parallel_33" targetRef="task_34" />
+    <bpmn:sequenceFlow id="Flow_task_34_event_35" sourceRef="task_34" targetRef="event_35" />
+    <bpmn:sequenceFlow id="Flow_event_35_parallel_37" sourceRef="event_35" targetRef="parallel_37" />
+    <bpmn:sequenceFlow id="Flow_parallel_33_task_36" sourceRef="parallel_33" targetRef="task_36" />
+    <bpmn:sequenceFlow id="Flow_task_36_parallel_37" sourceRef="task_36" targetRef="parallel_37" />
+    <bpmn:sequenceFlow id="Flow_parallel_37_xor_38" sourceRef="parallel_37" targetRef="xor_38" />
+    <bpmn:sequenceFlow id="Flow_xor_38_node_39" sourceRef="xor_38" targetRef="node_39" />
+    <bpmn:endEvent id="node_39" name="Process Ends at Customer Service">
+      <bpmn:extensionElements>
+        <camunda:executionListener expression="execution.removeVariable(&#34;SLA_Violation_Rebate_1&#34;)" event="end" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_xor_38_node_39</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:association id="DataAssociation_1_ext_node_1_0_write" associationDirection="One" sourceRef="ext_node_1" targetRef="DataRef_1_0_ext_node_1" />
+    <bpmn:association id="DataAssociation_1_task_5_1_write" associationDirection="One" sourceRef="task_5" targetRef="DataRef_1_1_task_5" />
+    <bpmn:association id="DataAssociation_1_task_5_0_read" associationDirection="One" sourceRef="DataRef_1_0_task_5" targetRef="task_5" />
+    <bpmn:association id="DataAssociation_1_task_6_1_read" associationDirection="One" sourceRef="DataRef_1_1_task_6" targetRef="task_6" />
+    <bpmn:association id="DataAssociation_1_task_6_2_read" associationDirection="One" sourceRef="DataRef_1_2_task_6" targetRef="task_6" />
+    <bpmn:association id="DataAssociation_1_task_7_3_write" associationDirection="One" sourceRef="task_7" targetRef="DataRef_1_3_task_7" />
+    <bpmn:association id="DataAssociation_1_task_8_4_write" associationDirection="One" sourceRef="task_8" targetRef="DataRef_1_4_task_8" />
+    <bpmn:association id="DataAssociation_1_task_11_3_write" associationDirection="One" sourceRef="task_11" targetRef="DataRef_1_3_task_11" />
+    <bpmn:association id="DataAssociation_1_task_11_3_read" associationDirection="One" sourceRef="DataRef_1_3_task_11" targetRef="task_11" />
+    <bpmn:association id="DataAssociation_1_task_11_4_read" associationDirection="One" sourceRef="DataRef_1_4_task_11" targetRef="task_11" />
+    <bpmn:association id="DataAssociation_1_task_14_5_write" associationDirection="One" sourceRef="task_14" targetRef="DataRef_1_5_task_14" />
+    <bpmn:association id="DataAssociation_1_task_14_2_read" associationDirection="One" sourceRef="DataRef_1_2_task_14" targetRef="task_14" />
+    <bpmn:association id="DataAssociation_1_task_14_3_read" associationDirection="One" sourceRef="DataRef_1_3_task_14" targetRef="task_14" />
+    <bpmn:association id="DataAssociation_1_event_15_5_read" associationDirection="One" sourceRef="DataRef_1_5_event_15" targetRef="event_15" />
+    <bpmn:association id="DataAssociation_1_ext_node_7_7_write" associationDirection="One" sourceRef="ext_node_7" targetRef="DataRef_1_7_ext_node_7" />
+    <bpmn:association id="DataAssociation_1_task_16_8_write" associationDirection="One" sourceRef="task_16" targetRef="DataRef_1_8_task_16" />
+    <bpmn:association id="DataAssociation_1_task_16_7_read" associationDirection="One" sourceRef="DataRef_1_7_task_16" targetRef="task_16" />
+    <bpmn:association id="DataAssociation_1_event_18_8_read" associationDirection="One" sourceRef="DataRef_1_8_event_18" targetRef="event_18" />
+    <bpmn:association id="DataAssociation_1_task_20_9_write" associationDirection="One" sourceRef="task_20" targetRef="DataRef_1_9_task_20" />
+    <bpmn:association id="DataAssociation_1_event_21_9_read" associationDirection="One" sourceRef="DataRef_1_9_event_21" targetRef="event_21" />
+    <bpmn:association id="DataAssociation_1_ext_node_6_6_write" associationDirection="One" sourceRef="ext_node_6" targetRef="DataRef_1_6_ext_node_6" />
+    <bpmn:association id="DataAssociation_1_task_24_9_write" associationDirection="One" sourceRef="task_24" targetRef="DataRef_1_9_task_24" />
+    <bpmn:association id="DataAssociation_1_task_24_6_read" associationDirection="One" sourceRef="DataRef_1_6_task_24" targetRef="task_24" />
+    <bpmn:association id="DataAssociation_1_event_25_9_read" associationDirection="One" sourceRef="DataRef_1_9_event_25" targetRef="event_25" />
+    <bpmn:association id="DataAssociation_1_ext_node_8_8_write" associationDirection="One" sourceRef="ext_node_8" targetRef="DataRef_1_8_ext_node_8" />
+    <bpmn:association id="DataAssociation_1_task_29_8_read" associationDirection="One" sourceRef="DataRef_1_8_task_29" targetRef="task_29" />
+    <bpmn:association id="DataAssociation_1_event_30_8_read" associationDirection="One" sourceRef="DataRef_1_8_event_30" targetRef="event_30" />
+    <bpmn:association id="DataAssociation_1_task_31_10_write" associationDirection="One" sourceRef="task_31" targetRef="DataRef_1_10_task_31" />
+    <bpmn:association id="DataAssociation_1_ext_node_9_9_write" associationDirection="One" sourceRef="ext_node_9" targetRef="DataRef_1_9_ext_node_9" />
+    <bpmn:association id="DataAssociation_1_task_34_9_read" associationDirection="One" sourceRef="DataRef_1_9_task_34" targetRef="task_34" />
+    <bpmn:association id="DataAssociation_1_event_35_9_read" associationDirection="One" sourceRef="DataRef_1_9_event_35" targetRef="event_35" />
+    <bpmn:association id="DataAssociation_1_task_36_10_write" associationDirection="One" sourceRef="task_36" targetRef="DataRef_1_10_task_36" />
+  </bpmn:process>
+  <bpmn:process id="Process_pool_2">
+    <bpmn:laneSet id="LaneSet_2">
+      <bpmn:lane id="lane_2_0" name="Service Management">
+        <bpmn:flowNodeRef>ext_node_2</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>xor_40</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>event_41</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ext_node_4</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_42</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_43</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_44</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>xor_45</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>event_46</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ext_node_5</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>event_47</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ext_node_12</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_48</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>event_49</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>node_50</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:dataObject id="DataObject_2_0" />
+    <bpmn:dataObject id="DataObject_2_1" />
+    <bpmn:dataObject id="DataObject_2_2" />
+    <bpmn:dataObject id="DataObject_2_3" />
+    <bpmn:dataObject id="DataObject_2_4" />
+    <bpmn:dataObject id="DataObject_2_5" />
+    <bpmn:dataObjectReference id="DataRef_2_0_ext_node_2" name="Detailed Problem Report" dataObjectRef="DataObject_2_0" />
+    <bpmn:startEvent id="ext_node_2" name="Receive Detailed Problem Report from Customer Service">
+      <bpmn:extensionElements>
+        <camunda:executionListener expression="execution.setVariable(&#34;Detailed_Problem_Report_2&#34;, &#34;Value_2_ext_node_2_0&#34;)" event="start" />
+      </bpmn:extensionElements>
+      <bpmn:outgoing>Flow_ext_node_2_xor_40</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_ext_node_2" messageRef="msg_1" />
+    </bpmn:startEvent>
+    <bpmn:exclusiveGateway id="xor_40" name="Problem Analyzable by Service Management?">
+      <bpmn:extensionElements>
+        <custom:parallelBlockIndex parallelBlockIndex="0" />
+        <custom:branchNesting branchNesting="0" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_ext_node_2_xor_40</bpmn:incoming>
+      <bpmn:outgoing>Flow_xor_40_event_41</bpmn:outgoing>
+      <bpmn:outgoing>Flow_xor_40_task_42</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:dataObjectReference id="DataRef_2_0_event_41" name="Detailed Problem Report" dataObjectRef="DataObject_2_0" />
+    <bpmn:intermediateThrowEvent id="event_41" name="Send Detailed Problem Report to Resource Provisioning">
+      <bpmn:extensionElements>
+        <camunda:executionListener expression="${Detailed_Problem_Report_2}" event="end" />
+        <custom:parallelBlockIndex parallelBlockIndex="0" />
+        <custom:branchNesting branchNesting="0" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_xor_40_event_41</bpmn:incoming>
+      <bpmn:outgoing>Flow_event_41_ext_node_4</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_event_41" messageRef="msg_5" />
+    </bpmn:intermediateThrowEvent>
+    <bpmn:dataObjectReference id="DataRef_2_2_ext_node_4" name="Status Report" dataObjectRef="DataObject_2_2" />
+    <bpmn:intermediateCatchEvent id="ext_node_4" name="Receive Status Report from Resource Provisioning">
+      <bpmn:extensionElements>
+        <camunda:executionListener expression="execution.setVariable(&#34;Status_Report_2&#34;, &#34;Value_2_ext_node_4_2&#34;)" event="start" />
+        <custom:parallelBlockIndex parallelBlockIndex="0" />
+        <custom:branchNesting branchNesting="0" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_event_41_ext_node_4</bpmn:incoming>
+      <bpmn:outgoing>Flow_ext_node_4_xor_45</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_ext_node_4" messageRef="msg_9" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:dataObjectReference id="DataRef_2_0_task_42" name="Detailed Problem Report" dataObjectRef="DataObject_2_0" />
+    <bpmn:task id="task_42" name="Analyze Problem">
+      <bpmn:extensionElements>
+        <camunda:executionListener expression="${Detailed_Problem_Report_2}" event="end" />
+        <custom:parallelBlockIndex parallelBlockIndex="0" />
+        <custom:branchNesting branchNesting="0" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_xor_40_task_42</bpmn:incoming>
+      <bpmn:outgoing>Flow_task_42_task_43</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:dataObjectReference id="DataRef_2_1_task_43" name="Trouble Report" dataObjectRef="DataObject_2_1" />
+    <bpmn:task id="task_43" name="Create Trouble Report">
+      <bpmn:extensionElements>
+        <camunda:executionListener expression="execution.setVariable(&#34;Trouble_Report_2&#34;, &#34;Value_2_task_43_1&#34;)" event="start" />
+        <custom:parallelBlockIndex parallelBlockIndex="0" />
+        <custom:branchNesting branchNesting="0" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_task_42_task_43</bpmn:incoming>
+      <bpmn:outgoing>Flow_task_43_task_44</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:dataObjectReference id="DataRef_2_2_task_44" name="Status Report" dataObjectRef="DataObject_2_2" />
+    <bpmn:dataObjectReference id="DataRef_2_1_task_44" name="Trouble Report" dataObjectRef="DataObject_2_1" />
+    <bpmn:task id="task_44" name="Create Status Report">
+      <bpmn:extensionElements>
+        <camunda:executionListener expression="execution.setVariable(&#34;Status_Report_2&#34;, &#34;Value_2_task_44_2&#34;)" event="start" />
+        <camunda:executionListener expression="${Trouble_Report_2}" event="end" />
+        <custom:parallelBlockIndex parallelBlockIndex="0" />
+        <custom:branchNesting branchNesting="0" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_task_43_task_44</bpmn:incoming>
+      <bpmn:outgoing>Flow_task_44_xor_45</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:exclusiveGateway id="xor_45">
+      <bpmn:extensionElements>
+        <custom:parallelBlockIndex parallelBlockIndex="0" />
+        <custom:branchNesting branchNesting="0" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_ext_node_4_xor_45</bpmn:incoming>
+      <bpmn:incoming>Flow_task_44_xor_45</bpmn:incoming>
+      <bpmn:outgoing>Flow_xor_45_event_46</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:dataObjectReference id="DataRef_2_2_event_46" name="Status Report" dataObjectRef="DataObject_2_2" />
+    <bpmn:intermediateThrowEvent id="event_46" name="Send Status Report to Customer Service">
+      <bpmn:extensionElements>
+        <camunda:executionListener expression="${Status_Report_2}" event="end" />
+        <custom:parallelBlockIndex parallelBlockIndex="0" />
+        <custom:branchNesting branchNesting="0" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_xor_45_event_46</bpmn:incoming>
+      <bpmn:outgoing>Flow_event_46_ext_node_5</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_event_46" messageRef="msg_6" />
+    </bpmn:intermediateThrowEvent>
+    <bpmn:dataObjectReference id="DataRef_2_4_ext_node_5" name="Restoration Request" dataObjectRef="DataObject_2_4" />
+    <bpmn:intermediateCatchEvent id="ext_node_5" name="Receive Restoration Request from Customer Service">
+      <bpmn:extensionElements>
+        <camunda:executionListener expression="execution.setVariable(&#34;Restoration_Request_2&#34;, &#34;Value_2_ext_node_5_4&#34;)" event="start" />
+        <custom:parallelBlockIndex parallelBlockIndex="0" />
+        <custom:branchNesting branchNesting="0" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_event_46_ext_node_5</bpmn:incoming>
+      <bpmn:outgoing>Flow_ext_node_5_event_47</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_ext_node_5" messageRef="msg_2" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:dataObjectReference id="DataRef_2_4_event_47" name="Restoration Request" dataObjectRef="DataObject_2_4" />
+    <bpmn:intermediateThrowEvent id="event_47" name="Send Restoration Request to Resource Provisioning">
+      <bpmn:extensionElements>
+        <camunda:executionListener expression="${Restoration_Request_2}" event="end" />
+        <custom:parallelBlockIndex parallelBlockIndex="0" />
+        <custom:branchNesting branchNesting="0" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_ext_node_5_event_47</bpmn:incoming>
+      <bpmn:outgoing>Flow_event_47_ext_node_12</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_event_47" messageRef="msg_7" />
+    </bpmn:intermediateThrowEvent>
+    <bpmn:dataObjectReference id="DataRef_2_5_ext_node_12" name="Trouble-Shooting Report" dataObjectRef="DataObject_2_5" />
+    <bpmn:intermediateCatchEvent id="ext_node_12" name="Receive Trouble-Shooting Report from Resource Provisioning">
+      <bpmn:extensionElements>
+        <camunda:executionListener expression="execution.setVariable(&#34;Trouble_Shooting_Report_2&#34;, &#34;Value_2_ext_node_12_5&#34;)" event="start" />
+        <custom:parallelBlockIndex parallelBlockIndex="0" />
+        <custom:branchNesting branchNesting="0" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_event_47_ext_node_12</bpmn:incoming>
+      <bpmn:outgoing>Flow_ext_node_12_task_48</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_ext_node_12" messageRef="msg_10" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:dataObjectReference id="DataRef_2_3_task_48" name="Final Status Report" dataObjectRef="DataObject_2_3" />
+    <bpmn:dataObjectReference id="DataRef_2_5_task_48" name="Trouble-Shooting Report" dataObjectRef="DataObject_2_5" />
+    <bpmn:dataObjectReference id="DataRef_2_4_task_48" name="Restoration Request" dataObjectRef="DataObject_2_4" />
+    <bpmn:task id="task_48" name="Create Problem Resolution Report (from Trouble-Shooting Report)">
+      <bpmn:extensionElements>
+        <camunda:executionListener expression="execution.setVariable(&#34;Final_Status_Report_2&#34;, &#34;Value_2_task_48_3&#34;)" event="start" />
+        <camunda:executionListener expression="${Trouble_Shooting_Report_2}" event="end" />
+        <camunda:executionListener expression="${Restoration_Request_2}" event="end" />
+        <custom:parallelBlockIndex parallelBlockIndex="0" />
+        <custom:branchNesting branchNesting="0" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_ext_node_12_task_48</bpmn:incoming>
+      <bpmn:outgoing>Flow_task_48_event_49</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:dataObjectReference id="DataRef_2_3_event_49" name="Final Status Report" dataObjectRef="DataObject_2_3" />
+    <bpmn:intermediateThrowEvent id="event_49" name="Send Problem Resolution Report to Customer Service">
+      <bpmn:extensionElements>
+        <camunda:executionListener expression="${Final_Status_Report_2}" event="end" />
+        <custom:parallelBlockIndex parallelBlockIndex="0" />
+        <custom:branchNesting branchNesting="0" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_task_48_event_49</bpmn:incoming>
+      <bpmn:outgoing>Flow_event_49_node_50</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_event_49" messageRef="msg_8" />
+    </bpmn:intermediateThrowEvent>
+    <bpmn:sequenceFlow id="Flow_ext_node_2_xor_40" sourceRef="ext_node_2" targetRef="xor_40" />
+    <bpmn:sequenceFlow id="Flow_xor_40_event_41" name="Not Analyzable" sourceRef="xor_40" targetRef="event_41" />
+    <bpmn:sequenceFlow id="Flow_event_41_ext_node_4" sourceRef="event_41" targetRef="ext_node_4" />
+    <bpmn:sequenceFlow id="Flow_ext_node_4_xor_45" sourceRef="ext_node_4" targetRef="xor_45" />
+    <bpmn:sequenceFlow id="Flow_xor_40_task_42" name="Analyzable" sourceRef="xor_40" targetRef="task_42" />
+    <bpmn:sequenceFlow id="Flow_task_42_task_43" sourceRef="task_42" targetRef="task_43" />
+    <bpmn:sequenceFlow id="Flow_task_43_task_44" sourceRef="task_43" targetRef="task_44" />
+    <bpmn:sequenceFlow id="Flow_task_44_xor_45" sourceRef="task_44" targetRef="xor_45" />
+    <bpmn:sequenceFlow id="Flow_xor_45_event_46" sourceRef="xor_45" targetRef="event_46" />
+    <bpmn:sequenceFlow id="Flow_event_46_ext_node_5" sourceRef="event_46" targetRef="ext_node_5" />
+    <bpmn:sequenceFlow id="Flow_ext_node_5_event_47" sourceRef="ext_node_5" targetRef="event_47" />
+    <bpmn:sequenceFlow id="Flow_event_47_ext_node_12" sourceRef="event_47" targetRef="ext_node_12" />
+    <bpmn:sequenceFlow id="Flow_ext_node_12_task_48" sourceRef="ext_node_12" targetRef="task_48" />
+    <bpmn:sequenceFlow id="Flow_task_48_event_49" sourceRef="task_48" targetRef="event_49" />
+    <bpmn:sequenceFlow id="Flow_event_49_node_50" sourceRef="event_49" targetRef="node_50" />
+    <bpmn:endEvent id="node_50" name="Process Ends at Service Management">
+      <bpmn:extensionElements />
+      <bpmn:incoming>Flow_event_49_node_50</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:association id="DataAssociation_2_ext_node_2_0_write" associationDirection="One" sourceRef="ext_node_2" targetRef="DataRef_2_0_ext_node_2" />
+    <bpmn:association id="DataAssociation_2_event_41_0_read" associationDirection="One" sourceRef="DataRef_2_0_event_41" targetRef="event_41" />
+    <bpmn:association id="DataAssociation_2_ext_node_4_2_write" associationDirection="One" sourceRef="ext_node_4" targetRef="DataRef_2_2_ext_node_4" />
+    <bpmn:association id="DataAssociation_2_task_42_0_read" associationDirection="One" sourceRef="DataRef_2_0_task_42" targetRef="task_42" />
+    <bpmn:association id="DataAssociation_2_task_43_1_write" associationDirection="One" sourceRef="task_43" targetRef="DataRef_2_1_task_43" />
+    <bpmn:association id="DataAssociation_2_task_44_2_write" associationDirection="One" sourceRef="task_44" targetRef="DataRef_2_2_task_44" />
+    <bpmn:association id="DataAssociation_2_task_44_1_read" associationDirection="One" sourceRef="DataRef_2_1_task_44" targetRef="task_44" />
+    <bpmn:association id="DataAssociation_2_event_46_2_read" associationDirection="One" sourceRef="DataRef_2_2_event_46" targetRef="event_46" />
+    <bpmn:association id="DataAssociation_2_ext_node_5_4_write" associationDirection="One" sourceRef="ext_node_5" targetRef="DataRef_2_4_ext_node_5" />
+    <bpmn:association id="DataAssociation_2_event_47_4_read" associationDirection="One" sourceRef="DataRef_2_4_event_47" targetRef="event_47" />
+    <bpmn:association id="DataAssociation_2_ext_node_12_5_write" associationDirection="One" sourceRef="ext_node_12" targetRef="DataRef_2_5_ext_node_12" />
+    <bpmn:association id="DataAssociation_2_task_48_3_write" associationDirection="One" sourceRef="task_48" targetRef="DataRef_2_3_task_48" />
+    <bpmn:association id="DataAssociation_2_task_48_5_read" associationDirection="One" sourceRef="DataRef_2_5_task_48" targetRef="task_48" />
+    <bpmn:association id="DataAssociation_2_task_48_4_read" associationDirection="One" sourceRef="DataRef_2_4_task_48" targetRef="task_48" />
+    <bpmn:association id="DataAssociation_2_event_49_3_read" associationDirection="One" sourceRef="DataRef_2_3_event_49" targetRef="event_49" />
+  </bpmn:process>
+  <bpmn:process id="Process_pool_3">
+    <bpmn:laneSet id="LaneSet_3">
+      <bpmn:lane id="lane_3_0" name="Resource Provisioning">
+        <bpmn:flowNodeRef>ext_node_3</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>xor_51</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_52</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_53</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_54</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>xor_55</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_56</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>event_57</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ext_node_11</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>event_58</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_59</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_60</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_61</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>event_62</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>node_63</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:dataObject id="DataObject_3_0" />
+    <bpmn:dataObject id="DataObject_3_1" />
+    <bpmn:dataObject id="DataObject_3_2" />
+    <bpmn:dataObject id="DataObject_3_3" />
+    <bpmn:dataObjectReference id="DataRef_3_0_ext_node_3" name="Detailed Problem Report" dataObjectRef="DataObject_3_0" />
+    <bpmn:startEvent id="ext_node_3" name="Receive Detailed Problem Report from Service Management">
+      <bpmn:extensionElements>
+        <camunda:executionListener expression="execution.setVariable(&#34;Detailed_Problem_Report_3&#34;, &#34;Value_3_ext_node_3_0&#34;)" event="start" />
+      </bpmn:extensionElements>
+      <bpmn:outgoing>Flow_ext_node_3_xor_51</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_ext_node_3" messageRef="msg_5" />
+    </bpmn:startEvent>
+    <bpmn:exclusiveGateway id="xor_51" name="Problem Detected?">
+      <bpmn:extensionElements>
+        <custom:parallelBlockIndex parallelBlockIndex="0" />
+        <custom:branchNesting branchNesting="0" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_ext_node_3_xor_51</bpmn:incoming>
+      <bpmn:outgoing>Flow_xor_51_task_52</bpmn:outgoing>
+      <bpmn:outgoing>Flow_xor_51_task_53</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:dataObjectReference id="DataRef_3_1_task_52" name="Status Report" dataObjectRef="DataObject_3_1" />
+    <bpmn:task id="task_52" name="Create Normal Service Execution Notification">
+      <bpmn:extensionElements>
+        <camunda:executionListener expression="execution.setVariable(&#34;Status_Report_3&#34;, &#34;Value_3_task_52_1&#34;)" event="start" />
+        <custom:parallelBlockIndex parallelBlockIndex="0" />
+        <custom:branchNesting branchNesting="0" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_xor_51_task_52</bpmn:incoming>
+      <bpmn:outgoing>Flow_task_52_xor_55</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:dataObjectReference id="DataRef_3_0_task_53" name="Detailed Problem Report" dataObjectRef="DataObject_3_0" />
+    <bpmn:task id="task_53" name="Analyze Problem">
+      <bpmn:extensionElements>
+        <camunda:executionListener expression="${Detailed_Problem_Report_3}" event="end" />
+        <custom:parallelBlockIndex parallelBlockIndex="0" />
+        <custom:branchNesting branchNesting="0" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_xor_51_task_53</bpmn:incoming>
+      <bpmn:outgoing>Flow_task_53_task_54</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:dataObjectReference id="DataRef_3_1_task_54" name="Status Report" dataObjectRef="DataObject_3_1" />
+    <bpmn:task id="task_54" name="Create Trouble Report">
+      <bpmn:extensionElements>
+        <camunda:executionListener expression="execution.setVariable(&#34;Status_Report_3&#34;, &#34;Value_3_task_54_1&#34;)" event="start" />
+        <custom:parallelBlockIndex parallelBlockIndex="0" />
+        <custom:branchNesting branchNesting="0" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_task_53_task_54</bpmn:incoming>
+      <bpmn:outgoing>Flow_task_54_xor_55</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:exclusiveGateway id="xor_55">
+      <bpmn:extensionElements>
+        <custom:parallelBlockIndex parallelBlockIndex="0" />
+        <custom:branchNesting branchNesting="0" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_task_52_xor_55</bpmn:incoming>
+      <bpmn:incoming>Flow_task_54_xor_55</bpmn:incoming>
+      <bpmn:outgoing>Flow_xor_55_task_56</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:dataObjectReference id="DataRef_3_1_task_56" name="Status Report" dataObjectRef="DataObject_3_1" />
+    <bpmn:task id="task_56" name="Create Status Report">
+      <bpmn:extensionElements>
+        <camunda:executionListener expression="execution.setVariable(&#34;Status_Report_3&#34;, &#34;Value_3_task_56_1&#34;)" event="start" />
+        <camunda:executionListener expression="${Status_Report_3}" event="end" />
+        <custom:parallelBlockIndex parallelBlockIndex="0" />
+        <custom:branchNesting branchNesting="0" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_xor_55_task_56</bpmn:incoming>
+      <bpmn:outgoing>Flow_task_56_event_57</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:dataObjectReference id="DataRef_3_1_event_57" name="Status Report" dataObjectRef="DataObject_3_1" />
+    <bpmn:intermediateThrowEvent id="event_57" name="Send Status Report to Service Management">
+      <bpmn:extensionElements>
+        <camunda:executionListener expression="${Status_Report_3}" event="end" />
+        <custom:parallelBlockIndex parallelBlockIndex="0" />
+        <custom:branchNesting branchNesting="0" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_task_56_event_57</bpmn:incoming>
+      <bpmn:outgoing>Flow_event_57_ext_node_11</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_event_57" messageRef="msg_9" />
+    </bpmn:intermediateThrowEvent>
+    <bpmn:dataObjectReference id="DataRef_3_2_ext_node_11" name="Restoration Request" dataObjectRef="DataObject_3_2" />
+    <bpmn:intermediateCatchEvent id="ext_node_11" name="Receive Restoration Request from Service Management">
+      <bpmn:extensionElements>
+        <camunda:executionListener expression="execution.setVariable(&#34;Restoration_Request_3&#34;, &#34;Value_3_ext_node_11_2&#34;)" event="start" />
+        <custom:parallelBlockIndex parallelBlockIndex="0" />
+        <custom:branchNesting branchNesting="0" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_event_57_ext_node_11</bpmn:incoming>
+      <bpmn:outgoing>Flow_ext_node_11_event_58</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_ext_node_11" messageRef="msg_7" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:intermediateCatchEvent id="event_58" name="Wait for Restoration Request (2 days)">
+      <bpmn:extensionElements>
+        <custom:parallelBlockIndex parallelBlockIndex="0" />
+        <custom:branchNesting branchNesting="0" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_ext_node_11_event_58</bpmn:incoming>
+      <bpmn:outgoing>Flow_event_58_task_59</bpmn:outgoing>
+      <bpmn:timerEventDefinition id="timerEventDefinition_event_58" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:dataObjectReference id="DataRef_3_2_task_59" name="Restoration Request" dataObjectRef="DataObject_3_2" />
+    <bpmn:task id="task_59" name="Track Errors">
+      <bpmn:extensionElements>
+        <camunda:executionListener expression="${Restoration_Request_3}" event="end" />
+        <custom:parallelBlockIndex parallelBlockIndex="0" />
+        <custom:branchNesting branchNesting="0" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_event_58_task_59</bpmn:incoming>
+      <bpmn:outgoing>Flow_task_59_task_60</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="task_60" name="Undertake Corrective Actions">
+      <bpmn:extensionElements>
+        <custom:parallelBlockIndex parallelBlockIndex="0" />
+        <custom:branchNesting branchNesting="0" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_task_59_task_60</bpmn:incoming>
+      <bpmn:outgoing>Flow_task_60_task_61</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:dataObjectReference id="DataRef_3_3_task_61" name="Trouble-Shooting Report" dataObjectRef="DataObject_3_3" />
+    <bpmn:task id="task_61" name="Create Trouble-Shooting Report">
+      <bpmn:extensionElements>
+        <camunda:executionListener expression="execution.setVariable(&#34;Trouble_Shooting_Report_3&#34;, &#34;Value_3_task_61_3&#34;)" event="start" />
+        <custom:parallelBlockIndex parallelBlockIndex="0" />
+        <custom:branchNesting branchNesting="0" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_task_60_task_61</bpmn:incoming>
+      <bpmn:outgoing>Flow_task_61_event_62</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:dataObjectReference id="DataRef_3_3_event_62" name="Trouble-Shooting Report" dataObjectRef="DataObject_3_3" />
+    <bpmn:intermediateThrowEvent id="event_62" name="Send Trouble-Shooting Report to Service Management">
+      <bpmn:extensionElements>
+        <camunda:executionListener expression="${Trouble_Shooting_Report_3}" event="end" />
+        <custom:parallelBlockIndex parallelBlockIndex="0" />
+        <custom:branchNesting branchNesting="0" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_task_61_event_62</bpmn:incoming>
+      <bpmn:outgoing>Flow_event_62_node_63</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_event_62" messageRef="msg_10" />
+    </bpmn:intermediateThrowEvent>
+    <bpmn:sequenceFlow id="Flow_ext_node_3_xor_51" sourceRef="ext_node_3" targetRef="xor_51" />
+    <bpmn:sequenceFlow id="Flow_xor_51_task_52" name="No Problem" sourceRef="xor_51" targetRef="task_52" />
+    <bpmn:sequenceFlow id="Flow_task_52_xor_55" sourceRef="task_52" targetRef="xor_55" />
+    <bpmn:sequenceFlow id="Flow_xor_51_task_53" name="Problem Detected" sourceRef="xor_51" targetRef="task_53" />
+    <bpmn:sequenceFlow id="Flow_task_53_task_54" sourceRef="task_53" targetRef="task_54" />
+    <bpmn:sequenceFlow id="Flow_task_54_xor_55" sourceRef="task_54" targetRef="xor_55" />
+    <bpmn:sequenceFlow id="Flow_xor_55_task_56" sourceRef="xor_55" targetRef="task_56" />
+    <bpmn:sequenceFlow id="Flow_task_56_event_57" sourceRef="task_56" targetRef="event_57" />
+    <bpmn:sequenceFlow id="Flow_event_57_ext_node_11" sourceRef="event_57" targetRef="ext_node_11" />
+    <bpmn:sequenceFlow id="Flow_ext_node_11_event_58" sourceRef="ext_node_11" targetRef="event_58" />
+    <bpmn:sequenceFlow id="Flow_event_58_task_59" sourceRef="event_58" targetRef="task_59" />
+    <bpmn:sequenceFlow id="Flow_task_59_task_60" sourceRef="task_59" targetRef="task_60" />
+    <bpmn:sequenceFlow id="Flow_task_60_task_61" sourceRef="task_60" targetRef="task_61" />
+    <bpmn:sequenceFlow id="Flow_task_61_event_62" sourceRef="task_61" targetRef="event_62" />
+    <bpmn:sequenceFlow id="Flow_event_62_node_63" sourceRef="event_62" targetRef="node_63" />
+    <bpmn:endEvent id="node_63" name="Process Ends at Resource Provisioning">
+      <bpmn:extensionElements />
+      <bpmn:incoming>Flow_event_62_node_63</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:association id="DataAssociation_3_ext_node_3_0_write" associationDirection="One" sourceRef="ext_node_3" targetRef="DataRef_3_0_ext_node_3" />
+    <bpmn:association id="DataAssociation_3_task_52_1_write" associationDirection="One" sourceRef="task_52" targetRef="DataRef_3_1_task_52" />
+    <bpmn:association id="DataAssociation_3_task_53_0_read" associationDirection="One" sourceRef="DataRef_3_0_task_53" targetRef="task_53" />
+    <bpmn:association id="DataAssociation_3_task_54_1_write" associationDirection="One" sourceRef="task_54" targetRef="DataRef_3_1_task_54" />
+    <bpmn:association id="DataAssociation_3_task_56_1_write" associationDirection="One" sourceRef="task_56" targetRef="DataRef_3_1_task_56" />
+    <bpmn:association id="DataAssociation_3_task_56_1_read" associationDirection="One" sourceRef="DataRef_3_1_task_56" targetRef="task_56" />
+    <bpmn:association id="DataAssociation_3_event_57_1_read" associationDirection="One" sourceRef="DataRef_3_1_event_57" targetRef="event_57" />
+    <bpmn:association id="DataAssociation_3_ext_node_11_2_write" associationDirection="One" sourceRef="ext_node_11" targetRef="DataRef_3_2_ext_node_11" />
+    <bpmn:association id="DataAssociation_3_task_59_2_read" associationDirection="One" sourceRef="DataRef_3_2_task_59" targetRef="task_59" />
+    <bpmn:association id="DataAssociation_3_task_61_3_write" associationDirection="One" sourceRef="task_61" targetRef="DataRef_3_3_task_61" />
+    <bpmn:association id="DataAssociation_3_event_62_3_read" associationDirection="One" sourceRef="DataRef_3_3_event_62" targetRef="event_62" />
+  </bpmn:process>
+  <bpmn:message id="msg_0" name="msg_0" />
+  <bpmn:message id="msg_1" name="msg_1" />
+  <bpmn:message id="msg_2" name="msg_2" />
+  <bpmn:message id="msg_3" name="msg_3" />
+  <bpmn:message id="msg_4" name="msg_4" />
+  <bpmn:message id="msg_5" name="msg_5" />
+  <bpmn:message id="msg_6" name="msg_6" />
+  <bpmn:message id="msg_7" name="msg_7" />
+  <bpmn:message id="msg_8" name="msg_8" />
+  <bpmn:message id="msg_9" name="msg_9" />
+  <bpmn:message id="msg_10" name="msg_10" />
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_1">
+      <bpmndi:BPMNShape id="Participant_pool_0_di" bpmnElement="Participant_pool_0" isHorizontal="true">
+        <dc:Bounds x="0" y="0" width="812" height="325" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="lane_0_0_di" bpmnElement="lane_0_0" isHorizontal="true">
+        <dc:Bounds x="30" y="0" width="782" height="325" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_node_1" bpmnElement="node_1">
+        <dc:Bounds x="140" y="79.5" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataObject_0_0_task_2_di" bpmnElement="DataRef_0_0_task_2">
+        <dc:Bounds x="246" y="175" width="35" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="246" y="230" width="35" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_task_2" bpmnElement="task_2">
+        <dc:Bounds x="246" y="50" width="120" height="95" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataObject_0_0_event_3_di" bpmnElement="DataRef_0_0_event_3">
+        <dc:Bounds x="436" y="165.5" width="35" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="436" y="220.5" width="35" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_event_3" bpmnElement="event_3">
+        <dc:Bounds x="436" y="79.5" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataObject_0_1_ext_node_10_di" bpmnElement="DataRef_0_1_ext_node_10">
+        <dc:Bounds x="571" y="165.5" width="35" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="571" y="220.5" width="35" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_ext_node_10" bpmnElement="ext_node_10">
+        <dc:Bounds x="571" y="79.5" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="_BPMNShape_node_4" bpmnElement="node_4">
+        <dc:Bounds x="706" y="79.5" width="36" height="36" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_node_1_task_2_di" bpmnElement="Flow_node_1_task_2">
+        <di:waypoint x="176" y="97.5" />
+        <di:waypoint x="246" y="97.5" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="191" y="82.5" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_task_2_event_3_di" bpmnElement="Flow_task_2_event_3">
+        <di:waypoint x="366" y="97.5" />
+        <di:waypoint x="436" y="97.5" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="381" y="82.5" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_event_3_ext_node_10_di" bpmnElement="Flow_event_3_ext_node_10">
+        <di:waypoint x="472" y="97.5" />
+        <di:waypoint x="571" y="97.5" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="487" y="82.5" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_ext_node_10_node_4_di" bpmnElement="Flow_ext_node_10_node_4">
+        <di:waypoint x="607" y="97.5" />
+        <di:waypoint x="706" y="97.5" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="622" y="82.5" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataAssociation_0_task_2_0_write_di" bpmnElement="DataAssociation_0_task_2_0_write">
+        <di:waypoint x="306" y="145" />
+        <di:waypoint x="263.5" y="175" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataAssociation_0_event_3_0_read_di" bpmnElement="DataAssociation_0_event_3_0_read">
+        <di:waypoint x="453.5" y="165.5" />
+        <di:waypoint x="454" y="115.5" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataAssociation_0_ext_node_10_1_write_di" bpmnElement="DataAssociation_0_ext_node_10_1_write">
+        <di:waypoint x="589" y="115.5" />
+        <di:waypoint x="588.5" y="165.5" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Participant_pool_1_di" bpmnElement="Participant_pool_1" isHorizontal="true">
+        <dc:Bounds x="0" y="375" width="4926.666666666666" height="2160.5" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="lane_1_2_di" bpmnElement="lane_1_2" isHorizontal="true">
+        <dc:Bounds x="30" y="2015.5" width="4896.666666666666" height="520" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="lane_1_1_di" bpmnElement="lane_1_1" isHorizontal="true">
+        <dc:Bounds x="30" y="1170" width="4896.666666666666" height="845.5" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="lane_1_0_di" bpmnElement="lane_1_0" isHorizontal="true">
+        <dc:Bounds x="30" y="375" width="4896.666666666666" height="795" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataObject_1_0_ext_node_1_di" bpmnElement="DataRef_1_0_ext_node_1">
+        <dc:Bounds x="140" y="540.5" width="35" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="140" y="595.5" width="35" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_ext_node_1" bpmnElement="ext_node_1">
+        <dc:Bounds x="140" y="454.5" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataObject_1_1_task_5_di" bpmnElement="DataRef_1_1_task_5">
+        <dc:Bounds x="275" y="550" width="35" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="275" y="605" width="35" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataObject_1_0_task_5_di" bpmnElement="DataRef_1_0_task_5">
+        <dc:Bounds x="340" y="550" width="35" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="340" y="605" width="35" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_task_5" bpmnElement="task_5">
+        <dc:Bounds x="275" y="425" width="120" height="95" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataObject_1_1_task_6_di" bpmnElement="DataRef_1_1_task_6">
+        <dc:Bounds x="475" y="550" width="35" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="475" y="605" width="35" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataObject_1_2_task_6_di" bpmnElement="DataRef_1_2_task_6">
+        <dc:Bounds x="540" y="550" width="35" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="540" y="605" width="35" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_task_6" bpmnElement="task_6">
+        <dc:Bounds x="475" y="425" width="120" height="95" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataObject_1_3_task_7_di" bpmnElement="DataRef_1_3_task_7">
+        <dc:Bounds x="675" y="550" width="35" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="675" y="605" width="35" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_task_7" bpmnElement="task_7">
+        <dc:Bounds x="675" y="425" width="129.33333333333331" height="95" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataObject_1_4_task_8_di" bpmnElement="DataRef_1_4_task_8">
+        <dc:Bounds x="874.3333333333333" y="550" width="35" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="874.3333333333333" y="605" width="35" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_task_8" bpmnElement="task_8">
+        <dc:Bounds x="874.3333333333333" y="425" width="120" height="95" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_xor_9" bpmnElement="xor_9" isMarkerVisible="true">
+        <dc:Bounds x="1064.3333333333333" y="454.5" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_task_10" bpmnElement="task_10">
+        <dc:Bounds x="1205.3333333333333" y="425" width="120" height="95" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataObject_1_3_task_11_di" bpmnElement="DataRef_1_3_task_11">
+        <dc:Bounds x="1205.3333333333333" y="720" width="35" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1205.3333333333333" y="775" width="35" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataObject_1_4_task_11_di" bpmnElement="DataRef_1_4_task_11">
+        <dc:Bounds x="1270.3333333333333" y="720" width="35" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1270.3333333333333" y="775" width="35" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_task_11" bpmnElement="task_11">
+        <dc:Bounds x="1205.3333333333333" y="595" width="120" height="95" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_xor_13" bpmnElement="xor_13" isMarkerVisible="true">
+        <dc:Bounds x="1470.3333333333333" y="454.5" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataObject_1_5_task_14_di" bpmnElement="DataRef_1_5_task_14">
+        <dc:Bounds x="1576.3333333333333" y="550" width="35" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1576.3333333333333" y="605" width="35" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataObject_1_2_task_14_di" bpmnElement="DataRef_1_2_task_14">
+        <dc:Bounds x="1641.3333333333333" y="550" width="35" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1641.3333333333333" y="605" width="35" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataObject_1_3_task_14_di" bpmnElement="DataRef_1_3_task_14">
+        <dc:Bounds x="1706.3333333333333" y="550" width="35" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1706.3333333333333" y="605" width="35" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_task_14" bpmnElement="task_14">
+        <dc:Bounds x="1576.3333333333333" y="425" width="120" height="95" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataObject_1_5_event_15_di" bpmnElement="DataRef_1_5_event_15">
+        <dc:Bounds x="1841.3333333333333" y="540.5" width="35" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1841.3333333333333" y="595.5" width="35" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_event_15" bpmnElement="event_15">
+        <dc:Bounds x="1841.3333333333333" y="454.5" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataObject_1_7_ext_node_7_di" bpmnElement="DataRef_1_7_ext_node_7">
+        <dc:Bounds x="1976.3333333333333" y="540.5" width="35" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1976.3333333333333" y="595.5" width="35" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_ext_node_7" bpmnElement="ext_node_7">
+        <dc:Bounds x="1976.3333333333333" y="454.5" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataObject_1_8_task_16_di" bpmnElement="DataRef_1_8_task_16">
+        <dc:Bounds x="2111.333333333333" y="1345" width="35" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2111.333333333333" y="1400" width="35" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataObject_1_7_task_16_di" bpmnElement="DataRef_1_7_task_16">
+        <dc:Bounds x="2176.333333333333" y="1345" width="35" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2176.333333333333" y="1400" width="35" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_task_16" bpmnElement="task_16">
+        <dc:Bounds x="2111.333333333333" y="1220" width="120" height="95" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_xor_17" bpmnElement="xor_17" isMarkerVisible="true">
+        <dc:Bounds x="2311.333333333333" y="1249.5" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataObject_1_8_event_18_di" bpmnElement="DataRef_1_8_event_18">
+        <dc:Bounds x="2452.333333333333" y="1335.5" width="35" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2452.333333333333" y="1390.5" width="35" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_event_18" bpmnElement="event_18">
+        <dc:Bounds x="2452.333333333333" y="1249.5" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_task_19" bpmnElement="task_19">
+        <dc:Bounds x="2452.333333333333" y="1465.5" width="120" height="95" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataObject_1_9_task_20_di" bpmnElement="DataRef_1_9_task_20">
+        <dc:Bounds x="2642.333333333333" y="1590.5" width="35" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2642.333333333333" y="1645.5" width="35" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_task_20" bpmnElement="task_20">
+        <dc:Bounds x="2642.333333333333" y="1465.5" width="120" height="95" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataObject_1_9_event_21_di" bpmnElement="DataRef_1_9_event_21">
+        <dc:Bounds x="2832.333333333333" y="1581" width="35" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2832.333333333333" y="1636" width="35" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_event_21" bpmnElement="event_21">
+        <dc:Bounds x="2832.333333333333" y="1495" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_task_22" bpmnElement="task_22">
+        <dc:Bounds x="2452.333333333333" y="1740.5" width="120" height="95" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_event_23" bpmnElement="event_23">
+        <dc:Bounds x="2642.333333333333" y="1770" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataObject_1_6_ext_node_6_di" bpmnElement="DataRef_1_6_ext_node_6">
+        <dc:Bounds x="2748.333333333333" y="1856" width="35" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2748.333333333333" y="1911" width="35" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_ext_node_6" bpmnElement="ext_node_6">
+        <dc:Bounds x="2748.333333333333" y="1770" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataObject_1_9_task_24_di" bpmnElement="DataRef_1_9_task_24">
+        <dc:Bounds x="2883.333333333333" y="1865.5" width="35" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2883.333333333333" y="1920.5" width="35" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataObject_1_6_task_24_di" bpmnElement="DataRef_1_6_task_24">
+        <dc:Bounds x="2948.333333333333" y="1865.5" width="35" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2948.333333333333" y="1920.5" width="35" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_task_24" bpmnElement="task_24">
+        <dc:Bounds x="2883.333333333333" y="1740.5" width="188" height="95" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataObject_1_9_event_25_di" bpmnElement="DataRef_1_9_event_25">
+        <dc:Bounds x="3141.333333333333" y="1856" width="35" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3141.333333333333" y="1911" width="35" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_event_25" bpmnElement="event_25">
+        <dc:Bounds x="3141.333333333333" y="1770" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_xor_26" bpmnElement="xor_26" isMarkerVisible="true">
+        <dc:Bounds x="3276.333333333333" y="1249.5" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_events-gateway_27" bpmnElement="events-gateway_27">
+        <dc:Bounds x="3382.333333333333" y="454.5" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataObject_1_8_ext_node_8_di" bpmnElement="DataRef_1_8_ext_node_8">
+        <dc:Bounds x="3488.333333333333" y="540.5" width="35" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3488.333333333333" y="595.5" width="35" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_ext_node_8" bpmnElement="ext_node_8">
+        <dc:Bounds x="3488.333333333333" y="454.5" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_parallel_28" bpmnElement="parallel_28">
+        <dc:Bounds x="3623.333333333333" y="454.5" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataObject_1_8_task_29_di" bpmnElement="DataRef_1_8_task_29">
+        <dc:Bounds x="3729.333333333333" y="550" width="35" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3729.333333333333" y="605" width="35" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_task_29" bpmnElement="task_29">
+        <dc:Bounds x="3729.333333333333" y="425" width="120" height="95" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataObject_1_8_event_30_di" bpmnElement="DataRef_1_8_event_30">
+        <dc:Bounds x="3919.333333333333" y="540.5" width="35" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3919.333333333333" y="595.5" width="35" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_event_30" bpmnElement="event_30">
+        <dc:Bounds x="3919.333333333333" y="454.5" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataObject_1_10_task_31_di" bpmnElement="DataRef_1_10_task_31">
+        <dc:Bounds x="3729.333333333333" y="2288" width="35" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3729.333333333333" y="2343" width="35" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_task_31" bpmnElement="task_31">
+        <dc:Bounds x="3729.333333333333" y="2163" width="158.66666666666666" height="95" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_parallel_32" bpmnElement="parallel_32">
+        <dc:Bounds x="4054.333333333333" y="454.5" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataObject_1_9_ext_node_9_di" bpmnElement="DataRef_1_9_ext_node_9">
+        <dc:Bounds x="3488.333333333333" y="913" width="35" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3488.333333333333" y="968" width="35" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_ext_node_9" bpmnElement="ext_node_9">
+        <dc:Bounds x="3488.333333333333" y="827" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_parallel_33" bpmnElement="parallel_33">
+        <dc:Bounds x="4160.333333333333" y="827" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataObject_1_9_task_34_di" bpmnElement="DataRef_1_9_task_34">
+        <dc:Bounds x="4266.333333333333" y="922.5" width="35" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="4266.333333333333" y="977.5" width="35" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_task_34" bpmnElement="task_34">
+        <dc:Bounds x="4266.333333333333" y="797.5" width="137.33333333333331" height="95" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataObject_1_9_event_35_di" bpmnElement="DataRef_1_9_event_35">
+        <dc:Bounds x="4473.666666666666" y="913" width="35" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="4473.666666666666" y="968" width="35" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_event_35" bpmnElement="event_35">
+        <dc:Bounds x="4473.666666666666" y="827" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataObject_1_10_task_36_di" bpmnElement="DataRef_1_10_task_36">
+        <dc:Bounds x="4266.333333333333" y="2385.5" width="35" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="4266.333333333333" y="2440.5" width="35" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_task_36" bpmnElement="task_36">
+        <dc:Bounds x="4266.333333333333" y="2260.5" width="158.66666666666666" height="95" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_parallel_37" bpmnElement="parallel_37">
+        <dc:Bounds x="4608.666666666666" y="827" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_xor_38" bpmnElement="xor_38" isMarkerVisible="true">
+        <dc:Bounds x="4714.666666666666" y="454.5" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="_BPMNShape_node_39" bpmnElement="node_39">
+        <dc:Bounds x="4820.666666666666" y="454.5" width="36" height="36" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_ext_node_1_task_5_di" bpmnElement="Flow_ext_node_1_task_5">
+        <di:waypoint x="176" y="472.5" />
+        <di:waypoint x="275" y="472.5" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="191" y="457.5" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_task_5_task_6_di" bpmnElement="Flow_task_5_task_6">
+        <di:waypoint x="395" y="472.5" />
+        <di:waypoint x="475" y="472.5" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="410" y="457.5" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_task_6_task_7_di" bpmnElement="Flow_task_6_task_7">
+        <di:waypoint x="595" y="472.5" />
+        <di:waypoint x="675" y="472.5" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="610" y="457.5" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_task_7_task_8_di" bpmnElement="Flow_task_7_task_8">
+        <di:waypoint x="804.3333333333333" y="472.5" />
+        <di:waypoint x="874.3333333333333" y="472.5" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="819.3333333333333" y="457.5" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_task_8_xor_9_di" bpmnElement="Flow_task_8_xor_9">
+        <di:waypoint x="994.3333333333333" y="472.5" />
+        <di:waypoint x="1064.3333333333333" y="472.5" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1009.3333333333333" y="457.5" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_xor_9_task_10_di" bpmnElement="Flow_xor_9_task_10">
+        <di:waypoint x="1100.3333333333333" y="472.5" />
+        <di:waypoint x="1205.3333333333333" y="472.5" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1115.3333333333333" y="457.5" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_task_10_xor_13_di" bpmnElement="Flow_task_10_xor_13">
+        <di:waypoint x="1325.3333333333333" y="472.5" />
+        <di:waypoint x="1470.3333333333333" y="472.5" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1340.3333333333333" y="457.5" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_xor_9_task_11_di" bpmnElement="Flow_xor_9_task_11">
+        <di:waypoint x="1082.3333333333333" y="490.5" />
+        <di:waypoint x="1082.3333333333333" y="642.5" />
+        <di:waypoint x="1205.3333333333333" y="642.5" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1097.3333333333333" y="627.5" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_task_11_xor_13_di" bpmnElement="Flow_task_11_xor_13">
+        <di:waypoint x="1325.3333333333333" y="642.5" />
+        <di:waypoint x="1488.3333333333333" y="642.5" />
+        <di:waypoint x="1488.3333333333333" y="490.5" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1340.3333333333333" y="475.5" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_xor_9_xor_13_di" bpmnElement="Flow_xor_9_xor_13">
+        <di:waypoint x="1082.3333333333333" y="490.5" />
+        <di:waypoint x="1082.3333333333333" y="917" />
+        <di:waypoint x="1488.3333333333333" y="917" />
+        <di:waypoint x="1488.3333333333333" y="490.5" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1097.3333333333333" y="902" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_xor_13_task_14_di" bpmnElement="Flow_xor_13_task_14">
+        <di:waypoint x="1506.3333333333333" y="472.5" />
+        <di:waypoint x="1576.3333333333333" y="472.5" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1521.3333333333333" y="457.5" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_task_14_event_15_di" bpmnElement="Flow_task_14_event_15">
+        <di:waypoint x="1696.3333333333333" y="472.5" />
+        <di:waypoint x="1841.3333333333333" y="472.5" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1711.3333333333333" y="457.5" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_event_15_ext_node_7_di" bpmnElement="Flow_event_15_ext_node_7">
+        <di:waypoint x="1877.3333333333333" y="472.5" />
+        <di:waypoint x="1976.3333333333333" y="472.5" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1892.3333333333333" y="457.5" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_ext_node_7_task_16_di" bpmnElement="Flow_ext_node_7_task_16">
+        <di:waypoint x="2012.3333333333333" y="472.5" />
+        <di:waypoint x="2022.3333333333333" y="472.5" />
+        <di:waypoint x="2091.333333333333" y="1267.5" />
+        <di:waypoint x="2111.333333333333" y="1267.5" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2027.3333333333333" y="1252.5" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_task_16_xor_17_di" bpmnElement="Flow_task_16_xor_17">
+        <di:waypoint x="2231.333333333333" y="1267.5" />
+        <di:waypoint x="2311.333333333333" y="1267.5" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2246.333333333333" y="1252.5" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_xor_17_event_18_di" bpmnElement="Flow_xor_17_event_18">
+        <di:waypoint x="2347.333333333333" y="1267.5" />
+        <di:waypoint x="2452.333333333333" y="1267.5" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2362.333333333333" y="1252.5" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_event_18_xor_26_di" bpmnElement="Flow_event_18_xor_26">
+        <di:waypoint x="2488.333333333333" y="1267.5" />
+        <di:waypoint x="3276.333333333333" y="1267.5" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2503.333333333333" y="1252.5" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_xor_17_task_19_di" bpmnElement="Flow_xor_17_task_19">
+        <di:waypoint x="2329.333333333333" y="1285.5" />
+        <di:waypoint x="2329.333333333333" y="1513" />
+        <di:waypoint x="2452.333333333333" y="1513" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2344.333333333333" y="1498" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_task_19_task_20_di" bpmnElement="Flow_task_19_task_20">
+        <di:waypoint x="2572.333333333333" y="1513" />
+        <di:waypoint x="2642.333333333333" y="1513" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2587.333333333333" y="1498" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_task_20_event_21_di" bpmnElement="Flow_task_20_event_21">
+        <di:waypoint x="2762.333333333333" y="1513" />
+        <di:waypoint x="2832.333333333333" y="1513" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2777.333333333333" y="1498" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_event_21_xor_26_di" bpmnElement="Flow_event_21_xor_26">
+        <di:waypoint x="2868.333333333333" y="1513" />
+        <di:waypoint x="3294.333333333333" y="1513" />
+        <di:waypoint x="3294.333333333333" y="1285.5" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2883.333333333333" y="1270.5" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_xor_17_task_22_di" bpmnElement="Flow_xor_17_task_22">
+        <di:waypoint x="2329.333333333333" y="1285.5" />
+        <di:waypoint x="2329.333333333333" y="1788" />
+        <di:waypoint x="2452.333333333333" y="1788" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2344.333333333333" y="1773" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_task_22_event_23_di" bpmnElement="Flow_task_22_event_23">
+        <di:waypoint x="2572.333333333333" y="1788" />
+        <di:waypoint x="2642.333333333333" y="1788" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2587.333333333333" y="1773" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_event_23_ext_node_6_di" bpmnElement="Flow_event_23_ext_node_6">
+        <di:waypoint x="2678.333333333333" y="1788" />
+        <di:waypoint x="2748.333333333333" y="1788" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2693.333333333333" y="1773" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_ext_node_6_task_24_di" bpmnElement="Flow_ext_node_6_task_24">
+        <di:waypoint x="2784.333333333333" y="1788" />
+        <di:waypoint x="2883.333333333333" y="1788" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2799.333333333333" y="1773" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_task_24_event_25_di" bpmnElement="Flow_task_24_event_25">
+        <di:waypoint x="3071.333333333333" y="1788" />
+        <di:waypoint x="3141.333333333333" y="1788" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3086.333333333333" y="1773" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_event_25_xor_26_di" bpmnElement="Flow_event_25_xor_26">
+        <di:waypoint x="3177.333333333333" y="1788" />
+        <di:waypoint x="3294.333333333333" y="1788" />
+        <di:waypoint x="3294.333333333333" y="1285.5" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3192.333333333333" y="1270.5" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_xor_26_events-gateway_27_di" bpmnElement="Flow_xor_26_events-gateway_27">
+        <di:waypoint x="3312.333333333333" y="1267.5" />
+        <di:waypoint x="3322.333333333333" y="1267.5" />
+        <di:waypoint x="3362.333333333333" y="472.5" />
+        <di:waypoint x="3382.333333333333" y="472.5" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3327.333333333333" y="457.5" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_events-gateway_27_ext_node_8_di" bpmnElement="Flow_events-gateway_27_ext_node_8">
+        <di:waypoint x="3418.333333333333" y="472.5" />
+        <di:waypoint x="3488.333333333333" y="472.5" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3433.333333333333" y="457.5" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_ext_node_8_parallel_28_di" bpmnElement="Flow_ext_node_8_parallel_28">
+        <di:waypoint x="3524.333333333333" y="472.5" />
+        <di:waypoint x="3623.333333333333" y="472.5" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3539.333333333333" y="457.5" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_parallel_28_task_29_di" bpmnElement="Flow_parallel_28_task_29">
+        <di:waypoint x="3659.333333333333" y="472.5" />
+        <di:waypoint x="3729.333333333333" y="472.5" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3674.333333333333" y="457.5" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_task_29_event_30_di" bpmnElement="Flow_task_29_event_30">
+        <di:waypoint x="3849.333333333333" y="472.5" />
+        <di:waypoint x="3919.333333333333" y="472.5" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3864.333333333333" y="457.5" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_event_30_parallel_32_di" bpmnElement="Flow_event_30_parallel_32">
+        <di:waypoint x="3955.333333333333" y="472.5" />
+        <di:waypoint x="4054.333333333333" y="472.5" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3970.333333333333" y="457.5" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_parallel_28_task_31_di" bpmnElement="Flow_parallel_28_task_31">
+        <di:waypoint x="3641.333333333333" y="490.5" />
+        <di:waypoint x="3641.333333333333" y="2210.5" />
+        <di:waypoint x="3729.333333333333" y="2210.5" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3656.333333333333" y="2195.5" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_task_31_parallel_32_di" bpmnElement="Flow_task_31_parallel_32">
+        <di:waypoint x="3887.9999999999995" y="2210.5" />
+        <di:waypoint x="4072.333333333333" y="2210.5" />
+        <di:waypoint x="4072.333333333333" y="490.5" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3902.9999999999995" y="475.5" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_parallel_32_xor_38_di" bpmnElement="Flow_parallel_32_xor_38">
+        <di:waypoint x="4090.333333333333" y="472.5" />
+        <di:waypoint x="4714.666666666666" y="472.5" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="4105.333333333333" y="457.5" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_events-gateway_27_ext_node_9_di" bpmnElement="Flow_events-gateway_27_ext_node_9">
+        <di:waypoint x="3400.333333333333" y="490.5" />
+        <di:waypoint x="3400.333333333333" y="845" />
+        <di:waypoint x="3488.333333333333" y="845" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3415.333333333333" y="830" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_ext_node_9_parallel_33_di" bpmnElement="Flow_ext_node_9_parallel_33">
+        <di:waypoint x="3524.333333333333" y="845" />
+        <di:waypoint x="4160.333333333333" y="845" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3539.333333333333" y="830" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_parallel_33_task_34_di" bpmnElement="Flow_parallel_33_task_34">
+        <di:waypoint x="4196.333333333333" y="845" />
+        <di:waypoint x="4266.333333333333" y="845" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="4211.333333333333" y="830" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_task_34_event_35_di" bpmnElement="Flow_task_34_event_35">
+        <di:waypoint x="4403.666666666666" y="845" />
+        <di:waypoint x="4473.666666666666" y="845" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="4418.666666666666" y="830" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_event_35_parallel_37_di" bpmnElement="Flow_event_35_parallel_37">
+        <di:waypoint x="4509.666666666666" y="845" />
+        <di:waypoint x="4608.666666666666" y="845" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="4524.666666666666" y="830" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_parallel_33_task_36_di" bpmnElement="Flow_parallel_33_task_36">
+        <di:waypoint x="4178.333333333333" y="863" />
+        <di:waypoint x="4178.333333333333" y="2308" />
+        <di:waypoint x="4266.333333333333" y="2308" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="4193.333333333333" y="2293" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_task_36_parallel_37_di" bpmnElement="Flow_task_36_parallel_37">
+        <di:waypoint x="4425" y="2308" />
+        <di:waypoint x="4626.666666666666" y="2308" />
+        <di:waypoint x="4626.666666666666" y="863" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="4440" y="848" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_parallel_37_xor_38_di" bpmnElement="Flow_parallel_37_xor_38">
+        <di:waypoint x="4644.666666666666" y="845" />
+        <di:waypoint x="4732.666666666666" y="845" />
+        <di:waypoint x="4732.666666666666" y="490.5" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="4659.666666666666" y="475.5" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_xor_38_node_39_di" bpmnElement="Flow_xor_38_node_39">
+        <di:waypoint x="4750.666666666666" y="472.5" />
+        <di:waypoint x="4820.666666666666" y="472.5" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="4765.666666666666" y="457.5" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataAssociation_1_ext_node_1_0_write_di" bpmnElement="DataAssociation_1_ext_node_1_0_write">
+        <di:waypoint x="158" y="490.5" />
+        <di:waypoint x="157.5" y="540.5" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataAssociation_1_task_5_1_write_di" bpmnElement="DataAssociation_1_task_5_1_write">
+        <di:waypoint x="335" y="520" />
+        <di:waypoint x="292.5" y="550" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataAssociation_1_task_5_0_read_di" bpmnElement="DataAssociation_1_task_5_0_read">
+        <di:waypoint x="357.5" y="550" />
+        <di:waypoint x="335" y="520" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataAssociation_1_task_6_1_read_di" bpmnElement="DataAssociation_1_task_6_1_read">
+        <di:waypoint x="492.5" y="550" />
+        <di:waypoint x="535" y="520" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataAssociation_1_task_6_2_read_di" bpmnElement="DataAssociation_1_task_6_2_read">
+        <di:waypoint x="557.5" y="550" />
+        <di:waypoint x="535" y="520" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataAssociation_1_task_7_3_write_di" bpmnElement="DataAssociation_1_task_7_3_write">
+        <di:waypoint x="739.6666666666666" y="520" />
+        <di:waypoint x="692.5" y="550" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataAssociation_1_task_8_4_write_di" bpmnElement="DataAssociation_1_task_8_4_write">
+        <di:waypoint x="934.3333333333333" y="520" />
+        <di:waypoint x="891.8333333333333" y="550" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataAssociation_1_task_11_3_write_di" bpmnElement="DataAssociation_1_task_11_3_write">
+        <di:waypoint x="1265.3333333333333" y="690" />
+        <di:waypoint x="1222.8333333333333" y="720" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataAssociation_1_task_11_3_read_di" bpmnElement="DataAssociation_1_task_11_3_read">
+        <di:waypoint x="1222.8333333333333" y="720" />
+        <di:waypoint x="1265.3333333333333" y="690" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataAssociation_1_task_11_4_read_di" bpmnElement="DataAssociation_1_task_11_4_read">
+        <di:waypoint x="1287.8333333333333" y="720" />
+        <di:waypoint x="1265.3333333333333" y="690" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataAssociation_1_task_14_5_write_di" bpmnElement="DataAssociation_1_task_14_5_write">
+        <di:waypoint x="1636.3333333333333" y="520" />
+        <di:waypoint x="1593.8333333333333" y="550" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataAssociation_1_task_14_2_read_di" bpmnElement="DataAssociation_1_task_14_2_read">
+        <di:waypoint x="1658.8333333333333" y="550" />
+        <di:waypoint x="1636.3333333333333" y="520" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataAssociation_1_task_14_3_read_di" bpmnElement="DataAssociation_1_task_14_3_read">
+        <di:waypoint x="1723.8333333333333" y="550" />
+        <di:waypoint x="1636.3333333333333" y="520" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataAssociation_1_event_15_5_read_di" bpmnElement="DataAssociation_1_event_15_5_read">
+        <di:waypoint x="1858.8333333333333" y="540.5" />
+        <di:waypoint x="1859.3333333333333" y="490.5" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataAssociation_1_ext_node_7_7_write_di" bpmnElement="DataAssociation_1_ext_node_7_7_write">
+        <di:waypoint x="1994.3333333333333" y="490.5" />
+        <di:waypoint x="1993.8333333333333" y="540.5" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataAssociation_1_task_16_8_write_di" bpmnElement="DataAssociation_1_task_16_8_write">
+        <di:waypoint x="2171.333333333333" y="1315" />
+        <di:waypoint x="2128.833333333333" y="1345" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataAssociation_1_task_16_7_read_di" bpmnElement="DataAssociation_1_task_16_7_read">
+        <di:waypoint x="2193.833333333333" y="1345" />
+        <di:waypoint x="2171.333333333333" y="1315" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataAssociation_1_event_18_8_read_di" bpmnElement="DataAssociation_1_event_18_8_read">
+        <di:waypoint x="2469.833333333333" y="1335.5" />
+        <di:waypoint x="2470.333333333333" y="1285.5" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataAssociation_1_task_20_9_write_di" bpmnElement="DataAssociation_1_task_20_9_write">
+        <di:waypoint x="2702.333333333333" y="1560.5" />
+        <di:waypoint x="2659.833333333333" y="1590.5" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataAssociation_1_event_21_9_read_di" bpmnElement="DataAssociation_1_event_21_9_read">
+        <di:waypoint x="2849.833333333333" y="1581" />
+        <di:waypoint x="2850.333333333333" y="1531" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataAssociation_1_ext_node_6_6_write_di" bpmnElement="DataAssociation_1_ext_node_6_6_write">
+        <di:waypoint x="2766.333333333333" y="1806" />
+        <di:waypoint x="2765.833333333333" y="1856" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataAssociation_1_task_24_9_write_di" bpmnElement="DataAssociation_1_task_24_9_write">
+        <di:waypoint x="2977.333333333333" y="1835.5" />
+        <di:waypoint x="2900.833333333333" y="1865.5" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataAssociation_1_task_24_6_read_di" bpmnElement="DataAssociation_1_task_24_6_read">
+        <di:waypoint x="2965.833333333333" y="1865.5" />
+        <di:waypoint x="2977.333333333333" y="1835.5" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataAssociation_1_event_25_9_read_di" bpmnElement="DataAssociation_1_event_25_9_read">
+        <di:waypoint x="3158.833333333333" y="1856" />
+        <di:waypoint x="3159.333333333333" y="1806" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataAssociation_1_ext_node_8_8_write_di" bpmnElement="DataAssociation_1_ext_node_8_8_write">
+        <di:waypoint x="3506.333333333333" y="490.5" />
+        <di:waypoint x="3505.833333333333" y="540.5" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataAssociation_1_task_29_8_read_di" bpmnElement="DataAssociation_1_task_29_8_read">
+        <di:waypoint x="3746.833333333333" y="550" />
+        <di:waypoint x="3789.333333333333" y="520" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataAssociation_1_event_30_8_read_di" bpmnElement="DataAssociation_1_event_30_8_read">
+        <di:waypoint x="3936.833333333333" y="540.5" />
+        <di:waypoint x="3937.333333333333" y="490.5" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataAssociation_1_task_31_10_write_di" bpmnElement="DataAssociation_1_task_31_10_write">
+        <di:waypoint x="3808.6666666666665" y="2258" />
+        <di:waypoint x="3746.833333333333" y="2288" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataAssociation_1_ext_node_9_9_write_di" bpmnElement="DataAssociation_1_ext_node_9_9_write">
+        <di:waypoint x="3506.333333333333" y="863" />
+        <di:waypoint x="3505.833333333333" y="913" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataAssociation_1_task_34_9_read_di" bpmnElement="DataAssociation_1_task_34_9_read">
+        <di:waypoint x="4283.833333333333" y="922.5" />
+        <di:waypoint x="4335" y="892.5" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataAssociation_1_event_35_9_read_di" bpmnElement="DataAssociation_1_event_35_9_read">
+        <di:waypoint x="4491.166666666666" y="913" />
+        <di:waypoint x="4491.666666666666" y="863" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataAssociation_1_task_36_10_write_di" bpmnElement="DataAssociation_1_task_36_10_write">
+        <di:waypoint x="4345.666666666666" y="2355.5" />
+        <di:waypoint x="4283.833333333333" y="2385.5" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Participant_pool_2_di" bpmnElement="Participant_pool_2" isHorizontal="true">
+        <dc:Bounds x="0" y="2585.5" width="2148" height="570.5" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="lane_2_0_di" bpmnElement="lane_2_0" isHorizontal="true">
+        <dc:Bounds x="30" y="2585.5" width="2118" height="570.5" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataObject_2_0_ext_node_2_di" bpmnElement="DataRef_2_0_ext_node_2">
+        <dc:Bounds x="140" y="2751" width="35" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="140" y="2806" width="35" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_ext_node_2" bpmnElement="ext_node_2">
+        <dc:Bounds x="140" y="2665" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_xor_40" bpmnElement="xor_40" isMarkerVisible="true">
+        <dc:Bounds x="275" y="2665" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataObject_2_0_event_41_di" bpmnElement="DataRef_2_0_event_41">
+        <dc:Bounds x="416" y="2751" width="35" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="416" y="2806" width="35" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_event_41" bpmnElement="event_41">
+        <dc:Bounds x="416" y="2665" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataObject_2_2_ext_node_4_di" bpmnElement="DataRef_2_2_ext_node_4">
+        <dc:Bounds x="551" y="2751" width="35" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="551" y="2806" width="35" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_ext_node_4" bpmnElement="ext_node_4">
+        <dc:Bounds x="551" y="2665" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataObject_2_0_task_42_di" bpmnElement="DataRef_2_0_task_42">
+        <dc:Bounds x="416" y="3006" width="35" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="416" y="3061" width="35" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_task_42" bpmnElement="task_42">
+        <dc:Bounds x="416" y="2881" width="120" height="95" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataObject_2_1_task_43_di" bpmnElement="DataRef_2_1_task_43">
+        <dc:Bounds x="606" y="3006" width="35" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="606" y="3061" width="35" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_task_43" bpmnElement="task_43">
+        <dc:Bounds x="606" y="2881" width="120" height="95" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataObject_2_2_task_44_di" bpmnElement="DataRef_2_2_task_44">
+        <dc:Bounds x="796" y="3006" width="35" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="796" y="3061" width="35" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataObject_2_1_task_44_di" bpmnElement="DataRef_2_1_task_44">
+        <dc:Bounds x="861" y="3006" width="35" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="861" y="3061" width="35" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_task_44" bpmnElement="task_44">
+        <dc:Bounds x="796" y="2881" width="120" height="95" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_xor_45" bpmnElement="xor_45" isMarkerVisible="true">
+        <dc:Bounds x="996" y="2665" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataObject_2_2_event_46_di" bpmnElement="DataRef_2_2_event_46">
+        <dc:Bounds x="1102" y="2751" width="35" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1102" y="2806" width="35" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_event_46" bpmnElement="event_46">
+        <dc:Bounds x="1102" y="2665" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataObject_2_4_ext_node_5_di" bpmnElement="DataRef_2_4_ext_node_5">
+        <dc:Bounds x="1237" y="2751" width="35" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1237" y="2806" width="35" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_ext_node_5" bpmnElement="ext_node_5">
+        <dc:Bounds x="1237" y="2665" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataObject_2_4_event_47_di" bpmnElement="DataRef_2_4_event_47">
+        <dc:Bounds x="1372" y="2751" width="35" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1372" y="2806" width="35" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_event_47" bpmnElement="event_47">
+        <dc:Bounds x="1372" y="2665" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataObject_2_5_ext_node_12_di" bpmnElement="DataRef_2_5_ext_node_12">
+        <dc:Bounds x="1507" y="2751" width="35" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1507" y="2806" width="35" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_ext_node_12" bpmnElement="ext_node_12">
+        <dc:Bounds x="1507" y="2665" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataObject_2_3_task_48_di" bpmnElement="DataRef_2_3_task_48">
+        <dc:Bounds x="1642" y="2760.5" width="35" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1642" y="2815.5" width="35" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataObject_2_5_task_48_di" bpmnElement="DataRef_2_5_task_48">
+        <dc:Bounds x="1707" y="2760.5" width="35" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1707" y="2815.5" width="35" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataObject_2_4_task_48_di" bpmnElement="DataRef_2_4_task_48">
+        <dc:Bounds x="1772" y="2760.5" width="35" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1772" y="2815.5" width="35" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_task_48" bpmnElement="task_48">
+        <dc:Bounds x="1642" y="2635.5" width="188" height="95" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataObject_2_3_event_49_di" bpmnElement="DataRef_2_3_event_49">
+        <dc:Bounds x="1907" y="2751" width="35" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1907" y="2806" width="35" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_event_49" bpmnElement="event_49">
+        <dc:Bounds x="1907" y="2665" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="_BPMNShape_node_50" bpmnElement="node_50">
+        <dc:Bounds x="2042" y="2665" width="36" height="36" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_ext_node_2_xor_40_di" bpmnElement="Flow_ext_node_2_xor_40">
+        <di:waypoint x="176" y="2683" />
+        <di:waypoint x="275" y="2683" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="191" y="2668" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_xor_40_event_41_di" bpmnElement="Flow_xor_40_event_41">
+        <di:waypoint x="311" y="2683" />
+        <di:waypoint x="416" y="2683" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="326" y="2668" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_event_41_ext_node_4_di" bpmnElement="Flow_event_41_ext_node_4">
+        <di:waypoint x="452" y="2683" />
+        <di:waypoint x="551" y="2683" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="467" y="2668" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_ext_node_4_xor_45_di" bpmnElement="Flow_ext_node_4_xor_45">
+        <di:waypoint x="587" y="2683" />
+        <di:waypoint x="996" y="2683" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="602" y="2668" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_xor_40_task_42_di" bpmnElement="Flow_xor_40_task_42">
+        <di:waypoint x="293" y="2701" />
+        <di:waypoint x="293" y="2928.5" />
+        <di:waypoint x="416" y="2928.5" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="308" y="2913.5" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_task_42_task_43_di" bpmnElement="Flow_task_42_task_43">
+        <di:waypoint x="536" y="2928.5" />
+        <di:waypoint x="606" y="2928.5" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="551" y="2913.5" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_task_43_task_44_di" bpmnElement="Flow_task_43_task_44">
+        <di:waypoint x="726" y="2928.5" />
+        <di:waypoint x="796" y="2928.5" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="741" y="2913.5" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_task_44_xor_45_di" bpmnElement="Flow_task_44_xor_45">
+        <di:waypoint x="916" y="2928.5" />
+        <di:waypoint x="1014" y="2928.5" />
+        <di:waypoint x="1014" y="2701" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="931" y="2686" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_xor_45_event_46_di" bpmnElement="Flow_xor_45_event_46">
+        <di:waypoint x="1032" y="2683" />
+        <di:waypoint x="1102" y="2683" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1047" y="2668" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_event_46_ext_node_5_di" bpmnElement="Flow_event_46_ext_node_5">
+        <di:waypoint x="1138" y="2683" />
+        <di:waypoint x="1237" y="2683" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1153" y="2668" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_ext_node_5_event_47_di" bpmnElement="Flow_ext_node_5_event_47">
+        <di:waypoint x="1273" y="2683" />
+        <di:waypoint x="1372" y="2683" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1288" y="2668" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_event_47_ext_node_12_di" bpmnElement="Flow_event_47_ext_node_12">
+        <di:waypoint x="1408" y="2683" />
+        <di:waypoint x="1507" y="2683" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1423" y="2668" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_ext_node_12_task_48_di" bpmnElement="Flow_ext_node_12_task_48">
+        <di:waypoint x="1543" y="2683" />
+        <di:waypoint x="1642" y="2683" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1558" y="2668" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_task_48_event_49_di" bpmnElement="Flow_task_48_event_49">
+        <di:waypoint x="1830" y="2683" />
+        <di:waypoint x="1907" y="2683" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1845" y="2668" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_event_49_node_50_di" bpmnElement="Flow_event_49_node_50">
+        <di:waypoint x="1943" y="2683" />
+        <di:waypoint x="2042" y="2683" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1958" y="2668" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataAssociation_2_ext_node_2_0_write_di" bpmnElement="DataAssociation_2_ext_node_2_0_write">
+        <di:waypoint x="158" y="2701" />
+        <di:waypoint x="157.5" y="2751" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataAssociation_2_event_41_0_read_di" bpmnElement="DataAssociation_2_event_41_0_read">
+        <di:waypoint x="433.5" y="2751" />
+        <di:waypoint x="434" y="2701" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataAssociation_2_ext_node_4_2_write_di" bpmnElement="DataAssociation_2_ext_node_4_2_write">
+        <di:waypoint x="569" y="2701" />
+        <di:waypoint x="568.5" y="2751" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataAssociation_2_task_42_0_read_di" bpmnElement="DataAssociation_2_task_42_0_read">
+        <di:waypoint x="433.5" y="3006" />
+        <di:waypoint x="476" y="2976" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataAssociation_2_task_43_1_write_di" bpmnElement="DataAssociation_2_task_43_1_write">
+        <di:waypoint x="666" y="2976" />
+        <di:waypoint x="623.5" y="3006" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataAssociation_2_task_44_2_write_di" bpmnElement="DataAssociation_2_task_44_2_write">
+        <di:waypoint x="856" y="2976" />
+        <di:waypoint x="813.5" y="3006" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataAssociation_2_task_44_1_read_di" bpmnElement="DataAssociation_2_task_44_1_read">
+        <di:waypoint x="878.5" y="3006" />
+        <di:waypoint x="856" y="2976" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataAssociation_2_event_46_2_read_di" bpmnElement="DataAssociation_2_event_46_2_read">
+        <di:waypoint x="1119.5" y="2751" />
+        <di:waypoint x="1120" y="2701" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataAssociation_2_ext_node_5_4_write_di" bpmnElement="DataAssociation_2_ext_node_5_4_write">
+        <di:waypoint x="1255" y="2701" />
+        <di:waypoint x="1254.5" y="2751" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataAssociation_2_event_47_4_read_di" bpmnElement="DataAssociation_2_event_47_4_read">
+        <di:waypoint x="1389.5" y="2751" />
+        <di:waypoint x="1390" y="2701" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataAssociation_2_ext_node_12_5_write_di" bpmnElement="DataAssociation_2_ext_node_12_5_write">
+        <di:waypoint x="1525" y="2701" />
+        <di:waypoint x="1524.5" y="2751" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataAssociation_2_task_48_3_write_di" bpmnElement="DataAssociation_2_task_48_3_write">
+        <di:waypoint x="1736" y="2730.5" />
+        <di:waypoint x="1659.5" y="2760.5" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataAssociation_2_task_48_5_read_di" bpmnElement="DataAssociation_2_task_48_5_read">
+        <di:waypoint x="1724.5" y="2760.5" />
+        <di:waypoint x="1736" y="2730.5" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataAssociation_2_task_48_4_read_di" bpmnElement="DataAssociation_2_task_48_4_read">
+        <di:waypoint x="1789.5" y="2760.5" />
+        <di:waypoint x="1736" y="2730.5" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataAssociation_2_event_49_3_read_di" bpmnElement="DataAssociation_2_event_49_3_read">
+        <di:waypoint x="1924.5" y="2751" />
+        <di:waypoint x="1925" y="2701" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Participant_pool_3_di" bpmnElement="Participant_pool_3" isHorizontal="true">
+        <dc:Bounds x="0" y="3206" width="2289" height="600" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="lane_3_0_di" bpmnElement="lane_3_0" isHorizontal="true">
+        <dc:Bounds x="30" y="3206" width="2259" height="600" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataObject_3_0_ext_node_3_di" bpmnElement="DataRef_3_0_ext_node_3">
+        <dc:Bounds x="140" y="3371.5" width="35" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="140" y="3426.5" width="35" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_ext_node_3" bpmnElement="ext_node_3">
+        <dc:Bounds x="140" y="3285.5" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_xor_51" bpmnElement="xor_51" isMarkerVisible="true">
+        <dc:Bounds x="275" y="3285.5" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataObject_3_1_task_52_di" bpmnElement="DataRef_3_1_task_52">
+        <dc:Bounds x="416" y="3381" width="35" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="416" y="3436" width="35" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_task_52" bpmnElement="task_52">
+        <dc:Bounds x="416" y="3256" width="137.33333333333331" height="95" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataObject_3_0_task_53_di" bpmnElement="DataRef_3_0_task_53">
+        <dc:Bounds x="416" y="3656" width="35" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="416" y="3711" width="35" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_task_53" bpmnElement="task_53">
+        <dc:Bounds x="416" y="3531" width="120" height="95" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataObject_3_1_task_54_di" bpmnElement="DataRef_3_1_task_54">
+        <dc:Bounds x="606" y="3656" width="35" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="606" y="3711" width="35" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_task_54" bpmnElement="task_54">
+        <dc:Bounds x="606" y="3531" width="120" height="95" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_xor_55" bpmnElement="xor_55" isMarkerVisible="true">
+        <dc:Bounds x="796" y="3285.5" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataObject_3_1_task_56_di" bpmnElement="DataRef_3_1_task_56">
+        <dc:Bounds x="902" y="3381" width="35" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="902" y="3436" width="35" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_task_56" bpmnElement="task_56">
+        <dc:Bounds x="902" y="3256" width="120" height="95" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataObject_3_1_event_57_di" bpmnElement="DataRef_3_1_event_57">
+        <dc:Bounds x="1102" y="3371.5" width="35" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1102" y="3426.5" width="35" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_event_57" bpmnElement="event_57">
+        <dc:Bounds x="1102" y="3285.5" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataObject_3_2_ext_node_11_di" bpmnElement="DataRef_3_2_ext_node_11">
+        <dc:Bounds x="1237" y="3371.5" width="35" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1237" y="3426.5" width="35" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_ext_node_11" bpmnElement="ext_node_11">
+        <dc:Bounds x="1237" y="3285.5" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_event_58" bpmnElement="event_58">
+        <dc:Bounds x="1372" y="3285.5" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataObject_3_2_task_59_di" bpmnElement="DataRef_3_2_task_59">
+        <dc:Bounds x="1478" y="3381" width="35" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1478" y="3436" width="35" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_task_59" bpmnElement="task_59">
+        <dc:Bounds x="1478" y="3256" width="120" height="95" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_task_60" bpmnElement="task_60">
+        <dc:Bounds x="1668" y="3256" width="120" height="95" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataObject_3_3_task_61_di" bpmnElement="DataRef_3_3_task_61">
+        <dc:Bounds x="1858" y="3381" width="35" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1858" y="3436" width="35" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_task_61" bpmnElement="task_61">
+        <dc:Bounds x="1858" y="3256" width="120" height="95" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataObject_3_3_event_62_di" bpmnElement="DataRef_3_3_event_62">
+        <dc:Bounds x="2048" y="3371.5" width="35" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2048" y="3426.5" width="35" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_event_62" bpmnElement="event_62">
+        <dc:Bounds x="2048" y="3285.5" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="_BPMNShape_node_63" bpmnElement="node_63">
+        <dc:Bounds x="2183" y="3285.5" width="36" height="36" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_ext_node_3_xor_51_di" bpmnElement="Flow_ext_node_3_xor_51">
+        <di:waypoint x="176" y="3303.5" />
+        <di:waypoint x="275" y="3303.5" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="191" y="3288.5" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_xor_51_task_52_di" bpmnElement="Flow_xor_51_task_52">
+        <di:waypoint x="311" y="3303.5" />
+        <di:waypoint x="416" y="3303.5" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="326" y="3288.5" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_task_52_xor_55_di" bpmnElement="Flow_task_52_xor_55">
+        <di:waypoint x="553.3333333333333" y="3303.5" />
+        <di:waypoint x="796" y="3303.5" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="568.3333333333333" y="3288.5" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_xor_51_task_53_di" bpmnElement="Flow_xor_51_task_53">
+        <di:waypoint x="293" y="3321.5" />
+        <di:waypoint x="293" y="3578.5" />
+        <di:waypoint x="416" y="3578.5" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="308" y="3563.5" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_task_53_task_54_di" bpmnElement="Flow_task_53_task_54">
+        <di:waypoint x="536" y="3578.5" />
+        <di:waypoint x="606" y="3578.5" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="551" y="3563.5" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_task_54_xor_55_di" bpmnElement="Flow_task_54_xor_55">
+        <di:waypoint x="726" y="3578.5" />
+        <di:waypoint x="814" y="3578.5" />
+        <di:waypoint x="814" y="3321.5" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="741" y="3306.5" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_xor_55_task_56_di" bpmnElement="Flow_xor_55_task_56">
+        <di:waypoint x="832" y="3303.5" />
+        <di:waypoint x="902" y="3303.5" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="847" y="3288.5" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_task_56_event_57_di" bpmnElement="Flow_task_56_event_57">
+        <di:waypoint x="1022" y="3303.5" />
+        <di:waypoint x="1102" y="3303.5" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1037" y="3288.5" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_event_57_ext_node_11_di" bpmnElement="Flow_event_57_ext_node_11">
+        <di:waypoint x="1138" y="3303.5" />
+        <di:waypoint x="1237" y="3303.5" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1153" y="3288.5" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_ext_node_11_event_58_di" bpmnElement="Flow_ext_node_11_event_58">
+        <di:waypoint x="1273" y="3303.5" />
+        <di:waypoint x="1372" y="3303.5" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1288" y="3288.5" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_event_58_task_59_di" bpmnElement="Flow_event_58_task_59">
+        <di:waypoint x="1408" y="3303.5" />
+        <di:waypoint x="1478" y="3303.5" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1423" y="3288.5" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_task_59_task_60_di" bpmnElement="Flow_task_59_task_60">
+        <di:waypoint x="1598" y="3303.5" />
+        <di:waypoint x="1668" y="3303.5" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1613" y="3288.5" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_task_60_task_61_di" bpmnElement="Flow_task_60_task_61">
+        <di:waypoint x="1788" y="3303.5" />
+        <di:waypoint x="1858" y="3303.5" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1803" y="3288.5" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_task_61_event_62_di" bpmnElement="Flow_task_61_event_62">
+        <di:waypoint x="1978" y="3303.5" />
+        <di:waypoint x="2048" y="3303.5" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1993" y="3288.5" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_event_62_node_63_di" bpmnElement="Flow_event_62_node_63">
+        <di:waypoint x="2084" y="3303.5" />
+        <di:waypoint x="2183" y="3303.5" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2099" y="3288.5" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataAssociation_3_ext_node_3_0_write_di" bpmnElement="DataAssociation_3_ext_node_3_0_write">
+        <di:waypoint x="158" y="3321.5" />
+        <di:waypoint x="157.5" y="3371.5" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataAssociation_3_task_52_1_write_di" bpmnElement="DataAssociation_3_task_52_1_write">
+        <di:waypoint x="484.66666666666663" y="3351" />
+        <di:waypoint x="433.5" y="3381" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataAssociation_3_task_53_0_read_di" bpmnElement="DataAssociation_3_task_53_0_read">
+        <di:waypoint x="433.5" y="3656" />
+        <di:waypoint x="476" y="3626" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataAssociation_3_task_54_1_write_di" bpmnElement="DataAssociation_3_task_54_1_write">
+        <di:waypoint x="666" y="3626" />
+        <di:waypoint x="623.5" y="3656" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataAssociation_3_task_56_1_write_di" bpmnElement="DataAssociation_3_task_56_1_write">
+        <di:waypoint x="962" y="3351" />
+        <di:waypoint x="919.5" y="3381" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataAssociation_3_task_56_1_read_di" bpmnElement="DataAssociation_3_task_56_1_read">
+        <di:waypoint x="919.5" y="3381" />
+        <di:waypoint x="962" y="3351" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataAssociation_3_event_57_1_read_di" bpmnElement="DataAssociation_3_event_57_1_read">
+        <di:waypoint x="1119.5" y="3371.5" />
+        <di:waypoint x="1120" y="3321.5" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataAssociation_3_ext_node_11_2_write_di" bpmnElement="DataAssociation_3_ext_node_11_2_write">
+        <di:waypoint x="1255" y="3321.5" />
+        <di:waypoint x="1254.5" y="3371.5" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataAssociation_3_task_59_2_read_di" bpmnElement="DataAssociation_3_task_59_2_read">
+        <di:waypoint x="1495.5" y="3381" />
+        <di:waypoint x="1538" y="3351" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataAssociation_3_task_61_3_write_di" bpmnElement="DataAssociation_3_task_61_3_write">
+        <di:waypoint x="1918" y="3351" />
+        <di:waypoint x="1875.5" y="3381" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataAssociation_3_event_62_3_read_di" bpmnElement="DataAssociation_3_event_62_3_read">
+        <di:waypoint x="2065.5" y="3371.5" />
+        <di:waypoint x="2066" y="3321.5" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="MessageFlow_0_event_3_ext_node_1_di" bpmnElement="MessageFlow_0_event_3_ext_node_1" color:border-color="#999999">
+        <di:waypoint x="454" y="115.5" />
+        <di:waypoint x="158" y="454.5" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="MessageFlow_1_event_15_ext_node_2_di" bpmnElement="MessageFlow_1_event_15_ext_node_2" color:border-color="#999999">
+        <di:waypoint x="1859.3333333333333" y="490.5" />
+        <di:waypoint x="158" y="2665" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="MessageFlow_2_event_23_ext_node_5_di" bpmnElement="MessageFlow_2_event_23_ext_node_5" color:border-color="#999999">
+        <di:waypoint x="2660.333333333333" y="1806" />
+        <di:waypoint x="1255" y="2665" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="MessageFlow_3_event_30_ext_node_10_di" bpmnElement="MessageFlow_3_event_30_ext_node_10" color:border-color="#999999">
+        <di:waypoint x="3937.333333333333" y="454.5" />
+        <di:waypoint x="589" y="115.5" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="MessageFlow_4_event_35_ext_node_10_di" bpmnElement="MessageFlow_4_event_35_ext_node_10" color:border-color="#999999">
+        <di:waypoint x="4491.666666666666" y="827" />
+        <di:waypoint x="589" y="115.5" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="MessageFlow_5_event_41_ext_node_3_di" bpmnElement="MessageFlow_5_event_41_ext_node_3" color:border-color="#999999">
+        <di:waypoint x="434" y="2701" />
+        <di:waypoint x="158" y="3285.5" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="MessageFlow_6_event_46_ext_node_7_di" bpmnElement="MessageFlow_6_event_46_ext_node_7" color:border-color="#999999">
+        <di:waypoint x="1120" y="2665" />
+        <di:waypoint x="1994.3333333333333" y="490.5" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="MessageFlow_7_event_47_ext_node_11_di" bpmnElement="MessageFlow_7_event_47_ext_node_11" color:border-color="#999999">
+        <di:waypoint x="1390" y="2701" />
+        <di:waypoint x="1255" y="3285.5" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="MessageFlow_8_event_49_ext_node_9_di" bpmnElement="MessageFlow_8_event_49_ext_node_9" color:border-color="#999999">
+        <di:waypoint x="1925" y="2665" />
+        <di:waypoint x="3506.333333333333" y="863" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="MessageFlow_9_event_57_ext_node_4_di" bpmnElement="MessageFlow_9_event_57_ext_node_4" color:border-color="#999999">
+        <di:waypoint x="1120" y="3285.5" />
+        <di:waypoint x="569" y="2701" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="MessageFlow_10_event_62_ext_node_12_di" bpmnElement="MessageFlow_10_event_62_ext_node_12" color:border-color="#999999">
+        <di:waypoint x="2066" y="3285.5" />
+        <di:waypoint x="1525" y="2701" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

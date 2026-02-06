@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?> <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" targetNamespace="http://example.org/police-car-service"> 
+  <process id="PoliceAppProcess" isExecutable="true">
+    <laneSet> <lane id="PoliceSystemLane" name="Police System"/> </laneSet> <startEvent id="StartServiceEvent" name="Service Successful"> <outgoing>Flow1</outgoing> </startEvent> <sequenceFlow id="Flow1" sourceRef="StartServiceEvent" targetRef="CheckServiceNeeded" /> <task id="CheckServiceNeeded" name="Check if Service Reminder Needed"> <incoming>Flow1</incoming> <outgoing>Flow2</outgoing> </task> <sequenceFlow id="Flow2" sourceRef="CheckServiceNeeded" targetRef="CheckCarRegistration" /> <exclusiveGateway id="ExclusiveGateway_CarRegistered"/> <sequenceFlow id="Flow3" sourceRef="CheckCarRegistration" targetRef="ExclusiveGateway_CarRegistered"/> <task id="CheckCarRegistration" name="Check Car Registration Status"> <incoming>Flow2</incoming> <outgoing>Flow3</outgoing> </task> <sequenceFlow id="Flow4" sourceRef="ExclusiveGateway_CarRegistered" targetRef="SendNotification"> <conditionExpression xsi:type="tFormalExpression">Car is Registered</conditionExpression> </sequenceFlow> <sequenceFlow id="Flow5" sourceRef="ExclusiveGateway_CarRegistered" targetRef="EndEvent_Process"> <conditionExpression xsi:type="tFormalExpression">Car is Unregistered</conditionExpression> </sequenceFlow> <intermediateThrowEvent id="SendNotification" name="Notify Car Owner"> <incoming>Flow4</incoming> <outgoing>Flow6</outgoing> <messageEventDefinition id="MessageDefinition1"/> </intermediateThrowEvent> <sequenceFlow id="Flow6" sourceRef="SendNotification" targetRef="TimerEvent_WaitForServiceOrFine" /> <intermediateCatchEvent id="TimerEvent_WaitForServiceOrFine" name="Wait 30 Days for Service"> <incoming>Flow6</incoming> <outgoing>Flow7</outgoing> <timerEventDefinition> <timeDuration>PT30D</timeDuration> </timerEventDefinition> </intermediateCatchEvent> <sequenceFlow id="Flow7" sourceRef="TimerEvent_WaitForServiceOrFine" targetRef="SendFine"/> <task id="SendFine" name="Issue Fine to Owner"> <incoming>Flow7</incoming> <outgoing>Flow8</outgoing> </task> <sequenceFlow id="Flow8" sourceRef="SendFine" targetRef="EndEvent_Process" /> <endEvent id="EndEvent_Process" name="Process Ended"> <incoming>Flow5</incoming> <incoming>Flow8</incoming> </endEvent> </process>
+  <process id="CarServiceFacility" isExecutable="true"> 
+    <laneSet> <lane id="MechanicLane" name="Mechanic"/> <lane id="ReceptionLane" name="Reception"/> </laneSet> <startEvent id="ReceivedCar" name="Car Arrived for Service"> <outgoing>FlowM1</outgoing> </startEvent> <sequenceFlow id="FlowM1" sourceRef="ReceivedCar" targetRef="EnterProblemsTask"/> <task id="EnterProblemsTask" name="Enter Problems for Reference"> <incoming>FlowM1</incoming> <outgoing>FlowM2</outgoing> </task> <sequenceFlow id="FlowM2" sourceRef="EnterProblemsTask" targetRef="RepairCarTask"/> <task id="RepairCarTask" name="Repair Car"> <incoming>FlowM2</incoming> <outgoing>FlowM3</outgoing> </task> <sequenceFlow id="FlowM3" sourceRef="RepairCarTask" targetRef="SendStatusUpdatesTask"/> <task id="SendStatusUpdatesTask" name="Send Status Updates"> <incoming>FlowM3</incoming> <outgoing>FlowM4</outgoing> </task> <sequenceFlow id="FlowM4" sourceRef="SendStatusUpdatesTask" targetRef="EnterRepairDoneTask"/> <task id="EnterRepairDoneTask" name="Enter Repair Completed and Pickerl Given"> <incoming>FlowM4</incoming> <outgoing>FlowM5</outgoing> </task> <sequenceFlow id="FlowM5" sourceRef="EnterRepairDoneTask" targetRef="ReceivePaymentTask"/> <task id="ReceivePaymentTask" name="Receive Payment via App"> <incoming>FlowM5</incoming> <outgoing>FlowM6</outgoing> </task> <sequenceFlow id="FlowM6" sourceRef="ReceivePaymentTask" targetRef="EnterNextServiceTask"/> <task id="EnterNextServiceTask" name="Enter Time for Next Service"> <incoming>FlowM6</incoming> <outgoing>FlowM7</outgoing> <dataOutputAssociation> <targetRef>NextServiceDateObject</targetRef> </dataOutputAssociation> </task> <sequenceFlow id="FlowM7" sourceRef="EnterNextServiceTask" targetRef="EndServiceProcess"/> <endEvent id="EndServiceProcess" name="Service Complete"> <incoming>FlowM7</incoming> </endEvent> <dataObject id="NextServiceDateObject" name="Next Service Date"/> </process> <collaboration id="PoliceCarServiceCollab"> <participant id="PoliceAppPool" processRef="PoliceAppProcess" name="Police System"/> <participant id="ServiceFacilityPool" processRef="CarServiceFacility" name="Car Service Facility"/> <messageFlow id="NotifyOwnerFlow" sourceRef="SendNotification" targetRef="ReceivedCar" name="Service Reminder"/> </collaboration> 
+
+  <bpmndi:BPMNDiagram id="BPMNDiagram_PoliceCarService">
+    <bpmndi:BPMNPlane id="BPMNPlane_PoliceCarService" bpmnElement="PoliceCarServiceCollab">
+      <bpmndi:BPMNShape id="Pool_PoliceAppPool" bpmnElement="PoliceAppPool" isHorizontal="true">
+        <dc:Bounds x="160" y="60" width="1470" height="250" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_PoliceSystemLane" bpmnElement="PoliceSystemLane" isHorizontal="true">
+        <dc:Bounds x="180" y="60" width="1430" height="250" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_StartServiceEvent" bpmnElement="StartServiceEvent">
+        <dc:Bounds x="220" y="162" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="211" y="198" width="54" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_CheckServiceNeeded" bpmnElement="CheckServiceNeeded">
+        <dc:Bounds x="320" y="150" width="100" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_ExclusiveGateway_CarRegistered" bpmnElement="ExclusiveGateway_CarRegistered" isMarkerVisible="true">
+        <dc:Bounds x="630" y="162" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_CheckCarRegistration" bpmnElement="CheckCarRegistration">
+        <dc:Bounds x="455" y="150" width="130" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_SendNotification" bpmnElement="SendNotification">
+        <dc:Bounds x="750" y="162" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="725" y="198" width="86" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_TimerEvent_WaitForServiceOrFine" bpmnElement="TimerEvent_WaitForServiceOrFine">
+        <dc:Bounds x="880" y="162" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="857" y="198" width="82" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_SendFine" bpmnElement="SendFine">
+        <dc:Bounds x="1000" y="150" width="100" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_EndEvent_Process" bpmnElement="EndEvent_Process">
+        <dc:Bounds x="1190" y="162" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1171" y="198" width="75" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Edge_Flow1" bpmnElement="Flow1">
+        <omgdi:waypoint x="256" y="180" />
+        <omgdi:waypoint x="320" y="180" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow2" bpmnElement="Flow2">
+        <omgdi:waypoint x="420" y="180" />
+        <omgdi:waypoint x="455" y="180" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow3" bpmnElement="Flow3">
+        <omgdi:waypoint x="585" y="180" />
+        <omgdi:waypoint x="630" y="180" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow4" bpmnElement="Flow4">
+        <omgdi:waypoint x="666" y="180" />
+        <omgdi:waypoint x="750" y="180" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow5" bpmnElement="Flow5">
+        <omgdi:waypoint x="648" y="162" />
+        <omgdi:waypoint x="648" y="110" />
+        <omgdi:waypoint x="1208" y="110" />
+        <omgdi:waypoint x="1208" y="162" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="800" y="205" width="100" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow6" bpmnElement="Flow6">
+        <omgdi:waypoint x="786" y="180" />
+        <omgdi:waypoint x="880" y="180" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow7" bpmnElement="Flow7">
+        <omgdi:waypoint x="916" y="180" />
+        <omgdi:waypoint x="1000" y="180" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow8" bpmnElement="Flow8">
+        <omgdi:waypoint x="1100" y="180" />
+        <omgdi:waypoint x="1190" y="180" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Pool_ServiceFacilityPool" bpmnElement="ServiceFacilityPool" isHorizontal="true">
+        <dc:Bounds x="160" y="340" width="1470" height="240" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_ReceptionLane" bpmnElement="ReceptionLane" isHorizontal="true">
+        <dc:Bounds x="180" y="480" width="1430" height="100" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_MechanicLane" bpmnElement="MechanicLane" isHorizontal="true">
+        <dc:Bounds x="180" y="340" width="1430" height="140" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_ReceivedCar" bpmnElement="ReceivedCar">
+        <dc:Bounds x="240" y="387" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="222" y="423" width="72" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_EnterProblemsTask" bpmnElement="EnterProblemsTask">
+        <dc:Bounds x="350" y="375" width="120" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_RepairCarTask" bpmnElement="RepairCarTask">
+        <dc:Bounds x="510" y="375" width="100" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_SendStatusUpdatesTask" bpmnElement="SendStatusUpdatesTask">
+        <dc:Bounds x="660" y="375" width="120" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_EnterRepairDoneTask" bpmnElement="EnterRepairDoneTask">
+        <dc:Bounds x="830" y="375" width="170" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_ReceivePaymentTask" bpmnElement="ReceivePaymentTask">
+        <dc:Bounds x="1050" y="495" width="120" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_EnterNextServiceTask" bpmnElement="EnterNextServiceTask">
+        <dc:Bounds x="1240" y="495" width="140" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_EndServiceProcess" bpmnElement="EndServiceProcess">
+        <dc:Bounds x="1430" y="507" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1404" y="543" width="88" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Edge_FlowM1" bpmnElement="FlowM1">
+        <omgdi:waypoint x="276" y="405" />
+        <omgdi:waypoint x="350" y="405" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_FlowM2" bpmnElement="FlowM2">
+        <omgdi:waypoint x="470" y="405" />
+        <omgdi:waypoint x="510" y="405" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_FlowM3" bpmnElement="FlowM3">
+        <omgdi:waypoint x="610" y="405" />
+        <omgdi:waypoint x="660" y="405" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_FlowM4" bpmnElement="FlowM4">
+        <omgdi:waypoint x="780" y="405" />
+        <omgdi:waypoint x="830" y="405" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_FlowM5" bpmnElement="FlowM5">
+        <omgdi:waypoint x="1000" y="405" />
+        <omgdi:waypoint x="1020" y="405" />
+        <omgdi:waypoint x="1020" y="525" />
+        <omgdi:waypoint x="1050" y="525" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_FlowM6" bpmnElement="FlowM6">
+        <omgdi:waypoint x="1170" y="525" />
+        <omgdi:waypoint x="1240" y="525" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_FlowM7" bpmnElement="FlowM7">
+        <omgdi:waypoint x="1380" y="525" />
+        <omgdi:waypoint x="1430" y="525" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="MessageFlow_NotifyOwnerFlow" bpmnElement="NotifyOwnerFlow" messageVisibleKind="messageFlow">
+        <omgdi:waypoint x="768" y="180" />
+        <omgdi:waypoint x="258" y="405" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="456" y="270" width="89" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

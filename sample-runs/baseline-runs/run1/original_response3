@@ -1,0 +1,36 @@
+{
+  "id": "chatcmpl-BSUaZ3iubiGvLdOHB0ENBq1prcXJu",
+  "object": "chat.completion",
+  "created": 1746130467,
+  "model": "gpt-4.1-2025-04-14",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<definitions xmlns=\"http://www.omg.org/spec/BPMN/20100524/MODEL\"\n             xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n             xmlns:bpmndi=\"http://www.omg.org/spec/BPMN/20100524/DI\"\n             xmlns:dc=\"http://www.omg.org/spec/DD/20100524/DC\"\n             xmlns:di=\"http://www.omg.org/spec/DD/20100524/DI\"\n             id=\"Definitions_1\"\n             targetNamespace=\"http://bpmn.io/schema/bpmn\">\n  <process id=\"CustomerProcess\" isExecutable=\"true\">\n    <laneSet>\n      <lane id=\"CustomerLane\" name=\"Customer\"/>\n    </laneSet>\n    <startEvent id=\"StartEvent_Customer\" name=\"Start\"/>\n    <sequenceFlow id=\"Flow_Cust_Send_Request\" sourceRef=\"StartEvent_Customer\" targetRef=\"Send_Request\"/>\n    <task id=\"Send_Request\" name=\"Send Credit Request\"/>\n    <sequenceFlow id=\"Flow_Cust_to_End\" sourceRef=\"Send_Request\" targetRef=\"MessageCatch_Assessment_Result\"/>\n    <intermediateCatchEvent id=\"MessageCatch_Assessment_Result\" name=\"Receive Assessment Result\">\n      <messageEventDefinition id=\"MessageEventDefinition_AssessmentResult\"/>\n    </intermediateCatchEvent>\n    <sequenceFlow id=\"Flow_CustomerEnd\" sourceRef=\"MessageCatch_Assessment_Result\" targetRef=\"EndEvent_Customer\"/>\n    <endEvent id=\"EndEvent_Customer\" name=\"End\"/>\n  </process>\n\n  <process id=\"BankProcess\" isExecutable=\"true\">\n    <laneSet>\n      <lane id=\"RiskLane\" name=\"Risk Department\"/>\n      <lane id=\"DisbursementLane\" name=\"Disbursement Department\"/>\n    </laneSet>\n    <startEvent id=\"StartEvent_Bank\" name=\"Start\"/>\n    <sequenceFlow id=\"Flow_Bank_Start_MsgCatch\" sourceRef=\"StartEvent_Bank\" targetRef=\"MessageCatch_NewRequest\"/>\n    <intermediateCatchEvent id=\"MessageCatch_NewRequest\" name=\"Receive Credit Request\">\n      <messageEventDefinition id=\"MessageEventDefinition_NewRequest\"/>\n    </intermediateCatchEvent>\n    <sequenceFlow id=\"Flow_Request_to_AssessRisk\" sourceRef=\"MessageCatch_NewRequest\" targetRef=\"Task_AssessRisk\"/>\n    <task id=\"Task_AssessRisk\" name=\"Assess Risk\"/>\n    <dataObjectReference id=\"DataObject_RiskResult\" dataObjectRef=\"RiskResult\"/>\n    <sequenceFlow id=\"Flow_AssessRisk_Gateway\" sourceRef=\"Task_AssessRisk\" targetRef=\"Gateway_RiskDecision\"/>\n    <exclusiveGateway id=\"Gateway_RiskDecision\" name=\"Risk Threshold?\"/>\n    <sequenceFlow id=\"Flow_HighRisk\" sourceRef=\"Gateway_RiskDecision\" targetRef=\"Task_AdvancedRisk\" name=\"Above\"/>\n    <task id=\"Task_AdvancedRisk\" name=\"Carry Out Advanced Risk Assessment\"/>\n    <sequenceFlow id=\"Flow_AdvancedRisk_to_AssResult\" sourceRef=\"Task_AdvancedRisk\" targetRef=\"Task_AssessmentResult\">\n      <conditionExpression xsi:type=\"tFormalExpression\"><![CDATA[advanced]]></conditionExpression>\n    </sequenceFlow>\n    <sequenceFlow id=\"Flow_SimpleRisk\" sourceRef=\"Gateway_RiskDecision\" targetRef=\"Task_SimpleRisk\" name=\"Below or Equal\"/>\n    <task id=\"Task_SimpleRisk\" name=\"Carry Out Simple Risk Assessment\"/>\n    <sequenceFlow id=\"Flow_SimpleRisk_to_AssResult\" sourceRef=\"Task_SimpleRisk\" targetRef=\"Task_AssessmentResult\">\n      <conditionExpression xsi:type=\"tFormalExpression\"><![CDATA[simple]]></conditionExpression>\n    </sequenceFlow>\n    <task id=\"Task_AssessmentResult\" name=\"Prepare Assessment Result\"/>\n    <sequenceFlow id=\"Flow_AssResult_to_NotifyCust\" sourceRef=\"Task_AssessmentResult\" targetRef=\"MessageThrow_NotifyCustomer\"/>\n    <intermediateThrowEvent id=\"MessageThrow_NotifyCustomer\" name=\"Send Assessment Result\">\n      <messageEventDefinition id=\"MessageEventDefinition_NotifyCustomer\"/>\n    </intermediateThrowEvent>\n    <sequenceFlow id=\"Flow_AssResult_to_Disbursement\" sourceRef=\"Task_AssessmentResult\" targetRef=\"Task_OrganizeDisbursement\"/>\n    <task id=\"Task_OrganizeDisbursement\" name=\"Organize Disbursement\"/>\n    <endEvent id=\"EndEvent_Bank\" name=\"End\"/>\n    <sequenceFlow id=\"Flow_Disbursement_to_EndBank\" sourceRef=\"Task_OrganizeDisbursement\" targetRef=\"EndEvent_Bank\"/>\n  </process>\n\n  <!-- Data Object Definitions -->\n  <dataObject id=\"RiskResult\" name=\"Risk Result\" />\n\n  <!-- Message Flows between Pools -->\n  <messageFlow id=\"MessageFlow_Cust_to_Bank\" sourceRef=\"Send_Request\" targetRef=\"MessageCatch_NewRequest\"/>\n  <messageFlow id=\"MessageFlow_Bank_to_Cust\" sourceRef=\"MessageThrow_NotifyCustomer\" targetRef=\"MessageCatch_Assessment_Result\"/>\n  \n</definitions>\n",
+        "refusal": null,
+        "annotations": []
+      },
+      "logprobs": null,
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 569,
+    "completion_tokens": 1082,
+    "total_tokens": 1651,
+    "prompt_tokens_details": {
+      "cached_tokens": 0,
+      "audio_tokens": 0
+    },
+    "completion_tokens_details": {
+      "reasoning_tokens": 0,
+      "audio_tokens": 0,
+      "accepted_prediction_tokens": 0,
+      "rejected_prediction_tokens": 0
+    }
+  },
+  "service_tier": "default",
+  "system_fingerprint": "fp_a1102cf978"
+}

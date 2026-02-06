@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="UTF-8"?> <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="motorClaimsProcess" targetNamespace="http://example.com/bpmn/motorclaims"> 
+  
+  <!-- Customer Pool --> <process id="CustomerProcess" isExecutable="true">
+    <laneSet> <lane id="customerLane" name="Customer"/> </laneSet> <startEvent id="cust_start" name="Start Motor Claim"/> <task id="submitClaim" name="Submit Claim and Documentation"/> <dataObjectReference id="claimDocsData" dataObjectRef="claimDocsDataObj" name="Claim Documentation"/> <intermediateThrowEvent id="sendClaimMsg" name="Send Claim"> <messageEventDefinition messageRef="msgSubmitClaim"/> </intermediateThrowEvent> <endEvent id="cust_end" name="Receive Outcome"/> <intermediateCatchEvent id="receiveOutcomeMsg" name="Receive Claim Outcome"> <messageEventDefinition messageRef="msgOutcomeLetter"/> </intermediateCatchEvent> <sequenceFlow id="flow1" sourceRef="cust_start" targetRef="submitClaim"/> <sequenceFlow id="flow2" sourceRef="submitClaim" targetRef="sendClaimMsg"/> <sequenceFlow id="flow3" sourceRef="sendClaimMsg" targetRef="receiveOutcomeMsg"/> <sequenceFlow id="flow4" sourceRef="receiveOutcomeMsg" targetRef="cust_end"/> </process>
+  <!-- Insurer Pool --> <process id="InsurerProcess" isExecutable="true">
+    <laneSet> <lane id="notifLane" name="Notification Department"/> <lane id="handlingLane" name="Handling Department"/> </laneSet> <startEvent id="insurer_start" name="Claim Arrives"> <messageEventDefinition messageRef="msgSubmitClaim"/> </startEvent> <!-- Notification Department --> <task id="checkDocs" name="Check Documents Completeness" >
+      <dataInputAssociation id="da1"> <sourceRef>claimDocsData</sourceRef>  </dataInputAssociation>
+    </task> <exclusiveGateway id="gw_docsComplete" name="Docs Complete?"/> <task id="registerClaim" name="Register Claim" >
+      <dataOutputAssociation id="da2"> <targetRef>claimData</targetRef> </dataOutputAssociation>
+    </task> <dataObjectReference id="claimData" dataObjectRef="claimDataObj" name="Registered Claim"/> <!-- Handling Department --> <task id="checkInsurance" name="Check Insurance" > <dataInputAssociation id="da3"> <sourceRef>claimData</sourceRef> </dataInputAssociation> </task> <exclusiveGateway id="gw_insuranceOK" name="Insurance Valid?"/> <task id="performAssessment" name="Perform Assessment" /> <exclusiveGateway id="gw_assessmentPositive" name="Assessment Positive?"/> <task id="authorizeRepair" name="Authorize Garage to Repair"/> <task id="schedulePayment" name="Schedule Payment" /> <!-- Claim Rejection Path --> <task id="rejectClaim" name="Reject Claim" /> <!-- Send Letter to Customer --> <task id="sendLetter" name="Send Outcome Letter to Customer" /> <intermediateThrowEvent id="throwOutcomeMsg" name="Outcome Letter Sent"> <messageEventDefinition messageRef="msgOutcomeLetter"/> </intermediateThrowEvent> <endEvent id="insurer_end" name="End Process"/> 
+    <!-- Data Objects --> <dataObject id="claimDocsDataObj" /> <dataObject id="claimDataObj" />
+    <!-- Data Stores can be added for persistence if required --> <!-- Sequence Flows --> <sequenceFlow id="i_flow1" sourceRef="insurer_start" targetRef="checkDocs"/> <sequenceFlow id="i_flow2" sourceRef="checkDocs" targetRef="gw_docsComplete"/> <sequenceFlow id="i_flow3" sourceRef="gw_docsComplete" targetRef="registerClaim"> <conditionExpression xsi:type="tFormalExpression">yes</conditionExpression> </sequenceFlow> <sequenceFlow id="i_flow4" sourceRef="registerClaim" targetRef="checkInsurance"/> <sequenceFlow id="i_flow5" sourceRef="gw_docsComplete" targetRef="rejectClaim"> <conditionExpression xsi:type="tFormalExpression">no</conditionExpression> </sequenceFlow> <sequenceFlow id="i_flow6" sourceRef="checkInsurance" targetRef="gw_insuranceOK"/> <sequenceFlow id="i_flow7" sourceRef="gw_insuranceOK" targetRef="performAssessment"> <conditionExpression xsi:type="tFormalExpression">yes</conditionExpression> </sequenceFlow> <sequenceFlow id="i_flow8" sourceRef="gw_insuranceOK" targetRef="rejectClaim"> <conditionExpression xsi:type="tFormalExpression">no</conditionExpression> </sequenceFlow> <sequenceFlow id="i_flow9" sourceRef="performAssessment" targetRef="gw_assessmentPositive"/> <sequenceFlow id="i_flow10" sourceRef="gw_assessmentPositive" targetRef="authorizeRepair"> <conditionExpression xsi:type="tFormalExpression">yes</conditionExpression> </sequenceFlow> <sequenceFlow id="i_flow11" sourceRef="authorizeRepair" targetRef="schedulePayment"/> <sequenceFlow id="i_flow12" sourceRef="schedulePayment" targetRef="sendLetter"/> <sequenceFlow id="i_flow13" sourceRef="gw_assessmentPositive" targetRef="rejectClaim"> <conditionExpression xsi:type="tFormalExpression">no</conditionExpression> </sequenceFlow> <!-- Merge after payment or rejection --> <sequenceFlow id="i_flow14" sourceRef="schedulePayment" targetRef="sendLetter"/> <sequenceFlow id="i_flow15" sourceRef="rejectClaim" targetRef="sendLetter"/> <sequenceFlow id="i_flow16" sourceRef="sendLetter" targetRef="throwOutcomeMsg"/> <sequenceFlow id="i_flow17" sourceRef="throwOutcomeMsg" targetRef="insurer_end"/> <!-- Data Associations -->   </process> <!-- Messages --> <message id="msgSubmitClaim" name="Claim Submission"/> <message id="msgOutcomeLetter" name="Claim Outcome"/> 
+  
+  <!-- Collaboration --> <collaboration id="ClaimCollab"> <participant id="CustomerParticipant" name="Customer" processRef="CustomerProcess"/> <participant id="InsurerParticipant" name="Car Insurer" processRef="InsurerProcess"/> <messageFlow id="mf1" sourceRef="sendClaimMsg" targetRef="insurer_start"/> <messageFlow id="mf2" sourceRef="throwOutcomeMsg" targetRef="receiveOutcomeMsg"/> </collaboration>
+  
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="ClaimCollab">
+      <bpmndi:BPMNShape id="CustomerPool_di" bpmnElement="CustomerParticipant" isHorizontal="true">
+        <dc:Bounds x="160" y="80" width="1640" height="280" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CustomerLane_di" bpmnElement="customerLane" isHorizontal="true">
+        <dc:Bounds x="180" y="80" width="1600" height="280" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="cust_start_di" bpmnElement="cust_start">
+        <dc:Bounds x="220" y="240" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="195" y="276" width="86" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="submitClaim_di" bpmnElement="submitClaim">
+        <dc:Bounds x="320" y="225" width="100" height="66" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="sendClaimMsg_di" bpmnElement="sendClaimMsg">
+        <dc:Bounds x="460" y="240" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="449" y="276" width="58" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="cust_end_di" bpmnElement="cust_end">
+        <dc:Bounds x="845" y="240" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="819" y="276" width="88" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="receiveOutcomeMsg_di" bpmnElement="receiveOutcomeMsg">
+        <dc:Bounds x="700" y="240" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="682" y="276" width="72" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="claimDocsData_di" bpmnElement="claimDocsData">
+        <dc:Bounds x="285" y="145" width="36" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="266" y="195" width="74" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="flow1_di" bpmnElement="flow1">
+        <di:waypoint x="256" y="258" />
+        <di:waypoint x="320" y="258" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow2_di" bpmnElement="flow2">
+        <di:waypoint x="420" y="258" />
+        <di:waypoint x="460" y="258" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow3_di" bpmnElement="flow3">
+        <di:waypoint x="496" y="258" />
+        <di:waypoint x="700" y="258" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow4_di" bpmnElement="flow4">
+        <di:waypoint x="736" y="258" />
+        <di:waypoint x="845" y="258" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="InsurerPool_di" bpmnElement="InsurerParticipant" isHorizontal="true">
+        <dc:Bounds x="160" y="380" width="1910" height="420" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="handlingLane_di" bpmnElement="handlingLane" isHorizontal="true">
+        <dc:Bounds x="180" y="520" width="1870" height="280" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="notifLane_di" bpmnElement="notifLane" isHorizontal="true">
+        <dc:Bounds x="180" y="380" width="1870" height="140" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="insurer_start_di" bpmnElement="insurer_start">
+        <dc:Bounds x="520" y="430" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="505" y="466" width="66" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="checkDocs_di" bpmnElement="checkDocs">
+        <dc:Bounds x="620" y="415" width="110" height="66" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="gw_docsComplete_di" bpmnElement="gw_docsComplete" isMarkerVisible="true">
+        <dc:Bounds x="760" y="435" width="40" height="40" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="739" y="411" width="82" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="registerClaim_di" bpmnElement="registerClaim">
+        <dc:Bounds x="840" y="415" width="110" height="66" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="checkInsurance_di" bpmnElement="checkInsurance">
+        <dc:Bounds x="1000" y="565" width="110" height="66" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="gw_insuranceOK_di" bpmnElement="gw_insuranceOK" isMarkerVisible="true">
+        <dc:Bounds x="1150" y="585" width="40" height="40" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1129" y="625" width="82" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="performAssessment_di" bpmnElement="performAssessment">
+        <dc:Bounds x="1230" y="565" width="120" height="66" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="gw_assessmentPositive_di" bpmnElement="gw_assessmentPositive" isMarkerVisible="true">
+        <dc:Bounds x="1380" y="585" width="40" height="40" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1370" y="547.5" width="60" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="authorizeRepair_di" bpmnElement="authorizeRepair">
+        <dc:Bounds x="1460" y="565" width="110" height="66" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="schedulePayment_di" bpmnElement="schedulePayment">
+        <dc:Bounds x="1600" y="565" width="110" height="66" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="rejectClaim_di" bpmnElement="rejectClaim">
+        <dc:Bounds x="1230" y="680" width="110" height="66" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="sendLetter_di" bpmnElement="sendLetter">
+        <dc:Bounds x="1740" y="595" width="120" height="66" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="throwOutcomeMsg_di" bpmnElement="throwOutcomeMsg">
+        <dc:Bounds x="1880" y="610" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1860" y="646" width="77" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="insurer_end_di" bpmnElement="insurer_end">
+        <dc:Bounds x="1950" y="610" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1937" y="646" width="63" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="claimData_di" bpmnElement="claimData">
+        <dc:Bounds x="1037" y="423" width="36" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1012" y="399" width="85" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="i_flow1_di" bpmnElement="i_flow1">
+        <di:waypoint x="556" y="448" />
+        <di:waypoint x="620" y="448" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="i_flow2_di" bpmnElement="i_flow2">
+        <di:waypoint x="730" y="448" />
+        <di:waypoint x="760" y="453" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="i_flow3_di" bpmnElement="i_flow3">
+        <di:waypoint x="800" y="455" />
+        <di:waypoint x="840" y="448" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="i_flow4_di" bpmnElement="i_flow4">
+        <di:waypoint x="950" y="448" />
+        <di:waypoint x="1000" y="598" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="i_flow5_di" bpmnElement="i_flow5">
+        <di:waypoint x="780" y="475" />
+        <di:waypoint x="780" y="730" />
+        <di:waypoint x="1230" y="730" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="i_flow6_di" bpmnElement="i_flow6">
+        <di:waypoint x="1110" y="598" />
+        <di:waypoint x="1150" y="605" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="i_flow7_di" bpmnElement="i_flow7">
+        <di:waypoint x="1190" y="605" />
+        <di:waypoint x="1230" y="598" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="i_flow8_di" bpmnElement="i_flow8">
+        <di:waypoint x="1180" y="615" />
+        <di:waypoint x="1180" y="713" />
+        <di:waypoint x="1230" y="713" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="i_flow9_di" bpmnElement="i_flow9">
+        <di:waypoint x="1350" y="598" />
+        <di:waypoint x="1380" y="605" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="i_flow10_di" bpmnElement="i_flow10">
+        <di:waypoint x="1420" y="605" />
+        <di:waypoint x="1460" y="598" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="i_flow11_di" bpmnElement="i_flow11">
+        <di:waypoint x="1570" y="598" />
+        <di:waypoint x="1600" y="598" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="i_flow12_di" bpmnElement="i_flow12">
+        <di:waypoint x="1710" y="598" />
+        <di:waypoint x="1740" y="628" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="i_flow13_di" bpmnElement="i_flow13">
+        <di:waypoint x="1400" y="625" />
+        <di:waypoint x="1400" y="713" />
+        <di:waypoint x="1340" y="713" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="i_flow14_di" bpmnElement="i_flow14">
+        <di:waypoint x="1710" y="598" />
+        <di:waypoint x="1740" y="628" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="i_flow15_di" bpmnElement="i_flow15">
+        <di:waypoint x="1340" y="725" />
+        <di:waypoint x="1800" y="725" />
+        <di:waypoint x="1800" y="661" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="i_flow16_di" bpmnElement="i_flow16">
+        <di:waypoint x="1860" y="628" />
+        <di:waypoint x="1880" y="628" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="i_flow17_di" bpmnElement="i_flow17">
+        <di:waypoint x="1916" y="628" />
+        <di:waypoint x="1950" y="628" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="cust_submitClaim_docs_da" bpmnElement="da1">
+        <di:waypoint x="321" y="187" />
+        <di:waypoint x="356" y="225" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ins_registerClaim_data_da" bpmnElement="da2">
+        <di:waypoint x="950" y="448" />
+        <di:waypoint x="1037" y="448" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ins_checkInsurance_data_da" bpmnElement="da3">
+        <di:waypoint x="1057" y="473" />
+        <di:waypoint x="1057" y="565" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="mf1_di" bpmnElement="mf1">
+        <di:waypoint x="496" y="258" />
+        <di:waypoint x="538" y="448" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="mf2_di" bpmnElement="mf2">
+        <di:waypoint x="1890" y="612" />
+        <di:waypoint x="1550" y="180" />
+        <di:waypoint x="718" y="180" />
+        <di:waypoint x="718" y="240" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

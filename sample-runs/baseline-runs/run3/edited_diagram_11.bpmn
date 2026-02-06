@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_1" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.34.0">
+  <process id="CompanyProcess" isExecutable="true">
+    <laneSet>
+      <lane id="WarehousemanLane" name="Warehousemen">
+        <flowNodeRef>Task_PackageGoods</flowNodeRef>
+      </lane>
+      <lane id="LogisticsHeadLane" name="Logistics Department Head">
+        <flowNodeRef>Task_WritePackageLabel</flowNodeRef>
+        <flowNodeRef>Gateway_InsuranceNeeded</flowNodeRef>
+        <flowNodeRef>Task_TakeParcelInsurance</flowNodeRef>
+        <flowNodeRef>EndEvent_SmallAmount</flowNodeRef>
+        <flowNodeRef>Gateway_ParallelJoin</flowNodeRef>
+        <flowNodeRef>EndEvent_PreparedForPickup</flowNodeRef>
+      </lane>
+      <lane id="SecretaryLane" name="Secretary">
+        <flowNodeRef>StartEvent_GoodsToBeShipped</flowNodeRef>
+        <flowNodeRef>Task_ClarifyShipping</flowNodeRef>
+        <flowNodeRef>Gateway_AmountCheck</flowNodeRef>
+        <flowNodeRef>Task_InviteLogisticsCompanies</flowNodeRef>
+        <flowNodeRef>Task_SelectLogisticsCompany</flowNodeRef>
+        <flowNodeRef>EndEvent_LargeAmount</flowNodeRef>
+        <flowNodeRef>Gateway_ParallelStart</flowNodeRef>
+        <flowNodeRef>Task_PrepareForPickup</flowNodeRef>
+      </lane>
+    </laneSet>
+    <startEvent id="StartEvent_GoodsToBeShipped" name="Goods to be shipped" />
+    <task id="Task_ClarifyShipping" name="Clarify shipping method" />
+    <exclusiveGateway id="Gateway_AmountCheck" name="Large amount?" />
+    <task id="Task_InviteLogisticsCompanies" name="Invite 3 logistics companies for offers" />
+    <task id="Task_SelectLogisticsCompany" name="Select logistics company" />
+    <endEvent id="EndEvent_LargeAmount" name="Shipping company selected" />
+    <task id="Task_WritePackageLabel" name="Write package label" />
+    <exclusiveGateway id="Gateway_InsuranceNeeded" name="Insurance needed?" />
+    <task id="Task_TakeParcelInsurance" name="Take parcel insurance" />
+    <endEvent id="EndEvent_SmallAmount" name="Label and insurance ready" />
+    <task id="Task_PackageGoods" name="Package goods" />
+    <parallelGateway id="Gateway_ParallelStart" name="Parallel Start" />
+    <parallelGateway id="Gateway_ParallelJoin" name="Parallel Join" />
+    <task id="Task_PrepareForPickup" name="Prepare goods for pickup" />
+    <endEvent id="EndEvent_PreparedForPickup" name="Ready for pickup" />
+    <dataObject id="DataObject_PackageLabel" name="Package Label" />
+    <dataObject id="DataObject_ParcelInsurance" name="Parcel Insurance" />
+    <dataObject id="DataObject_PackagedGoods" name="Packaged Goods" />
+    <sequenceFlow id="Flow1" sourceRef="StartEvent_GoodsToBeShipped" targetRef="Task_ClarifyShipping" />
+    <sequenceFlow id="Flow2" sourceRef="Task_ClarifyShipping" targetRef="Gateway_AmountCheck" />
+    <sequenceFlow id="Flow3" sourceRef="Gateway_AmountCheck" targetRef="Task_InviteLogisticsCompanies">
+      <conditionExpression xsi:type="tFormalExpression">largeAmount</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="Flow4" sourceRef="Task_InviteLogisticsCompanies" targetRef="Task_SelectLogisticsCompany" />
+    <sequenceFlow id="Flow5" sourceRef="Task_SelectLogisticsCompany" targetRef="Gateway_ParallelStart" />
+    <sequenceFlow id="Flow6" sourceRef="Gateway_AmountCheck" targetRef="Task_WritePackageLabel">
+      <conditionExpression xsi:type="tFormalExpression">smallAmount</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="Flow7" sourceRef="Task_WritePackageLabel" targetRef="Gateway_InsuranceNeeded" />
+    <sequenceFlow id="Flow8" sourceRef="Gateway_InsuranceNeeded" targetRef="Task_TakeParcelInsurance">
+      <conditionExpression xsi:type="tFormalExpression">insuranceNeeded</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="Flow9" sourceRef="Task_TakeParcelInsurance" targetRef="Gateway_ParallelStart" />
+    <sequenceFlow id="Flow10" sourceRef="Gateway_InsuranceNeeded" targetRef="Gateway_ParallelStart">
+      <conditionExpression xsi:type="tFormalExpression">!insuranceNeeded</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="Flow11" sourceRef="Gateway_ParallelStart" targetRef="Task_PackageGoods" />
+    <sequenceFlow id="Flow12" sourceRef="Gateway_ParallelStart" targetRef="EndEvent_LargeAmount" />
+    <sequenceFlow id="Flow13" sourceRef="Gateway_ParallelStart" targetRef="EndEvent_SmallAmount" />
+    <sequenceFlow id="Flow14" sourceRef="Task_PackageGoods" targetRef="Gateway_ParallelJoin" />
+    <sequenceFlow id="Flow17" sourceRef="Gateway_ParallelJoin" targetRef="Task_PrepareForPickup" />
+    <sequenceFlow id="Flow18" sourceRef="Task_PrepareForPickup" targetRef="EndEvent_PreparedForPickup" />
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="CompanyProcess">
+      <bpmndi:BPMNShape id="Lane_Warehouseman_di" bpmnElement="WarehousemanLane" isHorizontal="true">
+        <dc:Bounds x="160" y="230" width="1900" height="140" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_LogisticsHead_di" bpmnElement="LogisticsHeadLane" isHorizontal="true">
+        <dc:Bounds x="160" y="170" width="1900" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Secretary_di" bpmnElement="SecretaryLane" isHorizontal="true">
+        <dc:Bounds x="160" y="50" width="1900" height="120" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="StartEvent_GoodsToBeShipped_di" bpmnElement="StartEvent_GoodsToBeShipped">
+        <dc:Bounds x="210" y="96" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="198" y="132" width="61" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_ClarifyShipping_di" bpmnElement="Task_ClarifyShipping">
+        <dc:Bounds x="290" y="86" width="100" height="56" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_AmountCheck_di" bpmnElement="Gateway_AmountCheck" isMarkerVisible="true">
+        <dc:Bounds x="430" y="101" width="40" height="40" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="413" y="141" width="74" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_InviteLogisticsCompanies_di" bpmnElement="Task_InviteLogisticsCompanies">
+        <dc:Bounds x="510" y="66" width="135" height="56" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_SelectLogisticsCompany_di" bpmnElement="Task_SelectLogisticsCompany">
+        <dc:Bounds x="680" y="66" width="120" height="56" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_LargeAmount_di" bpmnElement="EndEvent_LargeAmount">
+        <dc:Bounds x="1210" y="96" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1184" y="132" width="89" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_WritePackageLabel_di" bpmnElement="Task_WritePackageLabel">
+        <dc:Bounds x="510" y="146" width="120" height="56" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_InsuranceNeeded_di" bpmnElement="Gateway_InsuranceNeeded" isMarkerVisible="true">
+        <dc:Bounds x="680" y="161" width="40" height="40" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="676" y="201" width="49" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_TakeParcelInsurance_di" bpmnElement="Task_TakeParcelInsurance">
+        <dc:Bounds x="780" y="190" width="90" height="56" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_SmallAmount_di" bpmnElement="EndEvent_SmallAmount">
+        <dc:Bounds x="1110" y="176" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1089" y="212" width="79" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_PackageGoods_di" bpmnElement="Task_PackageGoods">
+        <dc:Bounds x="960" y="266" width="110" height="56" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_ParallelStart_di" bpmnElement="Gateway_ParallelStart" isMarkerVisible="true">
+        <dc:Bounds x="880" y="101" width="40" height="40" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="868" y="141" width="64" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_ParallelJoin_di" bpmnElement="Gateway_ParallelJoin" isMarkerVisible="true">
+        <dc:Bounds x="1250" y="161" width="40" height="40" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1240" y="201" width="60" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_PrepareForPickup_di" bpmnElement="Task_PrepareForPickup">
+        <dc:Bounds x="1370" y="139" width="140" height="56" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_PreparedForPickup_di" bpmnElement="EndEvent_PreparedForPickup">
+        <dc:Bounds x="1560" y="156" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1537" y="192" width="83" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow1_di" bpmnElement="Flow1">
+        <di:waypoint x="246" y="114" />
+        <di:waypoint x="290" y="114" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow2_di" bpmnElement="Flow2">
+        <di:waypoint x="390" y="114" />
+        <di:waypoint x="430" y="121" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow3_di" bpmnElement="Flow3">
+        <di:waypoint x="470" y="121" />
+        <di:waypoint x="510" y="94" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow4_di" bpmnElement="Flow4">
+        <di:waypoint x="645" y="94" />
+        <di:waypoint x="680" y="94" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow5_di" bpmnElement="Flow5">
+        <di:waypoint x="800" y="94" />
+        <di:waypoint x="880" y="121" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow6_di" bpmnElement="Flow6">
+        <di:waypoint x="470" y="121" />
+        <di:waypoint x="510" y="174" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow7_di" bpmnElement="Flow7">
+        <di:waypoint x="630" y="174" />
+        <di:waypoint x="680" y="181" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow8_di" bpmnElement="Flow8">
+        <di:waypoint x="720" y="181" />
+        <di:waypoint x="825" y="190" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow9_di" bpmnElement="Flow9">
+        <di:waypoint x="870" y="218" />
+        <di:waypoint x="900" y="210" />
+        <di:waypoint x="900" y="141" />
+        <di:waypoint x="880" y="141" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow10_di" bpmnElement="Flow10">
+        <di:waypoint x="720" y="181" />
+        <di:waypoint x="900" y="181" />
+        <di:waypoint x="900" y="141" />
+        <di:waypoint x="900" y="141" />
+        <di:waypoint x="880" y="141" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow11_di" bpmnElement="Flow11">
+        <di:waypoint x="900" y="121" />
+        <di:waypoint x="970" y="266" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow12_di" bpmnElement="Flow12">
+        <di:waypoint x="920" y="121" />
+        <di:waypoint x="1228" y="114" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow13_di" bpmnElement="Flow13">
+        <di:waypoint x="920" y="141" />
+        <di:waypoint x="1128" y="176" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow14_di" bpmnElement="Flow14">
+        <di:waypoint x="1070" y="294" />
+        <di:waypoint x="1270" y="181" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow17_di" bpmnElement="Flow17">
+        <di:waypoint x="1290" y="181" />
+        <di:waypoint x="1370" y="167" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow18_di" bpmnElement="Flow18">
+        <di:waypoint x="1510" y="167" />
+        <di:waypoint x="1560" y="174" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

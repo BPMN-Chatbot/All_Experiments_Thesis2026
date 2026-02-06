@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?> <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:tns="http://example.org/bpmn" targetNamespace="http://example.org/bpmn"> 
+  <!-- Owner Pool --> <process id="OwnerProcess" isExecutable="true"> 
+    <laneSet> <lane id="OwnerLane" name="Owner"/> </laneSet> <startEvent id="OwnerStartEvt" name="Start Compensation Request" /> <task id="SubmitRequestTask" name="Submit Compensation Request" /> <intermediateThrowEvent id="SendRequestEvent" name="Send Compensation Request"> <messageEventDefinition id="SendRequestMsgDef"/> </intermediateThrowEvent> <intermediateCatchEvent id="ReceiveFeesNoticeEvent" name="Receive Fees Notice"> <messageEventDefinition id="ReceiveFeesNoticeMsgDef"/> </intermediateCatchEvent> <task id="PayFeesTask" name="Pay Fees" /> <intermediateThrowEvent id="SendProofOfPaymentEvent" name="Send Proof of Payment"> <messageEventDefinition id="SendProofOfPaymentMsgDef"/> </intermediateThrowEvent> <endEvent id="OwnerEndEvt" name="Process Complete"/> <sequenceFlow id="of1" sourceRef="OwnerStartEvt" targetRef="SubmitRequestTask"/> <sequenceFlow id="of2" sourceRef="SubmitRequestTask" targetRef="SendRequestEvent"/> <sequenceFlow id="of3" sourceRef="SendRequestEvent" targetRef="ReceiveFeesNoticeEvent"/> <sequenceFlow id="of4" sourceRef="ReceiveFeesNoticeEvent" targetRef="PayFeesTask"/> <sequenceFlow id="of5" sourceRef="PayFeesTask" targetRef="SendProofOfPaymentEvent"/> <sequenceFlow id="of6" sourceRef="SendProofOfPaymentEvent" targetRef="OwnerEndEvt"/> </process>
+  <!-- Tribunal Pool --> <process id="TribunalProcess" isExecutable="true">
+    <laneSet> <lane id="CashierLane" name="Cashier"/> </laneSet> <startEvent id="TribunalStartEvt" name="Wait for Compensation Request"> <messageEventDefinition id="CatchRequestMsgDef"/> </startEvent> <task id="RetrieveFileTask" name="Retrieve File"> <dataInputAssociation id="asso1"> <sourceRef>PremisesFileDataStore</sourceRef> </dataInputAssociation> <dataOutputAssociation id="asso2"> <targetRef>DataRef_PremisesFile</targetRef> </dataOutputAssociation> </task> <task id="CheckRequestTask" name="Check Request for Acceptability and Compliance"> <dataInputAssociation id="asso3"> <sourceRef>DataRef_PremisesFile</sourceRef> </dataInputAssociation> </task> <exclusiveGateway id="FeesPaidGateway" name="Fees Paid?"/> <task id="AllocateDateTask" name="Allocate Hearing Date" /> <endEvent id="TribunalEndEvt" name="Process Complete"/> <task id="ProduceFeesNoticeTask" name="Produce Fees Notice" /> <intermediateThrowEvent id="SendFeesNoticeEvent" name="Send Fees Notice"> <messageEventDefinition id="SendFeesNoticeMsgDef"/> </intermediateThrowEvent> <intermediateCatchEvent id="ReceiveProofOfPaymentEvent" name="Receive Proof of Payment"> <messageEventDefinition id="CatchProofOfPaymentMsgDef"/> </intermediateCatchEvent> <sequenceFlow id="tf1" sourceRef="TribunalStartEvt" targetRef="RetrieveFileTask"/> <sequenceFlow id="tf2" sourceRef="RetrieveFileTask" targetRef="CheckRequestTask"/> <sequenceFlow id="tf3" sourceRef="CheckRequestTask" targetRef="FeesPaidGateway"/> <sequenceFlow id="tf4" sourceRef="FeesPaidGateway" targetRef="AllocateDateTask"> <conditionExpression xsi:type="tFormalExpression"><![CDATA[feesPaid]]></conditionExpression> </sequenceFlow> <sequenceFlow id="tf5" sourceRef="AllocateDateTask" targetRef="TribunalEndEvt"/> <sequenceFlow id="tf6" sourceRef="FeesPaidGateway" targetRef="ProduceFeesNoticeTask"> <conditionExpression xsi:type="tFormalExpression"><![CDATA[!feesPaid]]></conditionExpression> </sequenceFlow> <sequenceFlow id="tf7" sourceRef="ProduceFeesNoticeTask" targetRef="SendFeesNoticeEvent"/> <sequenceFlow id="tf8" sourceRef="SendFeesNoticeEvent" targetRef="ReceiveProofOfPaymentEvent"/> <sequenceFlow id="tf9" sourceRef="ReceiveProofOfPaymentEvent" targetRef="CheckRequestTask"/> <!-- Data Objects and Data Store --> 
+  <dataObject id="PremisesFileDataObject" /> 
+    <dataObjectReference id="DataRef_PremisesFile" dataObjectRef="PremisesFileDataObject" name="Premises File"/>
+  <dataObject id="PremisesFileStore" /> 
+  <dataStoreReference id="PremisesFileDataStore" dataStoreRef="PremisesFileStore" name="Premises File Store"/> 
+</process> 
+  <!-- Message Flows between Pools --> <message id="CompRequestMsg" name="Compensation Request"/> <message id="FeesNoticeMsg" name="Fees Notice"/> <message id="ProofOfPaymentMsg" name="Proof Of Payment"/> 
+  <collaboration id="Collaboration1"> 
+    <participant id="OwnerPool" name="Owner" processRef="OwnerProcess"/> <participant id="TribunalPool" name="Tribunal" processRef="TribunalProcess"/> <messageFlow id="mf1" name="Compensation Request" sourceRef="SendRequestEvent" targetRef="TribunalStartEvt" messageRef="CompRequestMsg"/> <messageFlow id="mf2" name="Fees Notice" sourceRef="SendFeesNoticeEvent" targetRef="ReceiveFeesNoticeEvent" messageRef="FeesNoticeMsg"/> <messageFlow id="mf3" name="Proof Of Payment" sourceRef="SendProofOfPaymentEvent" targetRef="ReceiveProofOfPaymentEvent" messageRef="ProofOfPaymentMsg"/> </collaboration> 
+  
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration1">
+      <bpmndi:BPMNShape id="OwnerPool_di" bpmnElement="OwnerPool" isHorizontal="true">
+        <omgdc:Bounds x="160" y="100" width="1110" height="220" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="OwnerLane_di" bpmnElement="OwnerLane" isHorizontal="true">
+        <omgdc:Bounds x="180" y="120" width="1070" height="180" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="OwnerStartEvt_di" bpmnElement="OwnerStartEvt">
+        <omgdc:Bounds x="220" y="200" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="203" y="236" width="71" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="SubmitRequestTask_di" bpmnElement="SubmitRequestTask">
+        <omgdc:Bounds x="300" y="190" width="100" height="56" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="SendRequestEvent_di" bpmnElement="SendRequestEvent">
+        <omgdc:Bounds x="450" y="204" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="433" y="240" width="71" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ReceiveFeesNoticeEvent_di" bpmnElement="ReceiveFeesNoticeEvent">
+        <omgdc:Bounds x="570" y="204" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="554" y="240" width="68" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="PayFeesTask_di" bpmnElement="PayFeesTask">
+        <omgdc:Bounds x="670" y="190" width="100" height="56" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="SendProofOfPaymentEvent_di" bpmnElement="SendProofOfPaymentEvent">
+        <omgdc:Bounds x="840" y="204" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="824" y="240" width="69" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="OwnerEndEvt_di" bpmnElement="OwnerEndEvt">
+        <omgdc:Bounds x="940" y="206" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="934" y="242" width="48" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="of1_di" bpmnElement="of1">
+        <omgdi:waypoint x="256" y="218" />
+        <omgdi:waypoint x="300" y="218" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="of2_di" bpmnElement="of2">
+        <omgdi:waypoint x="400" y="218" />
+        <omgdi:waypoint x="450" y="222" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="of3_di" bpmnElement="of3">
+        <omgdi:waypoint x="486" y="222" />
+        <omgdi:waypoint x="570" y="222" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="of4_di" bpmnElement="of4">
+        <omgdi:waypoint x="606" y="222" />
+        <omgdi:waypoint x="670" y="218" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="of5_di" bpmnElement="of5">
+        <omgdi:waypoint x="770" y="218" />
+        <omgdi:waypoint x="840" y="222" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="of6_di" bpmnElement="of6">
+        <omgdi:waypoint x="876" y="222" />
+        <omgdi:waypoint x="940" y="224" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="TribunalPool_di" bpmnElement="TribunalPool" isHorizontal="true">
+        <omgdc:Bounds x="160" y="355" width="1110" height="350" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CashierLane_di" bpmnElement="CashierLane" isHorizontal="true">
+        <omgdc:Bounds x="180" y="375" width="1070" height="330" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TribunalStartEvt_di" bpmnElement="TribunalStartEvt">
+        <omgdc:Bounds x="280" y="475" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="263" y="511" width="71" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="RetrieveFileTask_di" bpmnElement="RetrieveFileTask">
+        <omgdc:Bounds x="380" y="465" width="108" height="56" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CheckRequestTask_di" bpmnElement="CheckRequestTask">
+        <omgdc:Bounds x="520" y="465" width="140" height="56" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="FeesPaidGateway_di" bpmnElement="FeesPaidGateway" isMarkerVisible="true">
+        <omgdc:Bounds x="710" y="479" width="40" height="40" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="702" y="533" width="56" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="AllocateDateTask_di" bpmnElement="AllocateDateTask">
+        <omgdc:Bounds x="800" y="465" width="120" height="56" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TribunalEndEvt_di" bpmnElement="TribunalEndEvt">
+        <omgdc:Bounds x="960" y="477" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="954" y="513" width="48" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ProduceFeesNoticeTask_di" bpmnElement="ProduceFeesNoticeTask">
+        <omgdc:Bounds x="730" y="575" width="120" height="56" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="SendFeesNoticeEvent_di" bpmnElement="SendFeesNoticeEvent">
+        <omgdc:Bounds x="900" y="589" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="874" y="625" width="88" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ReceiveProofOfPaymentEvent_di" bpmnElement="ReceiveProofOfPaymentEvent">
+        <omgdc:Bounds x="1080" y="589" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="1056" y="551.5" width="83" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataRef_PremisesFile_di" bpmnElement="DataRef_PremisesFile">
+        <omgdc:Bounds x="545" y="395" width="50" height="40" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="536" y="435" width="68" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="PremisesFileDataStore_di" bpmnElement="PremisesFileDataStore" isMarkerVisible="true">
+        <omgdc:Bounds x="385" y="395" width="50" height="40" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="376" y="435" width="68" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="tf1_di" bpmnElement="tf1">
+        <omgdi:waypoint x="316" y="493" />
+        <omgdi:waypoint x="380" y="493" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="tf2_di" bpmnElement="tf2">
+        <omgdi:waypoint x="488" y="493" />
+        <omgdi:waypoint x="520" y="493" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="tf9_di" bpmnElement="tf9">
+        <omgdi:waypoint x="1098" y="625" />
+        <omgdi:waypoint x="1098" y="675" />
+        <omgdi:waypoint x="600" y="675" />
+        <omgdi:waypoint x="600" y="521" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="tf3_di" bpmnElement="tf3">
+        <omgdi:waypoint x="660" y="493" />
+        <omgdi:waypoint x="710" y="499" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="tf4_di" bpmnElement="tf4">
+        <omgdi:waypoint x="750" y="499" />
+        <omgdi:waypoint x="800" y="493" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="tf6_di" bpmnElement="tf6">
+        <omgdi:waypoint x="730" y="519" />
+        <omgdi:waypoint x="790" y="540" />
+        <omgdi:waypoint x="790" y="575" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="tf5_di" bpmnElement="tf5">
+        <omgdi:waypoint x="920" y="493" />
+        <omgdi:waypoint x="960" y="495" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="tf7_di" bpmnElement="tf7">
+        <omgdi:waypoint x="850" y="603" />
+        <omgdi:waypoint x="900" y="607" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="tf8_di" bpmnElement="tf8">
+        <omgdi:waypoint x="936" y="607" />
+        <omgdi:waypoint x="1080" y="607" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="mf1_di" bpmnElement="mf1">
+        <omgdi:waypoint x="481" y="234" />
+        <omgdi:waypoint x="481" y="340" />
+        <omgdi:waypoint x="285" y="340" />
+        <omgdi:waypoint x="285" y="481" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="255" y="391" width="71" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="mf2_di" bpmnElement="mf2" messageVisibleKind="non_initiating">
+        <omgdi:waypoint x="935" y="601" />
+        <omgdi:waypoint x="935" y="415" />
+        <omgdi:waypoint x="750" y="340" />
+        <omgdi:waypoint x="595" y="238" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="905" y="435" width="60" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="mf3_di" bpmnElement="mf3">
+        <omgdi:waypoint x="867" y="237" />
+        <omgdi:waypoint x="990" y="320" />
+        <omgdi:waypoint x="1111" y="415" />
+        <omgdi:waypoint x="1111" y="595" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="1077" y="492" width="88" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="asso1_di" bpmnElement="asso1">
+        <omgdi:waypoint x="418" y="435" />
+        <omgdi:waypoint x="429" y="465" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="asso2_di" bpmnElement="asso2">
+        <omgdi:waypoint x="434" y="465" />
+        <omgdi:waypoint x="545" y="424" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="asso3_di" bpmnElement="asso3">
+        <omgdi:waypoint x="579" y="435" />
+        <omgdi:waypoint x="592" y="465" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?> <bpmn:definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_1" targetNamespace="http://www.example.org/bpmn20"> 
+  
+  <bpmn:collaboration id="Collaboration_1"> <bpmn:participant id="Management_Pool" name="Management" processRef="Management_Process"/> <bpmn:participant id="Accounting_Pool" name="Accounting Dept." processRef="Accounting_Process"/>
+    <!-- Message Flows Between Pools --> <bpmn:messageFlow id="msg1" name="Year &amp; Month" sourceRef="SendYearMonthEvent" targetRef="ReceiveYearMonthEvent"/> <bpmn:messageFlow id="msg2" name="Cash-out Report" sourceRef="SendReportEvent" targetRef="ReceiveReportEvent"/> 
+  </bpmn:collaboration> 
+  <!-- Management Pool --> <bpmn:process id="Management_Process" isExecutable="true"> 
+    <bpmn:laneSet> <bpmn:lane id="Management_Lane" name="Management"/> </bpmn:laneSet> <bpmn:startEvent id="StartEvent_Management" name="Start"/> <bpmn:task id="OrderCashOutReportTask" name="Order Cash-out Report"/> <intermediateThrowEvent id="SendYearMonthEvent" name="Send Year &amp; Month"> <bpmn:messageEventDefinition id="SendYearMonthMessageDef"/> </intermediateThrowEvent> <bpmn:intermediateCatchEvent id="ReceiveReportEvent" name="Receive Cash-out Report"> <bpmn:messageEventDefinition id="ReceiveReportMessageDef"/> </bpmn:intermediateCatchEvent> <bpmn:endEvent id="EndEvent_Management" name="End"/> <bpmn:sequenceFlow id="flow1" sourceRef="StartEvent_Management" targetRef="OrderCashOutReportTask"/> <bpmn:sequenceFlow id="flow2" sourceRef="OrderCashOutReportTask" targetRef="SendYearMonthEvent"/> <bpmn:sequenceFlow id="flow3" sourceRef="SendYearMonthEvent" targetRef="ReceiveReportEvent"/> <bpmn:sequenceFlow id="flow4" sourceRef="ReceiveReportEvent" targetRef="EndEvent_Management"/> </bpmn:process> 
+  <!-- Accounting Pool --> <bpmn:process id="Accounting_Process" isExecutable="true"> 
+    <bpmn:laneSet> <bpmn:lane id="Accountant_Lane" name="Accountant"/> </bpmn:laneSet> <bpmn:startEvent id="StartEvent_Accounting" name="Start"/> <bpmn:intermediateCatchEvent id="ReceiveYearMonthEvent" name="Receive Year &amp; Month"> <bpmn:messageEventDefinition id="ReceiveYearMonthMessageCatchDef"/> </bpmn:intermediateCatchEvent>  <bpmn:exclusiveGateway id="CheckIfNotEmptyGateway" name="Transactions Not Empty?"/> 
+    
+    <intermediateThrowEvent id="SendReportEvent" name="Send Cash-out Report"> <bpmn:messageEventDefinition id="SendReportMessageDef"/> </intermediateThrowEvent> <bpmn:endEvent id="EndEvent_Accounting" name="No Cash-out"/> <bpmn:endEvent id="EndEvent_Accounting2" name="End"/> <bpmn:sequenceFlow id="aflow1" sourceRef="StartEvent_Accounting" targetRef="ReceiveYearMonthEvent"/> <bpmn:sequenceFlow id="aflow2" sourceRef="ReceiveYearMonthEvent" targetRef="FilterTransactionsTask"/> <bpmn:sequenceFlow id="aflow3" sourceRef="FilterTransactionsTask" targetRef="CheckIfNotEmptyGateway"/> <bpmn:sequenceFlow id="aflow4" sourceRef="CheckIfNotEmptyGateway" targetRef="PrintReportTask"> <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression"><![CDATA[notEmpty]]></bpmn:conditionExpression> </bpmn:sequenceFlow> <bpmn:sequenceFlow id="aflow5" sourceRef="PrintReportTask" targetRef="SendReportEvent"/> <bpmn:sequenceFlow id="aflow6" sourceRef="SendReportEvent" targetRef="EndEvent_Accounting2"/> <bpmn:sequenceFlow id="aflow7" sourceRef="CheckIfNotEmptyGateway" targetRef="EndEvent_Accounting"> <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression"><![CDATA[empty]]></bpmn:conditionExpression> </bpmn:sequenceFlow> 
+
+
+    <!-- Data Store Definitions -->
+<bpmn:dataObject id="CashDatabase" name="Cash Database"/>
+<bpmn:dataObject id="FilteredTransactionsObject" name="Filtered Transactions"/>
+
+<!-- Data Store Reference -->
+<bpmn:dataStoreReference id="CashDatabaseStore" name="Cash Database" dataStoreRef="CashDatabase">
+</bpmn:dataStoreReference>
+
+<!-- Data Object Reference -->
+<bpmn:dataObjectReference id="FilteredTransactions" name="Filtered Transactions" dataObjectRef="FilteredTransactionsObject">
+</bpmn:dataObjectReference>
+
+<!-- Tasks with Data Associations -->
+<bpmn:task id="FilterTransactionsTask" name="Filter Cash Transactions">
+  <bpmn:dataInputAssociation id="FilterCashTransactionsInput">
+    <bpmn:sourceRef>CashDatabaseStore</bpmn:sourceRef>
+  </bpmn:dataInputAssociation>
+  <bpmn:dataOutputAssociation id="FilterCashTransactionsOutput">
+    <bpmn:targetRef>FilteredTransactions</bpmn:targetRef>
+  </bpmn:dataOutputAssociation>
+</bpmn:task>
+
+<bpmn:task id="PrintReportTask" name="Print Cash-out Report">
+  <bpmn:dataInputAssociation id="PrintReportInput">
+    <bpmn:sourceRef>FilteredTransactions</bpmn:sourceRef>
+  </bpmn:dataInputAssociation>
+</bpmn:task>
+
+  
+  </bpmn:process> 
+</bpmn:definitions>

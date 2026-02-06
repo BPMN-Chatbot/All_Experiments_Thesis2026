@@ -1,0 +1,446 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_1" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.34.0">
+  <collaboration id="Collaboration_1">
+    <participant id="MotorClaimHandlingP" name="Motor Claim Handling Process" processRef="MotorClaimHandling" />
+    <participant id="MotorClaimCustomerP" name="Customer" processRef="MotorClaimCustomer" />
+    <messageFlow id="MessageFlow_CustomerToInsurer" name="Submit Claim" sourceRef="ThrowEvent_SendClaim" targetRef="StartEvent_SubmitClaim" />
+  </collaboration>
+  <process id="MotorClaimHandling" name="Motor Claim Handling Process" isExecutable="true">
+    <laneSet id="LaneSet_1">
+      <lane id="Lane_HandlingDept" name="Handling Department">
+        <flowNodeRef>Task_CheckInsurance</flowNodeRef>
+        <flowNodeRef>Gateway_InsuranceOK</flowNodeRef>
+        <flowNodeRef>Task_AssessClaim</flowNodeRef>
+        <flowNodeRef>Gateway_Assessment</flowNodeRef>
+        <flowNodeRef>Task_AuthorizeGarage</flowNodeRef>
+        <flowNodeRef>Task_SchedulePayment</flowNodeRef>
+        <flowNodeRef>Task_RejectClaim1</flowNodeRef>
+        <flowNodeRef>Task_RejectClaim2</flowNodeRef>
+        <flowNodeRef>Task_RejectClaim3</flowNodeRef>
+        <flowNodeRef>Task_InformCustomerNegative2</flowNodeRef>
+        <flowNodeRef>Task_InformCustomerNegative3</flowNodeRef>
+        <flowNodeRef>EndEvent_ProcessCompleted_3</flowNodeRef>
+        <flowNodeRef>EndEvent_ProcessCompleted_4</flowNodeRef>
+        <flowNodeRef>Task_InformCustomerNegative1</flowNodeRef>
+        <flowNodeRef>EndEvent_ProcessCompleted_2</flowNodeRef>
+      </lane>
+      <lane id="Lane_NotificationDept" name="Notification Department">
+        <flowNodeRef>StartEvent_SubmitClaim</flowNodeRef>
+        <flowNodeRef>Task_CheckDocuments</flowNodeRef>
+        <flowNodeRef>Gateway_DocCheck</flowNodeRef>
+        <flowNodeRef>Task_RegisterClaim</flowNodeRef>
+        <flowNodeRef>Task_InformCustomerPositive</flowNodeRef>
+        <flowNodeRef>EndEvent_ProcessCompleted</flowNodeRef>
+      </lane>
+    </laneSet>
+    <startEvent id="StartEvent_SubmitClaim" name="Claim Submitted">
+      <outgoing>Flow_ClaimSubmission</outgoing>
+    </startEvent>
+    <task id="Task_CheckDocuments" name="Check Documents">
+      <incoming>Flow_ClaimSubmission</incoming>
+      <outgoing>Flow_CheckDocsDecision</outgoing>
+      <dataOutputAssociation id="asso1">
+        <sourceRef>DataObjectReference_ClaimDocuments</sourceRef>
+      </dataOutputAssociation>
+    </task>
+    <exclusiveGateway id="Gateway_DocCheck" name="Documents Complete?">
+      <incoming>Flow_CheckDocsDecision</incoming>
+      <outgoing>Flow_DocsOk</outgoing>
+      <outgoing>Flow_DocsNotOk</outgoing>
+    </exclusiveGateway>
+    <task id="Task_RegisterClaim" name="Register Claim" >
+      <incoming>Flow_DocsOk</incoming>
+      <outgoing>Flow_ToHandlingDept</outgoing>
+      <dataOutputAssociation id="asso2">
+        <sourceRef>DataObjectReference_ClaimFile</sourceRef>
+        <targetRef>Task_CheckInsurance</targetRef>
+      </dataOutputAssociation>
+    </task>
+    <task id="Task_CheckInsurance" name="Check Insurance" >
+      <incoming>Flow_ToHandlingDept</incoming>
+      <outgoing>Flow_CheckInsuranceDecision</outgoing>
+      <property id="Property_1hudxcn" name="__targetRef_placeholder" />
+      <dataInputAssociation id="asso4">
+        <sourceRef>DataObjectReference_ClaimFile</sourceRef>
+        <targetRef>Property_1hudxcn</targetRef>
+      </dataInputAssociation>
+    </task>
+    <exclusiveGateway id="Gateway_InsuranceOK" name="Insurance OK?">
+      <incoming>Flow_CheckInsuranceDecision</incoming>
+      <outgoing>Flow_InsuranceOK</outgoing>
+      <outgoing>Flow_InsuranceNotOK</outgoing>
+    </exclusiveGateway>
+    <task id="Task_AssessClaim" name="Assess Claim" >
+      <incoming>Flow_InsuranceOK</incoming>
+      <outgoing>Flow_AssessmentDecision</outgoing>
+    </task>
+    <exclusiveGateway id="Gateway_Assessment" name="Assessment Positive?">
+      <incoming>Flow_AssessmentDecision</incoming>
+      <outgoing>Flow_AssessmentPositive</outgoing>
+      <outgoing>Flow_AssessmentNegative</outgoing>
+    </exclusiveGateway>
+    <task id="Task_AuthorizeGarage" name="Phone Garage to Authorize Repairs" >
+      <incoming>Flow_AssessmentPositive</incoming>
+      <outgoing>Flow_AuthorizeToPayment</outgoing>
+    </task>
+    <task id="Task_SchedulePayment" name="Schedule Payment">
+      <incoming>Flow_AuthorizeToPayment</incoming>
+      <outgoing>Flow_ToInformCustomerPositive</outgoing>
+    </task>
+    <task id="Task_RejectClaim1" name="Reject Claim" >
+      <incoming>Flow_InsuranceNotOK</incoming>
+      <outgoing>Flow_ToInformCustomerNegative1</outgoing>
+    </task>
+    <task id="Task_RejectClaim2" name="Reject Claim" >
+      <incoming>Flow_AssessmentNegative</incoming>
+      <outgoing>Flow_ToInformCustomerNegative2</outgoing>
+    </task>
+    <task id="Task_RejectClaim3" name="Reject Claim" >
+      <incoming>Flow_DocsNotOk</incoming>
+      <outgoing>Flow_ToInformCustomerNegative3</outgoing>
+    </task>
+    <task id="Task_InformCustomerPositive" name="Send Letter to Customer" >
+      <incoming>Flow_ToInformCustomerPositive</incoming>
+      <outgoing>Flow_EndEvent</outgoing>
+    </task>
+    <task id="Task_InformCustomerNegative2" name="Send Letter to Customer" >
+      <incoming>Flow_ToInformCustomerNegative2</incoming>
+      <outgoing>Flow_EndEvent_3</outgoing>
+    </task>
+    <task id="Task_InformCustomerNegative3" name="Send Letter to Customer" >
+      <incoming>Flow_ToInformCustomerNegative3</incoming>
+      <outgoing>Flow_EndEvent_4</outgoing>
+    </task>
+    <endEvent id="EndEvent_ProcessCompleted" />
+    <endEvent id="EndEvent_ProcessCompleted_3" />
+    <endEvent id="EndEvent_ProcessCompleted_4" />
+    <dataObjectReference id="DataObjectReference_ClaimFile" name="Claim File" dataObjectRef="DataObject_ClaimFile" />
+    <dataObject id="DataObject_ClaimFile" name="Claim File" />
+    <dataObjectReference id="DataObjectReference_ClaimDocuments" name="Claim Documents" dataObjectRef="DataObject_ClaimDocuments" />
+    <dataObject id="DataObject_ClaimDocuments" name="Claim Documents" />
+    <task id="Task_InformCustomerNegative1" name="Send Letter to Customer" >
+      <incoming>Flow_ToInformCustomerNegative1</incoming>
+      <outgoing>Flow_EndEvent_2</outgoing>
+    </task>
+    <endEvent id="EndEvent_ProcessCompleted_2" />
+    <sequenceFlow id="Flow_ClaimSubmission" sourceRef="StartEvent_SubmitClaim" targetRef="Task_CheckDocuments" />
+    <sequenceFlow id="Flow_CheckDocsDecision" sourceRef="Task_CheckDocuments" targetRef="Gateway_DocCheck" />
+    <sequenceFlow id="Flow_DocsOk" sourceRef="Gateway_DocCheck" targetRef="Task_RegisterClaim">
+      <conditionExpression xsi:type="tFormalExpression">documentsComplete</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="Flow_DocsNotOk" sourceRef="Gateway_DocCheck" targetRef="Task_RejectClaim3">
+      <conditionExpression xsi:type="tFormalExpression">!documentsComplete</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="Flow_ToHandlingDept" sourceRef="Task_RegisterClaim" targetRef="Task_CheckInsurance" />
+    <sequenceFlow id="Flow_CheckInsuranceDecision" sourceRef="Task_CheckInsurance" targetRef="Gateway_InsuranceOK" />
+    <sequenceFlow id="Flow_InsuranceOK" sourceRef="Gateway_InsuranceOK" targetRef="Task_AssessClaim">
+      <conditionExpression xsi:type="tFormalExpression">insuranceValid</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="Flow_InsuranceNotOK" sourceRef="Gateway_InsuranceOK" targetRef="Task_RejectClaim1">
+      <conditionExpression xsi:type="tFormalExpression">!insuranceValid</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="Flow_AssessmentDecision" sourceRef="Task_AssessClaim" targetRef="Gateway_Assessment" />
+    <sequenceFlow id="Flow_AssessmentPositive" sourceRef="Gateway_Assessment" targetRef="Task_AuthorizeGarage">
+      <conditionExpression xsi:type="tFormalExpression">assessmentPositive</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="Flow_AssessmentNegative" sourceRef="Gateway_Assessment" targetRef="Task_RejectClaim2">
+      <conditionExpression xsi:type="tFormalExpression">!assessmentPositive</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="Flow_AuthorizeToPayment" sourceRef="Task_AuthorizeGarage" targetRef="Task_SchedulePayment" />
+    <sequenceFlow id="Flow_ToInformCustomerPositive" sourceRef="Task_SchedulePayment" targetRef="Task_InformCustomerPositive" />
+    <sequenceFlow id="Flow_ToInformCustomerNegative1" sourceRef="Task_RejectClaim1" targetRef="Task_InformCustomerNegative1" />
+    <sequenceFlow id="Flow_ToInformCustomerNegative2" sourceRef="Task_RejectClaim2" targetRef="Task_InformCustomerNegative2" />
+    <sequenceFlow id="Flow_ToInformCustomerNegative3" sourceRef="Task_RejectClaim3" targetRef="Task_InformCustomerNegative3" />
+    <sequenceFlow id="Flow_EndEvent" sourceRef="Task_InformCustomerPositive" targetRef="EndEvent_ProcessCompleted" />
+    <sequenceFlow id="Flow_EndEvent_3" sourceRef="Task_InformCustomerNegative2" targetRef="EndEvent_ProcessCompleted_3" />
+    <sequenceFlow id="Flow_EndEvent_4" sourceRef="Task_InformCustomerNegative3" targetRef="EndEvent_ProcessCompleted_4" />
+    <sequenceFlow id="Flow_EndEvent_2" sourceRef="Task_InformCustomerNegative1" targetRef="EndEvent_ProcessCompleted_2" />
+  </process>
+  <process id="MotorClaimCustomer" name="Customer" isExecutable="true">
+    <laneSet id="LaneSet_Customer">
+      <lane id="Lane_Customer" name="Customer">
+        <flowNodeRef>StartEvent_Begin</flowNodeRef>
+        <flowNodeRef>Task_PrepareClaim</flowNodeRef>
+        <flowNodeRef>Task_SubmitClaim</flowNodeRef>
+        <flowNodeRef>ThrowEvent_SendClaim</flowNodeRef>
+        <flowNodeRef>EndEvent_CustomerAfterLetter</flowNodeRef>
+      </lane>
+    </laneSet>
+    <startEvent id="StartEvent_Begin" name="Start Claim" />
+    <task id="Task_PrepareClaim" name="Prepare Claim" />
+    <task id="Task_SubmitClaim" name="Submit Claim" />
+    <intermediateThrowEvent id="ThrowEvent_SendClaim" name="Send Claim">
+      <outgoing>Cust_FlowToInsurer</outgoing>
+      <messageEventDefinition id="MsgDef_Claim" />
+    </intermediateThrowEvent>
+    <endEvent id="EndEvent_CustomerAfterLetter" name="Process Completed" />
+    <sequenceFlow id="Cust_Flow1" sourceRef="StartEvent_Begin" targetRef="Task_PrepareClaim" />
+    <sequenceFlow id="Cust_Flow2" sourceRef="Task_PrepareClaim" targetRef="Task_SubmitClaim" />
+    <sequenceFlow id="Cust_Flow3" sourceRef="Task_SubmitClaim" targetRef="EndEvent_CustomerAfterLetter" />
+    <sequenceFlow id="Cust_FlowToInsurer" sourceRef="Task_SubmitClaim" targetRef="ThrowEvent_SendClaim" />
+  </process>
+  
+  <bpmndi:BPMNDiagram id="BPMNDiagram_MotorClaim" name="Motor Claim BPMN Diagram">
+    <bpmndi:BPMNPlane id="BPMNPlane_MotorClaim" bpmnElement="Collaboration_1">
+      <bpmndi:BPMNShape id="Participant_MotorClaimHandlingP_di" bpmnElement="MotorClaimHandlingP" isHorizontal="true">
+        <dc:Bounds x="160" y="80" width="1800" height="530" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_NotificationDept_di" bpmnElement="Lane_NotificationDept" isHorizontal="true">
+        <dc:Bounds x="160" y="80" width="1800" height="180" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_HandlingDept_di" bpmnElement="Lane_HandlingDept" isHorizontal="true">
+        <dc:Bounds x="160" y="260" width="1800" height="350" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="StartEvent_SubmitClaim_di" bpmnElement="StartEvent_SubmitClaim">
+        <dc:Bounds x="220" y="189" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="197" y="165" width="81" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_CheckDocuments_di" bpmnElement="Task_CheckDocuments">
+        <dc:Bounds x="320" y="177" width="100" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_InsuranceOK_di" bpmnElement="Gateway_InsuranceOK" isMarkerVisible="true">
+        <dc:Bounds x="870" y="327" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="858" y="303" width="74" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_AuthorizeGarage_di" bpmnElement="Task_AuthorizeGarage">
+        <dc:Bounds x="1200" y="317" width="120" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_SchedulePayment_di" bpmnElement="Task_SchedulePayment">
+        <dc:Bounds x="1350" y="317" width="120" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_RejectClaim1_di" bpmnElement="Task_RejectClaim1">
+        <dc:Bounds x="950" y="415" width="110" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_InformCustomerPositive_di" bpmnElement="Task_InformCustomerPositive">
+        <dc:Bounds x="1590" y="140" width="140" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_ProcessCompleted_di" bpmnElement="EndEvent_ProcessCompleted">
+        <dc:Bounds x="1812" y="149" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_ProcessCompleted_3_di" bpmnElement="EndEvent_ProcessCompleted_3">
+        <dc:Bounds x="1552" y="434" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_RejectClaim2_di" bpmnElement="Task_RejectClaim2">
+        <dc:Bounds x="1185" y="422" width="110" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_InformCustomerNegative2_di" bpmnElement="Task_InformCustomerNegative2">
+        <dc:Bounds x="1345" y="422" width="130" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_Assessment_di" bpmnElement="Gateway_Assessment" isMarkerVisible="true">
+        <dc:Bounds x="1110" y="326" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1105" y="288.5" width="60" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_ProcessCompleted_2_di" bpmnElement="EndEvent_ProcessCompleted_2">
+        <dc:Bounds x="1532" y="532" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_InformCustomerNegative1_di" bpmnElement="Task_InformCustomerNegative1">
+        <dc:Bounds x="1295" y="520" width="130" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_AssessClaim_di" bpmnElement="Task_AssessClaim">
+        <dc:Bounds x="955" y="319" width="110" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_RejectClaim3_di" bpmnElement="Task_RejectClaim3">
+        <dc:Bounds x="435" y="310" width="100" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_InformCustomerNegative3_di" bpmnElement="Task_InformCustomerNegative3">
+        <dc:Bounds x="420" y="392" width="130" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_ProcessCompleted_4_di" bpmnElement="EndEvent_ProcessCompleted_4">
+        <dc:Bounds x="467" y="492" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataObjectReference_ClaimFile_di" bpmnElement="DataObjectReference_ClaimFile">
+        <dc:Bounds x="812" y="525" width="36" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="807" y="515" width="50" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_DocCheck_di" bpmnElement="Gateway_DocCheck" isMarkerVisible="true">
+        <dc:Bounds x="460" y="169" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="456" y="131.5" width="57" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_RegisterClaim_di" bpmnElement="Task_RegisterClaim">
+        <dc:Bounds x="570" y="173" width="110" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataObjectReference_ClaimDocuments_di" bpmnElement="DataObjectReference_ClaimDocuments">
+        <dc:Bounds x="322" y="105" width="36" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="298" y="95" width="88" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_CheckInsurance_di" bpmnElement="Task_CheckInsurance">
+        <dc:Bounds x="685" y="415" width="110" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_ClaimSubmission_di" bpmnElement="Flow_ClaimSubmission">
+        <di:waypoint x="256" y="207" />
+        <di:waypoint x="320" y="207" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_CheckDocsDecision_di" bpmnElement="Flow_CheckDocsDecision">
+        <di:waypoint x="420" y="198" />
+        <di:waypoint x="464" y="198" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_DocsOk_di" bpmnElement="Flow_DocsOk">
+        <di:waypoint x="507" y="197" />
+        <di:waypoint x="570" y="197" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_DocsNotOk_di" bpmnElement="Flow_DocsNotOk">
+        <di:waypoint x="485" y="219" />
+        <di:waypoint x="485" y="310" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_ToHandlingDept_di" bpmnElement="Flow_ToHandlingDept">
+        <di:waypoint x="680" y="203" />
+        <di:waypoint x="740" y="203" />
+        <di:waypoint x="740" y="415" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_CheckInsuranceDecision_di" bpmnElement="Flow_CheckInsuranceDecision">
+        <di:waypoint x="795" y="445" />
+        <di:waypoint x="840" y="445" />
+        <di:waypoint x="840" y="352" />
+        <di:waypoint x="870" y="352" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_InsuranceOK_di" bpmnElement="Flow_InsuranceOK">
+        <di:waypoint x="916" y="356" />
+        <di:waypoint x="938" y="356" />
+        <di:waypoint x="938" y="340" />
+        <di:waypoint x="955" y="340" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_InsuranceNotOK_di" bpmnElement="Flow_InsuranceNotOK">
+        <di:waypoint x="895" y="377" />
+        <di:waypoint x="895" y="445" />
+        <di:waypoint x="950" y="445" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_AssessmentDecision_di" bpmnElement="Flow_AssessmentDecision">
+        <di:waypoint x="1065" y="344" />
+        <di:waypoint x="1085" y="344" />
+        <di:waypoint x="1085" y="354" />
+        <di:waypoint x="1113" y="354" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_AssessmentPositive_di" bpmnElement="Flow_AssessmentPositive">
+        <di:waypoint x="1157" y="354" />
+        <di:waypoint x="1180" y="354" />
+        <di:waypoint x="1180" y="340" />
+        <di:waypoint x="1200" y="340" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_AssessmentNegative_di" bpmnElement="Flow_AssessmentNegative">
+        <di:waypoint x="1135" y="376" />
+        <di:waypoint x="1135" y="452" />
+        <di:waypoint x="1185" y="452" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_AuthorizeToPayment_di" bpmnElement="Flow_AuthorizeToPayment">
+        <di:waypoint x="1320" y="347" />
+        <di:waypoint x="1350" y="347" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_ToInformCustomerPositive_di" bpmnElement="Flow_ToInformCustomerPositive">
+        <di:waypoint x="1470" y="347" />
+        <di:waypoint x="1540" y="347" />
+        <di:waypoint x="1540" y="170" />
+        <di:waypoint x="1590" y="170" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_ToInformCustomerNegative1_di" bpmnElement="Flow_ToInformCustomerNegative1">
+        <di:waypoint x="1005" y="475" />
+        <di:waypoint x="1005" y="550" />
+        <di:waypoint x="1295" y="550" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_ToInformCustomerNegative2_di" bpmnElement="Flow_ToInformCustomerNegative2">
+        <di:waypoint x="1295" y="452" />
+        <di:waypoint x="1345" y="452" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_ToInformCustomerNegative3_di" bpmnElement="Flow_ToInformCustomerNegative3">
+        <di:waypoint x="485" y="370" />
+        <di:waypoint x="485" y="392" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_EndEvent_di" bpmnElement="Flow_EndEvent">
+        <di:waypoint x="1730" y="170" />
+        <di:waypoint x="1812" y="170" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_EndEvent_3_di" bpmnElement="Flow_EndEvent_3">
+        <di:waypoint x="1475" y="455" />
+        <di:waypoint x="1552" y="455" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_EndEvent_4_di" bpmnElement="Flow_EndEvent_4">
+        <di:waypoint x="485" y="452" />
+        <di:waypoint x="485" y="492" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_EndEvent_2_di" bpmnElement="Flow_EndEvent_2">
+        <di:waypoint x="1425" y="553" />
+        <di:waypoint x="1532" y="553" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Participant_MotorClaimCustomerP_di" bpmnElement="MotorClaimCustomerP" isHorizontal="true">
+        <dc:Bounds x="170" y="680" width="1100" height="160" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Customer_di" bpmnElement="Lane_Customer" isHorizontal="true">
+        <dc:Bounds x="170" y="680" width="1100" height="160" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="StartEvent_Begin_di" bpmnElement="StartEvent_Begin">
+        <dc:Bounds x="230" y="742" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="221" y="780" width="55" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_PrepareClaim_di" bpmnElement="Task_PrepareClaim">
+        <dc:Bounds x="305" y="730" width="110" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_SubmitClaim_di" bpmnElement="Task_SubmitClaim">
+        <dc:Bounds x="440" y="730" width="110" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ThrowEvent_SendClaim_di" bpmnElement="ThrowEvent_SendClaim">
+        <dc:Bounds x="600" y="749" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="606" y="785" width="58" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_CustomerAfterLetter_di" bpmnElement="EndEvent_CustomerAfterLetter">
+        <dc:Bounds x="752" y="762" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="755" y="802" width="54" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Cust_Flow1_di" bpmnElement="Cust_Flow1">
+        <di:waypoint x="266" y="760" />
+        <di:waypoint x="305" y="760" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Cust_Flow2_di" bpmnElement="Cust_Flow2">
+        <di:waypoint x="415" y="760" />
+        <di:waypoint x="440" y="760" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Cust_Flow3_di" bpmnElement="Cust_Flow3">
+        <di:waypoint x="550" y="780" />
+        <di:waypoint x="630" y="810" />
+        <di:waypoint x="720" y="810" />
+        <di:waypoint x="755" y="789" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Cust_FlowToInsurer_di" bpmnElement="Cust_FlowToInsurer">
+        <di:waypoint x="550" y="760" />
+        <di:waypoint x="600" y="767" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataOutputAssociation_011k7y5_di" bpmnElement="DataOutputAssociation_011k7y5">
+        <di:waypoint x="358" y="177" />
+        <di:waypoint x="350" y="155" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="asso4_di" bpmnElement="asso4">
+        <di:waypoint x="812" y="525" />
+        <di:waypoint x="775" y="475" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataOutputAssociation_0j1y58f_di" bpmnElement="DataOutputAssociation_0j1y58f">
+        <di:waypoint x="764" y="475" />
+        <di:waypoint x="812" y="532" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="MessageFlow_CustomerToInsurer_di" bpmnElement="MessageFlow_CustomerToInsurer">
+        <di:waypoint x="608" y="752" />
+        <di:waypoint x="500" y="590" />
+        <di:waypoint x="238" y="487" />
+        <di:waypoint x="238" y="225" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="555" y="654" width="66" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

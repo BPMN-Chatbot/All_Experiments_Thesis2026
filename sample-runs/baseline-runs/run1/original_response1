@@ -1,0 +1,36 @@
+{
+  "id": "chatcmpl-BSTrghKUNYc0yyWpfwBrikZqgxxqH",
+  "object": "chat.completion",
+  "created": 1746127684,
+  "model": "gpt-4.1-2025-04-14",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "```xml\n<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<definitions xmlns=\"http://www.omg.org/spec/BPMN/20100524/MODEL\"\n             xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n             id=\"Definitions_1\"\n             targetNamespace=\"http://www.example.org/bpmn\">\n\n  <!-- Pool: Customer -->\n  <collaboration id=\"Collaboration_1\">\n    <participant id=\"Customer_Pool\" name=\"Customer\" processRef=\"Customer_Process\"/>\n    <participant id=\"Bank_Pool\" name=\"Bank\" processRef=\"Bank_Process\"/>\n    <!-- Message Flows (defined after elements) -->\n    <messageFlow id=\"MF_Application\" sourceRef=\"Customer_Application_Submission\" targetRef=\"Bank_Receive_Application\"/>\n    <messageFlow id=\"MF_Reject_Email\" sourceRef=\"Bank_Send_Reject_Email\" targetRef=\"Customer_Receive_Reject\"/>\n    <messageFlow id=\"MF_Welcome_Pack\" sourceRef=\"Bank_Send_Welcome_Pack\" targetRef=\"Customer_Receive_Welcome_Pack\"/>\n    <messageFlow id=\"MF_Bank_Card\" sourceRef=\"Bank_Send_Bank_Card\" targetRef=\"Customer_Receive_Bank_Card\"/>\n    <messageFlow id=\"MF_PIN\" sourceRef=\"Bank_Send_PIN\" targetRef=\"Customer_Receive_PIN\"/>\n  </collaboration>\n\n  <!-- Customer Process -->\n  <process id=\"Customer_Process\" isExecutable=\"true\">\n    <laneSet>\n      <lane id=\"Customer_Lane\" name=\"Customer\"/>\n    </laneSet>\n    <startEvent id=\"Customer_Start\" name=\"Needs Account\"/>\n    <task id=\"Customer_Application_Submission\" name=\"Submit Online Application\"/>\n    <endEvent id=\"Customer_End\" name=\"End\"/>\n    <intermediateCatchEvent id=\"Customer_Receive_Reject\" name=\"Receive Rejection Email\">\n      <messageEventDefinition/>\n    </intermediateCatchEvent>\n    <intermediateCatchEvent id=\"Customer_Receive_Welcome_Pack\" name=\"Receive Welcome Pack Letter\">\n      <messageEventDefinition/>\n    </intermediateCatchEvent>\n    <intermediateCatchEvent id=\"Customer_Receive_Bank_Card\" name=\"Receive Bank Card Letter\">\n      <messageEventDefinition/>\n    </intermediateCatchEvent>\n    <intermediateCatchEvent id=\"Customer_Receive_PIN\" name=\"Receive PIN Letter\">\n      <messageEventDefinition/>\n    </intermediateCatchEvent>\n    <sequenceFlow id=\"CF1\" sourceRef=\"Customer_Start\" targetRef=\"Customer_Application_Submission\"/>\n    <sequenceFlow id=\"CF2\" sourceRef=\"Customer_Application_Submission\" targetRef=\"Customer_End\"/>\n    <sequenceFlow id=\"CF3\" sourceRef=\"Customer_Receive_Reject\" targetRef=\"Customer_End\"/>\n    <sequenceFlow id=\"CF4\" sourceRef=\"Customer_Receive_Welcome_Pack\" targetRef=\"Customer_End\"/>\n    <sequenceFlow id=\"CF5\" sourceRef=\"Customer_Receive_Bank_Card\" targetRef=\"Customer_End\"/>\n    <sequenceFlow id=\"CF6\" sourceRef=\"Customer_Receive_PIN\" targetRef=\"Customer_End\"/>\n  </process>\n\n  <!-- Bank Process -->\n  <process id=\"Bank_Process\" isExecutable=\"true\">\n    <laneSet>\n      <lane id=\"Bank_Customer_Service\" name=\"Customer Service\"/>\n      <lane id=\"Bank_Operations\" name=\"Operations\"/>\n    </laneSet>\n    <startEvent id=\"Bank_Start\" name=\"\"/>\n    <intermediateCatchEvent id=\"Bank_Receive_Application\" name=\"Receive Application\">\n      <messageEventDefinition/>\n    </intermediateCatchEvent>\n    <task id=\"Bank_Evaluate_Application\" name=\"Evaluate Application\"/>\n    <exclusiveGateway id=\"Bank_GW_Decision\" name=\"Application Approved?\"/>\n    <task id=\"Bank_Send_Reject_Email\" name=\"Send Rejection Email\"/>\n    <endEvent id=\"Bank_End\" name=\"\"/>\n    <task id=\"Bank_Create_Account\" name=\"Create Bank Account\"/>\n    <parallelGateway id=\"Bank_GW_Parallel_Send\" name=\"Send Welcome Pack, Card, PIN\"/>\n    <task id=\"Bank_Send_Welcome_Pack\" name=\"Send Welcome Pack Letter\"/>\n    <task id=\"Bank_Send_Bank_Card\" name=\"Send Bank Card Letter\"/>\n    <task id=\"Bank_Send_PIN\" name=\"Send PIN Letter\"/>\n    <endEvent id=\"Bank_End_Success\" name=\"\"/>\n    <dataObject id=\"Application_Doc\" name=\"Application\"/>\n    <dataObject id=\"Account_Info_Doc\" name=\"Account Information\"/>\n\n    <!-- Sequence flows and data associations -->\n    <sequenceFlow id=\"BF1\" sourceRef=\"Bank_Receive_Application\" targetRef=\"Bank_Evaluate_Application\"/>\n    <dataInputAssociation id=\"DA1\">\n      <sourceRef>Application_Doc</sourceRef>\n      <targetRef>Bank_Evaluate_Application</targetRef>\n    </dataInputAssociation>\n    <sequenceFlow id=\"BF2\" sourceRef=\"Bank_Evaluate_Application\" targetRef=\"Bank_GW_Decision\"/>\n    <sequenceFlow id=\"BF3\" sourceRef=\"Bank_GW_Decision\" targetRef=\"Bank_Send_Reject_Email\">\n      <conditionExpression xsi:type=\"tFormalExpression\"><![CDATA[not approved]]></conditionExpression>\n    </sequenceFlow>\n    <sequenceFlow id=\"BF4\" sourceRef=\"Bank_Send_Reject_Email\" targetRef=\"Bank_End\"/>\n    <sequenceFlow id=\"BF5\" sourceRef=\"Bank_GW_Decision\" targetRef=\"Bank_Create_Account\">\n      <conditionExpression xsi:type=\"tFormalExpression\"><![CDATA[approved]]></conditionExpression>\n    </sequenceFlow>\n    <sequenceFlow id=\"BF6\" sourceRef=\"Bank_Create_Account\" targetRef=\"Bank_GW_Parallel_Send\"/>\n    <dataOutputAssociation id=\"DA2\">\n      <sourceRef>Bank_Create_Account</sourceRef>\n      <targetRef>Account_Info_Doc</targetRef>\n    </dataOutputAssociation>\n    <sequenceFlow id=\"BF7\" sourceRef=\"Bank_GW_Parallel_Send\" targetRef=\"Bank_Send_Welcome_Pack\"/>\n    <sequenceFlow id=\"BF8\" sourceRef=\"Bank_GW_Parallel_Send\" targetRef=\"Bank_Send_Bank_Card\"/>\n    <sequenceFlow id=\"BF9\" sourceRef=\"Bank_GW_Parallel_Send\" targetRef=\"Bank_Send_PIN\"/>\n    <sequenceFlow id=\"BF10\" sourceRef=\"Bank_Send_Welcome_Pack\" targetRef=\"Bank_End_Success\"/>\n    <sequenceFlow id=\"BF11\" sourceRef=\"Bank_Send_Bank_Card\" targetRef=\"Bank_End_Success\"/>\n    <sequenceFlow id=\"BF12\" sourceRef=\"Bank_Send_PIN\" targetRef=\"Bank_End_Success\"/>\n    <!-- Data Associations for outgoing mailings -->\n    <dataInputAssociation id=\"DA3\">\n      <sourceRef>Account_Info_Doc</sourceRef>\n      <targetRef>Bank_Send_Welcome_Pack</targetRef>\n    </dataInputAssociation>\n    <dataInputAssociation id=\"DA4\">\n      <sourceRef>Account_Info_Doc</sourceRef>\n      <targetRef>Bank_Send_Bank_Card</targetRef>\n    </dataInputAssociation>\n    <dataInputAssociation id=\"DA5\">\n      <sourceRef>Account_Info_Doc</sourceRef>\n      <targetRef>Bank_Send_PIN</targetRef>\n    </dataInputAssociation>\n  </process>\n\n</definitions>\n```",
+        "refusal": null,
+        "annotations": []
+      },
+      "logprobs": null,
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 577,
+    "completion_tokens": 1582,
+    "total_tokens": 2159,
+    "prompt_tokens_details": {
+      "cached_tokens": 0,
+      "audio_tokens": 0
+    },
+    "completion_tokens_details": {
+      "reasoning_tokens": 0,
+      "audio_tokens": 0,
+      "accepted_prediction_tokens": 0,
+      "rejected_prediction_tokens": 0
+    }
+  },
+  "service_tier": "default",
+  "system_fingerprint": "fp_ac00b0000c"
+}

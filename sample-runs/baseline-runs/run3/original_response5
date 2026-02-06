@@ -1,0 +1,36 @@
+{
+  "id": "chatcmpl-BTz2CsZ8LT2uONe1zQXYaGgsaEa6F",
+  "object": "chat.completion",
+  "created": 1746485828,
+  "model": "gpt-4.1-2025-04-14",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "```xml\n<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<definitions xmlns=\"http://www.omg.org/spec/BPMN/20100524/MODEL\" \n             xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" \n             xmlns:bpmndi=\"http://www.omg.org/spec/BPMN/20100524/DI\"\n             xmlns:omgdc=\"http://www.omg.org/spec/DD/20100524/DC\"\n             xmlns:omgdi=\"http://www.omg.org/spec/DD/20100524/DI\"\n             xmlns:tns=\"http://example.org/bpmn\"\n             targetNamespace=\"http://example.org/bpmn\">\n\n  <!-- Owner Pool -->\n  <process id=\"OwnerProcess\" isExecutable=\"true\">\n    <laneSet>\n      <lane id=\"OwnerLane\" name=\"Owner\"/>\n    </laneSet>\n    <startEvent id=\"OwnerStartEvt\" name=\"Start Compensation Request\" />\n    <task id=\"SubmitRequestTask\" name=\"Submit Compensation Request\" />\n    <intermediateThrowEvent id=\"SendRequestEvent\" name=\"Send Compensation Request\">\n      <messageEventDefinition id=\"SendRequestMsgDef\"/>\n    </intermediateThrowEvent>\n    <intermediateCatchEvent id=\"ReceiveFeesNoticeEvent\" name=\"Receive Fees Notice\">\n      <messageEventDefinition id=\"ReceiveFeesNoticeMsgDef\"/>\n    </intermediateCatchEvent>\n    <task id=\"PayFeesTask\" name=\"Pay Fees\" />\n    <intermediateThrowEvent id=\"SendProofOfPaymentEvent\" name=\"Send Proof of Payment\">\n      <messageEventDefinition id=\"SendProofOfPaymentMsgDef\"/>\n    </intermediateThrowEvent>\n    <endEvent id=\"OwnerEndEvt\" name=\"Process Complete\"/>\n    <sequenceFlow id=\"of1\" sourceRef=\"OwnerStartEvt\" targetRef=\"SubmitRequestTask\"/>\n    <sequenceFlow id=\"of2\" sourceRef=\"SubmitRequestTask\" targetRef=\"SendRequestEvent\"/>\n    <sequenceFlow id=\"of3\" sourceRef=\"SendRequestEvent\" targetRef=\"ReceiveFeesNoticeEvent\"/>\n    <sequenceFlow id=\"of4\" sourceRef=\"ReceiveFeesNoticeEvent\" targetRef=\"PayFeesTask\"/>\n    <sequenceFlow id=\"of5\" sourceRef=\"PayFeesTask\" targetRef=\"SendProofOfPaymentEvent\"/>\n    <sequenceFlow id=\"of6\" sourceRef=\"SendProofOfPaymentEvent\" targetRef=\"OwnerEndEvt\"/>\n  </process>\n  \n  <!-- Tribunal Pool -->\n  <process id=\"TribunalProcess\" isExecutable=\"true\">\n    <laneSet>\n      <lane id=\"CashierLane\" name=\"Cashier\"/>\n    </laneSet>\n    <startEvent id=\"TribunalStartEvt\" name=\"Wait for Compensation Request\">\n      <messageEventDefinition id=\"CatchRequestMsgDef\"/>\n    </startEvent>\n    <task id=\"RetrieveFileTask\" name=\"Retrieve File\">\n      <dataInputAssociation>\n        <sourceRef>PremisesFileDataStore</sourceRef>\n      </dataInputAssociation>\n      <dataOutputAssociation>\n        <targetRef>PremisesFileDataObject</targetRef>\n      </dataOutputAssociation>\n    </task>\n    <task id=\"CheckRequestTask\" name=\"Check Request for Acceptability and Compliance\">\n      <dataInputAssociation>\n        <sourceRef>PremisesFileDataObject</sourceRef>\n      </dataInputAssociation>\n    </task>\n    <exclusiveGateway id=\"FeesPaidGateway\" name=\"Fees Paid?\"/>\n    <task id=\"AllocateDateTask\" name=\"Allocate Hearing Date\" />\n    <endEvent id=\"TribunalEndEvt\" name=\"Process Complete\"/>\n    <task id=\"ProduceFeesNoticeTask\" name=\"Produce Fees Notice\" />\n    <intermediateThrowEvent id=\"SendFeesNoticeEvent\" name=\"Send Fees Notice\">\n      <messageEventDefinition id=\"SendFeesNoticeMsgDef\"/>\n    </intermediateThrowEvent>\n    <intermediateCatchEvent id=\"ReceiveProofOfPaymentEvent\" name=\"Receive Proof of Payment\">\n      <messageEventDefinition id=\"CatchProofOfPaymentMsgDef\"/>\n    </intermediateCatchEvent>\n    <sequenceFlow id=\"tf1\" sourceRef=\"TribunalStartEvt\" targetRef=\"RetrieveFileTask\"/>\n    <sequenceFlow id=\"tf2\" sourceRef=\"RetrieveFileTask\" targetRef=\"CheckRequestTask\"/>\n    <sequenceFlow id=\"tf3\" sourceRef=\"CheckRequestTask\" targetRef=\"FeesPaidGateway\"/>\n    <sequenceFlow id=\"tf4\" sourceRef=\"FeesPaidGateway\" targetRef=\"AllocateDateTask\">\n      <conditionExpression xsi:type=\"tFormalExpression\"><![CDATA[feesPaid]]></conditionExpression>\n    </sequenceFlow>\n    <sequenceFlow id=\"tf5\" sourceRef=\"AllocateDateTask\" targetRef=\"TribunalEndEvt\"/>\n    <sequenceFlow id=\"tf6\" sourceRef=\"FeesPaidGateway\" targetRef=\"ProduceFeesNoticeTask\">\n      <conditionExpression xsi:type=\"tFormalExpression\"><![CDATA[!feesPaid]]></conditionExpression>\n    </sequenceFlow>\n    <sequenceFlow id=\"tf7\" sourceRef=\"ProduceFeesNoticeTask\" targetRef=\"SendFeesNoticeEvent\"/>\n    <sequenceFlow id=\"tf8\" sourceRef=\"SendFeesNoticeEvent\" targetRef=\"ReceiveProofOfPaymentEvent\"/>\n    <sequenceFlow id=\"tf9\" sourceRef=\"ReceiveProofOfPaymentEvent\" targetRef=\"CheckRequestTask\"/>\n    <!-- Data Objects and Data Store -->\n    <dataObject id=\"PremisesFileDataObject\" name=\"Premises File\"/>\n    <dataStoreReference id=\"PremisesFileDataStore\" name=\"Premises File Store\"/>\n  </process>\n  \n  <!-- Message Flows between Pools -->\n  <message id=\"CompRequestMsg\" name=\"Compensation Request\"/>\n  <message id=\"FeesNoticeMsg\" name=\"Fees Notice\"/>\n  <message id=\"ProofOfPaymentMsg\" name=\"Proof Of Payment\"/>\n  <collaboration id=\"Collaboration1\">\n    <participant id=\"OwnerPool\" name=\"Owner\" processRef=\"OwnerProcess\"/>\n    <participant id=\"TribunalPool\" name=\"Tribunal\" processRef=\"TribunalProcess\"/>\n    <messageFlow id=\"mf1\" name=\"Compensation Request\" sourceRef=\"SendRequestEvent\" targetRef=\"TribunalStartEvt\" messageRef=\"CompRequestMsg\"/>\n    <messageFlow id=\"mf2\" name=\"Fees Notice\" sourceRef=\"SendFeesNoticeEvent\" targetRef=\"ReceiveFeesNoticeEvent\" messageRef=\"FeesNoticeMsg\"/>\n    <messageFlow id=\"mf3\" name=\"Proof Of Payment\" sourceRef=\"SendProofOfPaymentEvent\" targetRef=\"ReceiveProofOfPaymentEvent\" messageRef=\"ProofOfPaymentMsg\"/>\n  </collaboration>\n</definitions>\n```",
+        "refusal": null,
+        "annotations": []
+      },
+      "logprobs": null,
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 677,
+    "completion_tokens": 1406,
+    "total_tokens": 2083,
+    "prompt_tokens_details": {
+      "cached_tokens": 0,
+      "audio_tokens": 0
+    },
+    "completion_tokens_details": {
+      "reasoning_tokens": 0,
+      "audio_tokens": 0,
+      "accepted_prediction_tokens": 0,
+      "rejected_prediction_tokens": 0
+    }
+  },
+  "service_tier": "default",
+  "system_fingerprint": "fp_3b5c2e113e"
+}

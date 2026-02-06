@@ -1,0 +1,148 @@
+sessionKey,case,run,cluster,userType,overallCorrectness,overallRelevance,overallCompleteness,Correctness.pools&Lanes,Correctness.messageFlow,Correctness.dataFlow,Relevance.pools&Lanes,Relevance.messageFlow,Relevance.dataFlow,Completeness.pools&Lanes,Completeness.messageFlow,Completeness.dataFlow,question_comments,diagram_comments
+R1CAIXTJ,6,3,3,expert,3,3,3,3,4.0,2,3,4.0,2,3,4.0,2,,
+R1CAIXTJ,4,3,2,expert,2,2,2,2,2.0,2,2,2.0,2,2,2.0,2,"Does ""Pools & Lanes"" include control flow, activities, gateways, and events?
+Why do we have to ""reassessing the document compliance"" when the payment arrives?","I assume that ""Pools & Lanes"" include evaluation of control-flow, activities, gateways, and events? 
+
+there is no possibility to reject a request, every case ends with a hearing date being allocated
+allocate hearing date is only done if payment was late
+owner never receives the date
+waiting for payment should be modeled with some event-based gateway with the option to cancel waiting for the payment
+payment is at the inscription of the gate, but never checked with an activity
+owner only has one activity. At least the compensation request should be written, before send
+receive compensation request from owner -> receive compensation request, Send Payment to Tribunal -> Send Payment Record 
+too much objects in the model, no need to model Request, Fees, and Record in owner
+..."
+R2BVQTYK,5,1,3,expert,2,3,2,7,2.0,2,7,7.0,2,7,2.0,2,(comment regarding the textual description: it is unclear to me what a “Pickerl” is),"“Receive service confirmation from mechanic” waits for message from car owner, not from the car service facility.
+The “while repair not done” gateway in the car service facility pool is labelled incorrectly. It should be labelled as “is repair completed?” with outgoing flows “yes” and “no”, or the task “Send status update via email” should be a loop task. In the latter case, the “while repair not done” gateway should be removed. 
+The task “Complete repair” is only executed after the repair is done. The process will therefore get stuck in an endless loop of sending status update emails. 
+There are superfluous/unused data objects: “service report” for Car service facility, “fine” and “payment” for car owner and “service reminder” for policy system.
+Fines should be modelled as a data store since they should be persistent after the process is completed. Also the next service date and payments would be better modelled as data stores.
+It is not necessary to include notification as a data object with the corresponding data flows for “send notification to owner” in the police system pool and for “receive notification from police system” in the car owner pool.
+There are missing message flows between car owner and car service facility (e.g., for “send status update via email” and “notify owner repair done”). Also between Police system and car owner, for “send fine to owner”.
+Receiving the fine and paying the car service is missing from the car owner pool."
+R2BVQTYK,2,1,1,expert,6,6,7,7,7.0,6,7,7.0,6,7,7.0,7,,"Given the textual description, it does not seem necessary to split up the ordering of the report into two tasks (""specify year and month"" and ""order cash-out report"").
+I would model the cash-out reports in data stores so they are persistent and can be consulted after the process is completed."
+R1DJVSFC,1,2,1,expert,5,5,6,3,1.0,5,5,2.0,5,3,2.0,5,,The customer pool & corresponding message flow is missing in the generated model. The three prepare activities appear as an inadequate translation of message flows (prepare and send could be joined together for each item). However the parallel and xor logic is well rendered!
+R1DJVSFC,3,2,2,expert,5,5,5,2,2.0,5,5,2.0,5,2,1.0,6,,
+R1UDJTYD,2,2,1,expert,5,5,6,3,4.0,6,3,6.0,6,6,5.0,6,,"I would have modeled the process with one pool for the organization and two lanes for the roles. Potentially, the process would be simpler.
+Management cannot complete if there is no report."
+R1UDJTYD,5,2,3,expert,5,6,5,7,4.0,5,7,5.0,6,7,4.0,4,,"There are no update messages from the mechanic to the owner. Similarly, there are no messages related to payment (although the description remains vague on this aspect).
+The mechanic portion seems incomplete in general. The flows from the exclusive gateway are not labeled.
+If the car is no longer registered, a fine is issued. The owner must pay a fine to complete
+"
+R1MXHSCE,2,3,1,expert,7,7,7,7,7.0,5,7,7.0,7,7,7.0,7,Kind of awkward to evaluate the message flow since there is none in this model. ,
+R1MXHSCE,5,3,3,expert,5,3,6,6,3.0,6,5,7.0,6,7,6.0,7,,"Bad readability (crossing lines), data element ""Fine"" in the Car Owner pool is initialized but never referenced, missing message flow between car service and car owner (e.g., sending repair status etc.)"
+R1XSJGHP,4,2,2,expert,6,7,7,7,7.0,6,7,7.0,7,7,7.0,7,,"Minor remark regarding correctness: Checking if the fee has been paid should be a separate activity, reading from the request"
+R1XSJGHP,6,2,3,expert,5,6,7,7,3.0,7,7,6.0,7,7,7.0,7,,
+R1MLAFMY,3,3,2,expert,4,5,5,2,2.0,5,5,4.0,6,2,2.0,5,"How to rate semantic process model errors,?   e.g. Loop, I think there is a loop just before the end of the process 
+How to you evaluate semantic errors, long process runtimes (in the process? e.g. loop, 10 days waiting time if the product is not available before next product on list is ordered)
+","
+The data flow is not correct. the wholesaler pool is missing (to trigger event gateway).  I believe there is a loop just before the end of the process?  Is the last gateway syntactically correct. Never saw this  'For ...' before.
+What happens if no product is available?
+numbering the tasks and gateways would help to comment the model."
+R1MLAFMY,1,3,1,expert,5,6,5,6,3.0,5,6,6.0,6,6,3.0,5,"It was not really clear,  how problems (see above) should be assessed and how to differentiate between relevance, competeness and correctness of the model elements.","I would have modeled the customer differently and more precisely (included send application and individual events for the respective messages). that would also affect the data flow (in client) and message flow.  In my opinion, the account itself is missing as a datapool in ‘Bank’.  There could also be several lanes in Bank. Whether Welcome, Bank Card and Pin have to be sent in separate messages is not clear from the description.  Possibly only one could be enough. 
+"
+R2EYARSS,1,2,1,expert,5,6,6,5,4.0,6,5,4.0,6,5,4.0,6,"The assessment of correctness, relevance and completness is a bit subjective. Based on the requirements of the modeler and use case the provided model can be more than sufficent although it lacks in terms of some details like message flows (or usage of specific task types) and pool (customer).","- It is unclear whether the data objects are modeled once and linked to all corresponding tasks or modeled separately for each task.
+- However, the generated model serves as a very good starting point for further refinement."
+R2EYARSS,3,2,2,expert,5,4,5,6,4.0,5,6,4.0,4,6,4.0,5,,"- lacks in terms of data object and flows (e.g. first task - why does a ""read"" oepration write to object ""order""?)
+- for me, the lane ""Warehouse"" is not really relevant
+- Due to the supported BPMN constructs, the loop is ok, but lacks in comprehensibility and correctness (only if a strict sequential order is wanted).
+- uncleare time intermediate event at the end of the process (""End of Order Processing"")
+"
+R1MISBBC,4,1,2,expert,5,7,7,6,7.0,2,7,7.0,2,7,7.0,2,,"In the diagram, the process starts when the owner starts a compensation request, which is different from what has been described in the textual description. 
+The owner process is stuck (it never finishes) if the chasher process selects the ""yes"" branch on the XOR gateway. 
+Data objects are not linked to other BPMN elements. 
+The element ""start compensation request"" should be a conditional start event. 
+It is not common to have the same name for a pool and the lane (I am referring to the owner), and to have only one lane inside a pool. However, it is not an error since the standard does not specify anything on these aspects. "
+R1MISBBC,6,1,3,expert,5,7,6,6,7.0,3,6,7.0,3,6,7.0,3,,"On the clerk lane, ""assign clerk"" seems out of place. Logically, the clerk should be assigned by another role. Yet, this is not clear in the textual description as well. If it's ok to keep that activity as executed by the clerk, it should be placed as the first activity, before the (assigned) clerk actually performs any other tasks. 
+The ""regulator"" lane is paced inside the ""insurance"" lane, which is not specified in the text. 
+Some tasks of the regulator are over-abstracted: the text specifiers that the regulator performs phone calls and may visit the place of the incident. This is not specified in the model. 
+The last part of the process in the diagram is executed by the clerk, yet this is not specified by the text.  
+""Insurance agent"" pools contains an ""agent"" lane, that is a repetition
+As for the diagram before: the start event should be of type conditional; all data flows are missing ( replaced by labels); Beneficiary is both a lane and a pool. "
+R2ZKDKCV,1,3,1,expert,4,6,5,7,2.0,1,7,3.0,1,7,2.0,1,,"While the process of the bank is fairly well structured, the same cannot be said for the customer: a message flow from customer to the start event of the bank process is missing, and all the message flows from the bank to the customer are intercepted by the same event. Either the process of the customer is more detailed, or it is simply left as a blank pool with incoming and outgoing message flows."
+R2ZKDKCV,3,3,2,expert,6,7,6,5,7.0,6,7,7.0,6,7,7.0,6,"I found out only now that, instead of data associations, comments are used to represent the data flow. This should be pointed out in the introduction.","The event-based-exclusive gateway is improperly used: if the timer expires, the process no longer waits for the product to be received. Instead of an event-based-exclusive gateway, a parallel gateway should be used."
+R2LXDUWR,5,3,3,expert,5,5,6,6,2.0,5,6,5.0,6,7,6.0,6,,"The process does not have a clear start, there is a loop in the overall message-flow that starts each process.
+
+Payment via App is not modeled in the customer, but in the car service facility.
+
+The car owner sends confirmation to the police before going to the service facility. Should the car owner even be the one sending the notification to the police? It would make more sense if it was the mechanic doing it.
+
+There is a Customer Service swim lane at the Car Service Facility.
+
+The police sends the fine to the customer, but the customer does not receive it.
+
+The next service time should be sent from the mechanic to the police?"
+R2LXDUWR,2,3,1,expert,7,7,7,7,,7,7,,7,7,,7,"there is no message-flow so I gave a 4, but feel free to change this score to whatever value is appropriate for such cases.",
+R2YCRAQK,4,1,2,expert,6,6,7,5,6.0,6,5,6.0,6,7,7.0,7,"1) I assume with data flow you mean the sequence flow + data that is transferred via this sequence flow. 
+2) Regarding question about completeness I voted for Fully agree, since I compared the diagram with the textual input. I cannot compare it with real domain since I am not a domain expert of tribunal processes. As far as I could see the diagram contains even modeling elements which were not explicitly described in the text.
+3) Regarding correctness and relevance see  Answer to Question 7. Most of the things  I mentioned in the answer of the previous question are a matter of modeling style and/or a matter of how someone is interpreting the semantics of words in the given textual input, which can lead to modle variants. In my opinion there is just one thing which seems to be incorrect -> the behavior of the pool owner. Explanation see above.
+","Tribunal not really good naming but OK! Can be left as it is.
+Pool + Lane same name, could be optimized here. 
+According to the text, it should actually be checked whether acceptability and compliance are OK. It is not clear from the text passage what is meant by compliance. Leaves room for interpretation in the text. Later in the text it is implied that compliance may also mean that the fee has been paid, as this check step is repeated.  The solution with “Fees Paid with Request” seems to me to be sensibly placed at this point. Otherwise you would have to do another check. However, this somehow does not match the label of the previous task (“Check Request Acceptability and Compliance”). As a reader who is not a domain expert for this type of court case, you would expect the XOR Gateway to be labeled something like: “Acceptability and Compliance given?”.
+However, there is a problem in the Pool Owner. On the one hand, according to the textual description, it is expected or described that the owner could already pay the fee at a time before  the cashier makes his first check regarding acceptability and compliance. On the other hand in the BPMN diagram, the owner only pays the fee in his pool after he has received the fee notice and the payment notification to the tribunal only takes place afterwards. 
+I am not an expert on legal proceedings, but does the payment confirmation have to be sent separately? There is nothing in the text that says that an extra process step has to be carried out by the owner. Don't you just look at the bank account to see if a payment has been received? In any case, if this extra process step should also be modeled, then I think that's good, because as I said it wasn't in the text.  
+
+Also to be discussed in the Pool Tribunal / Lane Cashier is the message send event “Send Fee Notice to Owner”. On the one hand, good if it has to be modeled additionally, because it was not in the text. On the other hand, the question arises: What is the meaning of “Produce Fees Notice”?  Does it perhaps already include the fact that the fee notice is sent to the owner?
+There is also the question of whether a separate pool is needed for owners. In a university environment, where students are supposed to learn BPMN and modeling options, it does not hurt to model 2 pools. In a typical BPMN modeling task, 2 pools are also expected. In practice, where modeling is probably done from the perspective of the court, the owner pool is probably not needed. Of course, the text does not provide any information about what is actually required. Therefore, the modeling of 2 pools seem to basically correct regarding this question.
+"
+R2YCRAQK,6,1,3,expert,5,6,6,5,6.0,5,6,6.0,5,7,7.0,5,My answers to the rankings (questions 1 - 6) are because of several open questions in the model where in my opinion there could be issues in the model.,"Issues which I found in the model with regard to the input text:
+Just to be complete with my comments: 
+First of all, I also found that a Pool consists of only one lane and pool label and lane label (Beneficiary,  Insurance Agent vs. Agent) are more or less the same.  I now treat this as modeling style or modeling strategy respectively – for me OK since nothing gets lost.
+I still wonder why there is a task “call insurance agent” and “notify Agent of claim”. I wonder why this cannot be put together. Depends of the semantics of “call” and “notify” if I call an insurance agent, I do it with the aim to notify him about something. Therefore, I would personally do not split this into two separate process steps. But maybe once again a strategy or desired modeling style?
+
+Apart from these comments, which I also gave in the previous example, here are some more specific issues and points of discussions respectively.
+
+The start event in the pool Insurance Agent has different color. In the pool Beneficiary, the start event is white colored. The there is this blue colored start event and then the green colored start even in the lane “clerk”. Do these colors also have different meaning for the same type of start event (message start event)? Or did this happened by incident or is this an error. I have not read anything color semantics in your evaluation description. Therefore I have to assume, that this is an issue regarding notation (layouting) and happened incidentally.
+
+I wonder why your data (data comment) “Write to: Claim Notification” is connected to the start vent in the Pool Insurance Agent. I would understand it, if you would model a task or a triggering event. But this is a catching event. The same holds for the message receive event in the lane clerk. Do you treat these events as equivalents for Message Receive Tasks?  If a need a “Write to: “ then here I would model as follows: First the message receive event, which is just for catching and receiving this message from the Beneficiary followed by an task e.g. “record claim notification”. This task is related to the comment representing the data.
+
+Regarding “Write to: Claim Notification” it is hard for a reader not involved in this particular application case  what is meant here. In general I assume that “Write to” and “Read from:” are operations to update / read a storage. But what kind of storage is meant here. The compound noun “Claim notification” is treated as an instance (single object). Here on the other hand it seems that that “Claim notification” is something like a storage (e.g., DB table) to which the instance is written. To summarize the semantics of the  notion ‘”claim notification” is switching from a simple instance (a message) to a kind of storage. 
+
+In the intermediate event (Pool Insurance Agent) there is the triggering/throwing message event “Forward Claim Notification to Insurance Company” (seems to be the equivalent a Send Message Task) and it is connected with the data + data operation “Read from: Claim notification.  Besides the comment mentioned before about message instance vs. storage, I also think that this should be splitted into two process steps. If I interprete this process correctly, the Claim Notification is read form some kind of persistent storage and is forwarded to the insurance company. However, my general knowledge in this case says: Before someone can forward it, s/he has to read it from storage, if a storage is involved.  On the other hand, I neither can find any hint about reading and writing Claim notification.  Although I appreciate additional information found in the model, here I am not quite sure if this is correct here. Maybe (due to a certain desired strategy) the system has done here more than it should.
+
+According to the textual input, it makes sense, that insurance agent is modelled as a sperate pool (“insurance agent …. contacts the insurance company”). This is a hint, that the insurance agent is an independent thing, therefore the resulting pool as such is correct. However, I just would like to give the hint, that insurance agents often also are employees within the insurance company. If this was meant when writing the input text, then a lane “insurance agent” within the pool “insurance company”. But once again, because of the above sentence, in this universe of discourse insurance agents are independent from insurance companies.
+
+Lane “clerk”: After the start message event, which I have already discussed, there is the task “Enter Claim Notification”. This raises several open questions:
+a)	Is the clerk really responsible for this task? This information is not given in the input text.
+b)	Could it be, that this is the real point in time where the notification is written into a storage and not in the other pool?
+c)	Why is there a “Read from: Claim Notification” if the Tasks tells the reader “Enter Claim Notification” (can be seen as a synonym for write)
+d)	Where does the “Case File” comes from? It is not in the text describing this part of the process. To write something into a case file makes sense. But it is an assumption not given in the text.
+e)	I wonder “what is written” into a Case File.  Or if the case file is the data: Into what storage is the case file written?
+f)	Read and write of “Claim notification”. Seeing this in two separate pools is confusing but thist might be due to a certain model interpretation I have. If I see this insurance agent as a separate pool, I would expect this expresses that this is a consultant with an own company. In such a case I wonder if the two pools (two companies:  company of the insurance agent and insurance company) really share data that is written or read respectively. On the other hand, if the insurance agent would be an employee it could be modelled as a lane, meaning that this lane shares the IT infrastructure with all the other lanes within this pool.
+Unfortunately, in this task (process step) there are to many open questions. There fore I have to assume that here is a semantic issue in the result.
+
+Next task is “Assing Clerk”.  This process step contradicts with the context in which this step is placed. Since the lane “clerk” has the semantic that person in the role “clerk” has the responsibility for a certain task (process step),  a clerk is responsible of assigning a clerk. Even if clerk is a role, it is confusing to read.  Since assigning a clerk is an important process step, there should be another instance/ role the assigns a clerk before the whole process is handed over to the lane clerk (e.g., A distributer within the insurance company assigns a qualified clerk”. Futhermore, it is not clear why there is a need for “Read from: Case File”. Is this because the “distributer” can better assign a qualified clerk if he reads the case file an what kind of accident happened? If so OK.
+
+In my opinion, the sentence: “The next steps basically try to answer two questions: Whose insurance is obliged to pay and how much is it going to cost?” might lead to two interpretations and thus two model variants. The one, which is preferred here is:  Estimate costs anyway.   However another interpretation of the sentence and particularly the phrase “Whose insurance is obliged to pay” could be: First try to find out which insurance (and thus insurance company) is obliged to pay. If it is the own insurance company or both insurance companies share the costs, estimate the cost. If the own company is not obliged, then the process ends her (i.e., why wasting working time to estimate costs if the own company do not have to pay).
+
+I wonder why “Repair quote” is prepared but “repair quote” is not treated as an important piece of data. In my opinion such a repair quote is very important.  The same holds for all kind of information that is gathered (medical information, repair information, etc.)  - see tasks “Gather Medical and Repair Information” and “Gather Additional Information”. Why isn’t this written somewhere?
+
+Furthermore, I have interpreted the text as such: All these information are the basis for preparing a good Repair quote. “Estimating the costs for repairs and doctors is influenced by many variables: Which repair is really needed? … “ . All these questions are answered in my opinion during these gathering tasks. Nevertheless the preparation of the repair quite is before the regulator can gather the necessary information.
+
+It is not really clear from the input text, which actor is responsible to initiate legal measures  “… if legal measures are initiated, the process might take …”. Thus it is an assumption that the insurance company and within the insurance company the clerk initiate it. Could be true but could be also wrong. 
+
+In my opinion it is good that in the BPMN output such information like  concrete costs or possible durations of process steps are not modelled.  The time descriptions do not represent any kind of time events.
+
+Finally, as in the previous example: If such a process is modeled for an insurance company, it is more likely that only the process steps withing the insurance company pool are really 
+
+To summarize: 
+The textual input leaves space for interpretations, which itself can lead to variants of the model. The given model represents one of these variants. Overall it shows the process as described in the input text but there issues in the details of the model. For instance it is not clear why some kind of data is used (written or read). Some of the process steps (e.g., tasks like assign clerk, prepare repair quote) seem to be misplaced. In some parts of the model from a readers point of view the resulting model tries to catch too much details even if such details are not really mentioned in the input text. With details I mainly mean the “comments” holding the data and the operations (read , write) performed on this data. For instance, I could not find the term “Case file” in the text. Thus it seems that this term was generated from contextual knowledge the system has. 
+From a modelers perspective, confronted with such a text, I would try to answer my open questions and determine the semantics of words and phrases to get an impression what a stakeholder wants to tell me (what s/he means and has in mind when telling me this story). Maybe, in parallel I would draw a sketch of the model.  In this sense, I can also understand the resulting model. A sketch of the model, that is provided by a system. 
+"
+R2FNPLCG,2,2,1,expert,7,7,7,7,7.0,7,7,7.0,5,7,7.0,6,,
+R2FNPLCG,5,2,3,expert,5,6,6,7,4.0,5,7,7.0,6,7,6.0,6,,"Police Pool logic is incomplete. If a car is not registered, the proces goes on. But I think it should stop there..."
+R4a1B,5,1,3,expert,5,6,5,6,6.0,6,7,7.0,7,7,5.0,5,,missing payment part message-flow
+R4a1B,2,1,1,expert,7,7,7,7,7.0,7,7,7.0,7,7,7.0,7,Fully agreeing with message-flow since there is no message flow at all.,"Personally, I would name the year and month data object request."
+R2GHYARL,6,2,3,expert,4,6,6,7,7.0,6,7,6.0,6,7,7.0,7,,
+R2GHYARL,4,2,2,expert,5,7,7,7,5.0,6,7,7.0,7,7,7.0,7,,The control-flow in the Owner lane fails to capture the possibility that the owner has already paid the fees hence the owner should not wait for a notification of payment.
+R2SIXTHL,6,3,3,expert,3,6,3,2,6.0,5,4,6.0,6,1,2.0,3,"Semantics are not fully clear, e.g., regarding the regulator role and several other aspects mentioned in the text. Thus, rating is difficult.","Several issues exist with the model, e.g., tasks are not elementary (should be multiple tasks), odd phrasing in task names (e.g., the Clerk assigns a Clerk in the first task), in the gateway condition ""No ..."", in the end event."
+R2SIXTHL,4,3,2,expert,3,4,3,5,3.0,2,5,6.0,3,4,1.0,3,"- Odd phrasing in the textual description; semantics are partially unclear. It is therefore difficult to determine relevance, correctness, and completeness.
+- Some aspects cannot be rated, e.g., the correctness of tasks.
+- Description ""Data & Data-Flow"" vs. ""Data-Flow"".","Several issues exist such as: a hearing date is only allocated if the fee has not been payed; the process start at the Owner is not described and unclear; certain data objects should be marked as inputs as they seem to be needed when starting a process; reading and writing of data objects misses, e.g., a read in the task ""Retrieve premesis file""; message flows are missing, e.g., to send the allocated date."
+R2LNEXLA,1,1,1,expert,5,6,6,4,7.0,3,4,7.0,6,7,4.0,5,"From my perspective, the relevance of modeling elements is purpose-driven. Taking as a basis for a discussion might have different implications than preparing an implementation of a model for process execution (e.g., in terms of Pools and Lanes, which are semantically not defined properly in the BPMN standard).","From the text there is only few evidence, where data objects are needed. Taking the creation of a bank account as an example, there is no information present in the text that tells us that the application is needed for this task. On the other hand side, we see that notifying the customer about a rejection is not depending on the application. However, at least the name of the customer should be relevant, too. 
+
+I am pretty sure that I would use two different process end events to make clear that we have different results. Implementing the process model (i.e. making it executable) could then communicate the two results in two different ways, which would be my preference.
+
+There is no information in the text that justifies the modeled swimlane."
+R2LNEXLA,3,1,2,expert,5,6,3,4,3.0,6,6,6.0,7,4,3.0,6,,"Since you only asked for Pools & Lanes, Message Flows and Data Flows, I did not judge the control flow. However, the last sentence is not covered by the model at all. The required check if a product is in stock should be an activity right before the gateway. Furthermore, there should be a loop back right before this activity or there should be a second Start event, which allows for executing this activity as the first activity in the process. Sure, this probably does not make sense in practical scenarios but this is how the text could be interpreted."

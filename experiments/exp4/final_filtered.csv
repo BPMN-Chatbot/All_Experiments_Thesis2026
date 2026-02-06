@@ -1,0 +1,72 @@
+sessionKey,userType,usefulness_easy,usefulness_productivity,usefulness_general,intention_use,general_feedback
+R1CAIXTJ,expert,5,6,6,3,"I think it is very easy and convenient to generate an initial model. However, it is difficult and requires a lot of experience to evaluate this model and identify the introduced errors. When using the tool, it suggests that the solution is fine. This is kind of misleading for non-experts? In the two examples I had to assess, they looked good at first glance but contained fundamental errors in the control-flow and had missing activities. Overall, I find the tool very useful, but particularly for experts."
+R2BVQTYK,expert,5,5,6,5,
+R1DJVSFC,expert,6,6,6,6,
+R1UDJTYD,expert,5,3,5,2,"It was frustrating to get the chatbot to do what I wanted. It's somewhat manageable with very specific instructions (e.g., task x comes after task y), but then it is more effective to do it by hand. When given additional elaborations on some parts of the process, it sometimes redraw the process entirely instead of just the mentioned parts. You cannot have an actual conversation with the chatbot, e.g., the user cannot interact by asking questions or by demanding explanations. This makes interacting feel somewhat ""one-sided"". It also seems to not understand references to selected elements. I think improvements in how the user is capable to interact with the chatbot could make the experience less frustrating.
+However, in its current form, it is very useful to draft processes from textual description, even without many details provided. Subsequent refinement of the process is the challenge. The checkers were useful for identifying problems. The autofix functionality did not produces very accurate results in my testing."
+R1MXHSCE,expert,5,5,7,4,
+R1XSJGHP,expert,5,6,6,5,
+R1MLAFMY,expert,5,5,5,5,I would like to be able to change small things in the model without natural language (with a graphical editor). Closing the pool (black box) did not work (pool disappered).  The data sources/sinks caused me the most problems. The  Numbering of gateways and tasks would be helpful to reference them in the text. Can the tool also splitt a model into sub-processes (for larger models)?  Is it traceable for the user from which text  became what? Nice approach :)
+R2EYARSS,expert,4,6,7,7,"Using the BPMN-Chatbot as assistant for modeling can be of great help. Although sometimes the chatbot provides overloaded and possibly logical errors, however, in combination with human expert knowledge the productivity can be increased. For example, first drafts of a business process can be generated and then be refined iteratively, from low-detailed to high-detailed business process models."
+R1MISBBC,expert,6,6,6,7,"The tool has a lot of potential to address the first part of the modelling activity, where a raw version of the diagram is created. This will have a huge impact and save so much time, since the modellers will only have to fine-tune the diagram. The checkers are interesting yet the autofix capability needs to be improved, in some cases, the proposed solution was not correct, and I was not able to give feedback on the LLM."
+R2ZKDKCV,expert,2,2,3,3,"For an expert, the tool makes the experience more difficult and frustrating compared to drawing the diagram by hand. In particular, the tool was able to correctly model the process only if I described with fine details how the process would have looked like. When I gave less detailed instructions, the tool drew a completely different model, changing parts that were not affected by the changes I wanted to be made. The model checker was able to detect issues, but completely incapable of auto-repairing the model. There was no way for the tool to understand the concept of empty pool, or to draw data associations."
+R2LXDUWR,expert,5,4,6,5,"I ran the checker feature initially and then later. I recorded some observations below.
+
+-------------------------------------------------------------
+Initialy:
+
+Collaboration Checker ERROR:
+This process is unsound due to dead tokens.
+Highlight Elements did nothing
+
+Data Flow Checker WARNING:
+Data Object is neither written to nor read in some paths: ""Service Request"".
+The initital event (highligted by the error) writes to the data object.
+
+Data Object is neither written to nor read in some paths: ""Notification"".
+The same.
+
+Data Object is neither written to nor read in some paths: ""Next Service Time"".
+An activity writes to this data object.
+
+-----------------------------------
+After making changes
+
+This process is unsound due to dead tokens.
+Highlight now works. It highlights two message-flow arcs and provides an explanation. One of the highlighted arcs does not seem relevant to the problem.
+The autofix is reasonable, but I don't think we want to model not recievening a fine from the police in this case.
+
+I used the autofix to remove some data objects and it worked well.
+
+------------------------------------
+Other feedback
+
+It would be helpful if the tool highlited the parts of the model that were altered. It would make it much easier to check what changed.
+"
+R2YCRAQK,expert,5,5,6,6,"This tool is very exciting and is very good - no doubts!
+The ranking in questions 1 - 2 was hard to make. It could on average also be a 6 for question 1 and 2. But it depents what is meant with ""makes modeling easier"" and ""increase productivity"".
+Focusing on the generation of an initial sketch  of a process diagram from textual input, my ranking would be definitely a 7 both in question 1 and 2. However, after this generation, a modeler (together with a domain expert) still has to go through the diagram. Since a textual input never is complete and often is ambiguous, such a system will make design decisions and assumptions, that will not meet the expectations of the modeler or the expectations of the domain expert. Therefore, and as said above, there should be always a human in the loop.
+I also think, that the questions 1 and 2 should not yet asked at this stage. Of course these questions are important, but the tool seems to be prototype. This prototype will be continuously improved. I totally see the strong potential of such a system. Therefore, in future version where some other features are implemented I would give the mark 6 or even 7 for questions 1 and 2. However, questions 1 and 2 seem to refer to the current prototype version of the tool.  A future feature that I definitely miss (I know that this feature cannot be part of the prototype, but I was asked to evaluate the prototype and not a future system) is the possibility to directly edit the diagram graphically without the need of prompting requrest everytime  I would like to do a change in the diagram. I tried my best it but I could not find such an editing feature. I could click on modeling elements an highlight them but I did not find a way to edit them. For a modeler, this slows down the modeling process in the current version and thus it is not really easier or efficient. For a modeler who is familiar of working with modelling workbenches it was unfamiliar to interact via natural language. Since this technology (LLMs) is also relatively new, as a modeler you sometimes have to handle internal doubts and questions like: Do I express myself exactly enough? What will happen if not? There is a kind of loss in control, since you do not exactly know what will happen and will be generated after you send your request to the LLM system. My personal usage impression was: Since I was aiming at getting good results after each stated request, I automatically tried to express myself on one hand as exactly as possible, on the other hand, I avoided to confront the system with a request that includes several model updates at once. Thus, I pulled myself forward, one little update step after another. Furthermore, I tried to be always focused on the aimed update (intermediate result) and the overall updated (final result). That means, I first tried to build the “picture” of the future updated model (or part of the model) in my mind. Then, since I did not have the direct editing possibility, I tried to “translate” my thoughts/picture in my mind into a natural language request that can be given to the system.  Another feature, that could be interesting is a versioning during model. I tried my best with prompts (and also tried it in the right hand side of the tools screen) but I could not command the system to restore the original process model. However, in a scenario where you only get an update model via prompts, it would be good to have a “roll back” function which gives you an earlier version of the model, just in case, the system updated in a way that the new model cannot be used further.
+Once again, the system is great. A future system will certainly get  a 7 for all questions, but since I was asked to tell something about the current version, I could not give the whole points. But I tried to explain why.
+
+"
+R2FNPLCG,expert,6,6,6,6,"I find the tool very useful for generating an initial draft of a model based on a textual description. Additionally, the checkers are helpful when the model needs to be more formal—that is, correct enough to be executed in a workflow engine. However, if the model is intended solely for informational purposes, the model checkers are less essential.
+
+Overall, I like the tool and believe it is sufficiently effective for use in real scenarios, provided the user is capable of assessing the correctness of the model. But this requirement generally applies when using any LLM."
+R4a1B,expert,5,5,6,6,"The option to go back to a previous task when noticing a personal error would help the survey: I missed reading a sentence in the car service app task, which I only noticed when working with the chatbot, and now my first evaluation of the model is off.
+
+It would also be helpful to alert participants that the sequence flows of loops cannot be named/annotated - at least it did not work for me.
+
+The final model is incomplete because the collaboration checker shows an unsound error, but from the process description, any autofix provided by the checker did not make sense. "
+R2GHYARL,expert,5,4,5,4,"What makes the modeling task frustrating is the introduction of modeling errors in fragments of the model that are not mentioned in the prompt and should not be changed. Even after prompting the chatbot to fix these errors led to the introduction of additional errors. This creates a sense of uncertainty regarding the correctness of the model, since fragments that are assumed to be correct might not be correct anymore after a change prompt that should locally affect other model fragments. However, externalizing the modeling task in NL helps to deepen the model understanding irrespective of the outcome. Combined with the possibility to manually edit the model, I see the potential of the chatbot to help to achieve models with higher correctness. The checkers also provide very useful insights regarding the data flow, which is typically more challenging to follow in a BPMN model."
+R2SIXTHL,expert,6,4,5,5,"- The chatbox as an additional feature seems helpful in certain cases if it is an add-on to a fully featured editor.
+- The chat is not helpful for making specific changes: the change needs to be phrased, the response reviewed, and possibly corrected.
+- The chat is helpful for changes that affect the model in various aspects (e.g., introducing matching sending and receiving events and message flows, creating or editing multiple tasks).
+- Models tend to grow quickly during conversation.
+- When chatting, added elements and changed semantics are unpredictable, requiring constant reviews. 
+- Automatic checking can be helpful, however, not all messages were relevant. 
+- Automatic fixing of detected issues tend work better for data-related fixes.
+- One requested change of the model resulted in an unsound process. Automatic fixing introduced several new problems.
+- Suggested changes that can be accepted or declined could be helpful.
+"
+R2LNEXLA,expert,6,6,7,5,Sometimes I felt like I wanted to simply select a modeling element I want to apply changes to (both Flow nodes and edges) and then I want to describe the changes like it is already possible. Describing which part the LLM should change turned out the most challenging and annoying part (though using the tool was not annoying but helpful overall).

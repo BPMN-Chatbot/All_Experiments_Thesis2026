@@ -1,0 +1,494 @@
+{
+  "type": "object",
+  "properties": {
+    "pools": {
+      "type": "array",
+      "description": "Multiple pools represent separate organizational units. Lanes are departments or participants within a pool.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "dataObjects": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "description": "Use this only for digiatal or physical data files or persistent data stores (e.g., databases), not for general objects.",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "data-file",
+                    "data-store"
+                  ]
+                }
+              },
+              "required": [
+                "name",
+                "type"
+              ]
+            }
+          },
+          "lanes": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "name"
+              ],
+              "minItems": 1
+            }
+          },
+          "startEvent": {
+            "oneOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "subType": {
+                    "type": "string",
+                    "enum": [
+                      "default"
+                    ],
+                    "description": "Default Start Event starts the process immediately."
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "laneIndex": {
+                    "type": "integer",
+                    "description": "Index of the lane in the pool's lanes array"
+                  }
+                },
+                "required": [
+                  "subType",
+                  "name",
+                  "laneIndex"
+                ]
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "subType": {
+                    "type": "string",
+                    "enum": [
+                      "messageReceive"
+                    ],
+                    "description": "Message Receive Start Event waits for an external message to arrive before starting the process."
+                  },
+                  "id": {
+                    "type": "integer"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "laneIndex": {
+                    "type": "integer"
+                  },
+                  "writeDataObjectRefs": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer"
+                    }
+                  }
+                },
+                "required": [
+                  "subType",
+                  "id",
+                  "name",
+                  "laneIndex"
+                ]
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "subType": {
+                    "type": "string",
+                    "enum": [
+                      "timer"
+                    ],
+                    "description": "Start Event Timer waits for a specific time before starting the process."
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "laneIndex": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "subType",
+                  "name",
+                  "laneIndex"
+                ]
+              }
+            ]
+          },
+          "process": {
+            "type": "array",
+            "description": "The order in this array defines execution sequence.",
+            "items": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "enum": [
+                        "task"
+                      ]
+                    },
+                    "subType": {
+                      "type": "string",
+                      "enum": [
+                        "abstract",
+                        "user",
+                        "manual",
+                        "service",
+                        "script",
+                        "business-rule",
+                        "embedded-subprocess"
+                      ]
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "laneIndex": {
+                      "type": "integer"
+                    },
+                    "readDataObjectRefs": {
+                      "type": "array",
+                      "description": "Indices of data objects to read from.",
+                      "items": {
+                        "type": "integer"
+                      }
+                    },
+                    "writeDataObjectRefs": {
+                      "type": "array",
+                      "description": "Indices of data objects to write to.",
+                      "items": {
+                        "type": "integer"
+                      }
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "subType",
+                    "name",
+                    "laneIndex"
+                  ]
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "enum": [
+                        "event"
+                      ]
+                    },
+                    "subType": {
+                      "type": "string",
+                      "enum": [
+                        "timer"
+                      ]
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "laneIndex": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "subType",
+                    "name",
+                    "laneIndex"
+                  ]
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "enum": [
+                        "event"
+                      ]
+                    },
+                    "subType": {
+                      "type": "string",
+                      "enum": [
+                        "messageReceive"
+                      ],
+                      "description": "Message Receive Event waits for an external message to arrive."
+                    },
+                    "id": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "laneIndex": {
+                      "type": "integer"
+                    },
+                    "writeDataObjectRefs": {
+                      "type": "array",
+                      "items": {
+                        "type": "integer"
+                      }
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "subType",
+                    "id",
+                    "name",
+                    "laneIndex"
+                  ]
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "enum": [
+                        "event"
+                      ]
+                    },
+                    "subType": {
+                      "type": "string",
+                      "enum": [
+                        "messageSend"
+                      ],
+                      "description": "Message Send Event sends an external message."
+                    },
+                    "receiveEventId": {
+                      "type": "integer",
+                      "description": "Id of corresponding Message Receive Event in another pool. Will be used to connect message flow."
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "laneIndex": {
+                      "type": "integer"
+                    },
+                    "readDataObjectRefs": {
+                      "type": "array",
+                      "items": {
+                        "type": "integer"
+                      }
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "subType",
+                    "name",
+                    "laneIndex"
+                  ]
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "enum": [
+                        "loop"
+                      ]
+                    },
+                    "condition": {
+                      "type": "string"
+                    },
+                    "body": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/properties/pools/items/properties/process/items"
+                      },
+                      "minItems": 1
+                    },
+                    "laneIndex": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "condition",
+                    "body",
+                    "laneIndex"
+                  ]
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "enum": [
+                        "parallel"
+                      ]
+                    },
+                    "branches": {
+                      "type": "array",
+                      "minItems": 2,
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "branch": {
+                            "type": "array",
+                            "items": {
+                              "$ref": "#/properties/pools/items/properties/process/items"
+                            }
+                          }
+                        },
+                        "required": [
+                          "branch"
+                        ]
+                      }
+                    },
+                    "laneIndex": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "branches",
+                    "laneIndex"
+                  ]
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "enum": [
+                        "xor"
+                      ]
+                    },
+                    "condition": {
+                      "type": "string",
+                      "description": "Describe a decision point."
+                    },
+                    "branches": {
+                      "type": "array",
+                      "minItems": 2,
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "label": {
+                            "type": "string"
+                          },
+                          "branch": {
+                            "type": "array",
+                            "items": {
+                              "$ref": "#/properties/pools/items/properties/process/items"
+                            }
+                          }
+                        },
+                        "required": [
+                          "label",
+                          "branch"
+                        ]
+                      }
+                    },
+                    "laneIndex": {
+                      "type": "integer",
+                      "description": "Index of the lane of the participant taking the decision."
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "branches",
+                    "laneIndex"
+                  ]
+                },
+                {
+                  "type": "object",
+                  "description": "Decision points based on external events. Waits for an event and directs process flow based on which event happens first",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "enum": [
+                        "events-gateway"
+                      ]
+                    },
+                    "branches": {
+                      "type": "array",
+                      "minItems": 2,
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "event": {
+                            "oneOf": [
+                              {
+                                "$ref": "#/properties/pools/items/properties/process/items/oneOf/1"
+                              },
+                              {
+                                "$ref": "#/properties/pools/items/properties/process/items/oneOf/2"
+                              }
+                            ]
+                          },
+                          "branch": {
+                            "type": "array",
+                            "items": {
+                              "$ref": "#/properties/pools/items/properties/process/items"
+                            }
+                          }
+                        },
+                        "required": [
+                          "event",
+                          "branch"
+                        ]
+                      }
+                    },
+                    "laneIndex": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "branches",
+                    "laneIndex"
+                  ]
+                }
+              ]
+            }
+          },
+          "endEvent": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "laneIndex": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "name",
+              "laneIndex"
+            ]
+          }
+        },
+        "required": [
+          "name",
+          "lanes",
+          "dataObjects",
+          "startEvent",
+          "process",
+          "endEvent"
+        ]
+      }
+    }
+  },
+  "required": [
+    "pools"
+  ],
+  "additionalProperties": false
+}

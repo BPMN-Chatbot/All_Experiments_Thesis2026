@@ -1,0 +1,36 @@
+{
+  "id": "chatcmpl-BTdUEafstNTXfUvVDGpQ0VXxa9EkJ",
+  "object": "chat.completion",
+  "created": 1746402998,
+  "model": "gpt-4.1-2025-04-14",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "```xml\n<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<definitions xmlns=\"http://www.omg.org/spec/BPMN/20100524/MODEL\"\n             xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n             xmlns:bpmndi=\"http://www.omg.org/spec/BPMN/20100524/DI\"\n             xmlns:dc=\"http://www.omg.org/spec/DD/20100524/DC\"\n             targetNamespace=\"http://example.com/bpmn\">\n  <process id=\"CreditRequestProcess\" isExecutable=\"true\">\n    <laneSet>\n      <lane id=\"l_ProcessingDepartment\" name=\"Processing Department\"/>\n      <lane id=\"l_RiskDepartment\" name=\"Risk Department\"/>\n    </laneSet>\n    <!-- Start Event -->\n    <startEvent id=\"startEvent_CreditRequestReceived\" name=\"Credit Request Received\">\n      <outgoing>flow_start_assessRisk</outgoing>\n    </startEvent>\n    <!-- Assess Risk Task -->\n    <task id=\"task_AssessRisk\" name=\"Assess Risk\">\n      <incoming>flow_start_assessRisk</incoming>\n      <outgoing>flow_assessRisk_gateway</outgoing>\n      <laneRef>l_RiskDepartment</laneRef>\n    </task>\n    <!-- Exclusive Gateway: Risk Level -->\n    <exclusiveGateway id=\"gateway_RiskLevel\" name=\"Risk Above Threshold?\">\n      <incoming>flow_assessRisk_gateway</incoming>\n      <outgoing>flow_highRisk_advancedAssessment</outgoing>\n      <outgoing>flow_lowRisk_simpleAssessment</outgoing>\n    </exclusiveGateway>\n    <!-- Advanced Risk Assessment -->\n    <task id=\"task_AdvancedRiskAssessment\" name=\"Advanced Risk Assessment\">\n      <incoming>flow_highRisk_advancedAssessment</incoming>\n      <outgoing>flow_advancedAssessment_merge</outgoing>\n      <laneRef>l_RiskDepartment</laneRef>\n    </task>\n    <!-- Simple Risk Assessment -->\n    <task id=\"task_SimpleRiskAssessment\" name=\"Simple Risk Assessment\">\n      <incoming>flow_lowRisk_simpleAssessment</incoming>\n      <outgoing>flow_simpleAssessment_merge</outgoing>\n      <laneRef>l_RiskDepartment</laneRef>\n    </task>\n    <!-- Parallel Gateway: Merge Assessments and Branch to Notify/Disburse -->\n    <parallelGateway id=\"gateway_parallel_merge\" name=\"Assessment Completed\">\n      <incoming>flow_simpleAssessment_merge</incoming>\n      <incoming>flow_advancedAssessment_merge</incoming>\n      <outgoing>flow_merge_notifyCustomer</outgoing>\n      <outgoing>flow_merge_organizeDisbursement</outgoing>\n    </parallelGateway>\n    <!-- Notify Customer Message Throw Event -->\n    <intermediateThrowEvent id=\"event_NotifyCustomer\" name=\"Notify Customer (Send Result)\">\n      <incoming>flow_merge_notifyCustomer</incoming>\n      <outgoing>flow_notifyCustomer_end</outgoing>\n      <eventDefinitionRefs>\n        <messageEventDefinition id=\"msgDef_NotifyCustomer\"/>\n      </eventDefinitionRefs>\n      <laneRef>l_ProcessingDepartment</laneRef>\n    </intermediateThrowEvent>\n    <!-- Organize Disbursement Task -->\n    <task id=\"task_OrganizeDisbursement\" name=\"Organize Disbursement\">\n      <incoming>flow_merge_organizeDisbursement</incoming>\n      <outgoing>flow_disbursement_end</outgoing>\n      <laneRef>l_ProcessingDepartment</laneRef>\n    </task>\n    <!-- End Events -->\n    <endEvent id=\"endEvent_NotifyCustomer\" name=\"Customer Notified\">\n      <incoming>flow_notifyCustomer_end</incoming>\n    </endEvent>\n    <endEvent id=\"endEvent_DisbursementOrganized\" name=\"Disbursement Organized\">\n      <incoming>flow_disbursement_end</incoming>\n    </endEvent>\n    <!-- Sequence Flows -->\n    <sequenceFlow id=\"flow_start_assessRisk\" sourceRef=\"startEvent_CreditRequestReceived\" targetRef=\"task_AssessRisk\"/>\n    <sequenceFlow id=\"flow_assessRisk_gateway\" sourceRef=\"task_AssessRisk\" targetRef=\"gateway_RiskLevel\"/>\n    <sequenceFlow id=\"flow_highRisk_advancedAssessment\" sourceRef=\"gateway_RiskLevel\" targetRef=\"task_AdvancedRiskAssessment\">\n      <conditionExpression xsi:type=\"tFormalExpression\"><![CDATA[risk > threshold]]></conditionExpression>\n    </sequenceFlow>\n    <sequenceFlow id=\"flow_lowRisk_simpleAssessment\" sourceRef=\"gateway_RiskLevel\" targetRef=\"task_SimpleRiskAssessment\">\n      <conditionExpression xsi:type=\"tFormalExpression\"><![CDATA[risk <= threshold]]></conditionExpression>\n    </sequenceFlow>\n    <sequenceFlow id=\"flow_simpleAssessment_merge\" sourceRef=\"task_SimpleRiskAssessment\" targetRef=\"gateway_parallel_merge\"/>\n    <sequenceFlow id=\"flow_advancedAssessment_merge\" sourceRef=\"task_AdvancedRiskAssessment\" targetRef=\"gateway_parallel_merge\"/>\n    <sequenceFlow id=\"flow_merge_notifyCustomer\" sourceRef=\"gateway_parallel_merge\" targetRef=\"event_NotifyCustomer\"/>\n    <sequenceFlow id=\"flow_merge_organizeDisbursement\" sourceRef=\"gateway_parallel_merge\" targetRef=\"task_OrganizeDisbursement\"/>\n    <sequenceFlow id=\"flow_notifyCustomer_end\" sourceRef=\"event_NotifyCustomer\" targetRef=\"endEvent_NotifyCustomer\"/>\n    <sequenceFlow id=\"flow_disbursement_end\" sourceRef=\"task_OrganizeDisbursement\" targetRef=\"endEvent_DisbursementOrganized\"/>\n  </process>\n  <!-- Customer pool for notification -->\n  <collaboration id=\"collab_CreditProcess\">\n    <participant id=\"pool_Company\" name=\"Company\" processRef=\"CreditRequestProcess\"/>\n    <participant id=\"pool_Customer\" name=\"Customer\"/>\n    <!-- Message Flow: Notify Customer -->\n    <messageFlow id=\"msgFlow_NotifyCustomer\" name=\"Assessment Result\"\n                 sourceRef=\"event_NotifyCustomer\" targetRef=\"event_ReceiveNotification\"/>\n  </collaboration>\n  <!-- Customer receives notification message -->\n  <process id=\"CustomerProcess\" isExecutable=\"false\">\n    <laneSet>\n      <lane id=\"l_Customer\" name=\"Customer\"/>\n    </laneSet>\n    <intermediateCatchEvent id=\"event_ReceiveNotification\" name=\"Receive Assessment Result\">\n      <eventDefinitionRefs>\n        <messageEventDefinition id=\"msgDef_ReceiveNotification\"/>\n      </eventDefinitionRefs>\n      <laneRef>l_Customer</laneRef>\n    </intermediateCatchEvent>\n  </process>\n</definitions>\n```",
+        "refusal": null,
+        "annotations": []
+      },
+      "logprobs": null,
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 572,
+    "completion_tokens": 1384,
+    "total_tokens": 1956,
+    "prompt_tokens_details": {
+      "cached_tokens": 0,
+      "audio_tokens": 0
+    },
+    "completion_tokens_details": {
+      "reasoning_tokens": 0,
+      "audio_tokens": 0,
+      "accepted_prediction_tokens": 0,
+      "rejected_prediction_tokens": 0
+    }
+  },
+  "service_tier": "default",
+  "system_fingerprint": "fp_cf18407276"
+}

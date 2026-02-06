@@ -1,0 +1,495 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_1" targetNamespace="http://example.bpmn" exporter="Camunda Modeler" exporterVersion="5.34.0">
+  <collaboration id="Collaboration_InsuranceProcess">
+    <participant id="Participant_Beneficiary" name="Beneficiary" processRef="BeneficiaryProcess" />
+    <participant id="Participant_Agent" name="Agent" processRef="AgentProcess" />
+    <participant id="Participant_InsuranceCompany" name="Insurance Company" processRef="InsuranceCompanyProcess" />
+    <messageFlow id="Message_BeneficiaryToAgent" name="Notify Agent" sourceRef="MessageThrowEvent_NotifyAgent" targetRef="StartEvent_WaitForBeneficiary" />
+    <messageFlow id="Message_AgentToInsurance" name="Notify Insurance" sourceRef="MessageThrowEvent_NotifyInsurance" targetRef="StartEvent_WaitForAgent" />
+  </collaboration>
+  <process id="BeneficiaryProcess" isExecutable="true">
+    <laneSet>
+      <lane id="BeneficiaryLane" name="Beneficiary" />
+    </laneSet>
+    <startEvent id="StartEvent_Accident" name="Accident Occurred" />
+    <task id="Task_CallAgent" name="Call Insurance Agent" />
+    <endEvent id="EndEvent_BeneficiaryEnd" name="Process Completed" />
+    <sequenceFlow id="Flow1" sourceRef="StartEvent_Accident" targetRef="Task_CallAgent" />
+    <intermediateThrowEvent id="MessageThrowEvent_NotifyAgent" name="Notify Agent">
+      <messageEventDefinition id="MessageEventDefinition_BtoA" />
+    </intermediateThrowEvent>
+    <sequenceFlow id="Flow2" sourceRef="Task_CallAgent" targetRef="MessageThrowEvent_NotifyAgent" />
+    <sequenceFlow id="Flow3" sourceRef="MessageThrowEvent_NotifyAgent" targetRef="EndEvent_BeneficiaryEnd" />
+  </process>
+  <process id="AgentProcess" isExecutable="true">
+    <laneSet>
+      <lane id="AgentLane" name="Agent" />
+    </laneSet>
+    <startEvent id="StartEvent_WaitForBeneficiary" name="Wait for Beneficiary">
+      <messageEventDefinition id="MessageEventDefinition_AgentCatch" />
+    </startEvent>
+    <task id="Task_ContactInsurance" name="Contact Insurance Company" />
+    <intermediateThrowEvent id="MessageThrowEvent_NotifyInsurance" name="Notify Insurance Company">
+      <messageEventDefinition id="MessageEventDefinition_AtoI" />
+    </intermediateThrowEvent>
+    <endEvent id="EndEvent_AgentEnd" name="Process Completed" />
+    <sequenceFlow id="A_Flow1" sourceRef="StartEvent_WaitForBeneficiary" targetRef="Task_ContactInsurance" />
+    <sequenceFlow id="A_Flow2" sourceRef="Task_ContactInsurance" targetRef="MessageThrowEvent_NotifyInsurance" />
+    <sequenceFlow id="A_Flow3" sourceRef="MessageThrowEvent_NotifyInsurance" targetRef="EndEvent_AgentEnd" />
+  </process>
+  <process id="InsuranceCompanyProcess" isExecutable="true">
+    <laneSet>
+      <lane id="ClerkLane" name="Clerk" />
+      <lane id="RegulatorLane" name="Regulator" />
+    </laneSet>
+    <startEvent id="StartEvent_WaitForAgent" name="Wait for Agent">
+      <messageEventDefinition id="MessageEventDefinition_InsuranceCatch" />
+    </startEvent>
+    <dataObject id="DataObject_ClaimNotification" name="Claim Notification" />
+    <dataObjectReference id="DataObjectRef_ClaimNotification" name="Claim Notification" dataObjectRef="DataObject_ClaimNotification" />
+    <task id="Task_EnterClaimNotification" name="Enter Notification of Claim">
+      <dataInputAssociation id="Assoc1_Task_Enter_Claim">
+        <sourceRef>DataObjectRef_ClaimNotification</sourceRef>
+        <targetRef>Task_EnterClaimNotification</targetRef>
+      </dataInputAssociation>
+    </task>
+    <sequenceFlow id="IC_Flow0" sourceRef="StartEvent_WaitForAgent" targetRef="Task_EnterClaimNotification" />
+    <task id="Task_AssignClerk" name="Assign Qualified Clerk" />
+    <sequenceFlow id="IC_Flow1" sourceRef="Task_EnterClaimNotification" targetRef="Task_AssignClerk" />
+    <dataObject id="DataStore_PolicyDB" name="Policy Database" />
+    <dataStoreReference id="DataStoreRef_PolicyDB" name="Policy Database" dataStoreRef="DataStore_PolicyDB" />
+    <task id="Task_CheckPolicyValidity" name="Check Policy Validity">
+      <dataInputAssociation id="Assoc2_PolicyDB">
+        <sourceRef>DataStoreRef_PolicyDB</sourceRef>
+        <targetRef>Task_CheckPolicyValidity</targetRef>
+      </dataInputAssociation>
+    </task>
+    <sequenceFlow id="IC_Flow2" sourceRef="Task_AssignClerk" targetRef="Task_CheckPolicyValidity" />
+    <exclusiveGateway id="Gateway_PolicyValid" name="Policy Valid?" />
+    <sequenceFlow id="IC_Flow3" sourceRef="Task_CheckPolicyValidity" targetRef="Gateway_PolicyValid" />
+    <endEvent id="EndEvent_InvalidPolicy" name="Policy Invalid" />
+    <sequenceFlow id="IC_Flow4" sourceRef="Gateway_PolicyValid" targetRef="EndEvent_InvalidPolicy">
+      <conditionExpression xsi:type="tFormalExpression">No</conditionExpression>
+    </sequenceFlow>
+    <parallelGateway id="Gateway_SplitObligedAndCost" name="Start Evaluation" />
+    <sequenceFlow id="IC_Flow5" sourceRef="Gateway_PolicyValid" targetRef="Gateway_SplitObligedAndCost">
+      <conditionExpression xsi:type="tFormalExpression">Yes</conditionExpression>
+    </sequenceFlow>
+    <task id="Task_TalkDoctorsAndVictims" name="Talk to Doctors &#38; Injured Parties" />
+    <task id="Task_CarRepairQuote" name="Quote for Car Repairs" />
+    <task id="Task_DecideRepairParts" name="Decide on Repair Parts" />
+    <sequenceFlow id="IC_Flow6" sourceRef="Gateway_SplitObligedAndCost" targetRef="Task_TalkDoctorsAndVictims" />
+    <sequenceFlow id="IC_Flow7" sourceRef="Task_TalkDoctorsAndVictims" targetRef="Task_CarRepairQuote" />
+    <sequenceFlow id="IC_Flow8" sourceRef="Task_CarRepairQuote" targetRef="Task_DecideRepairParts" />
+    <task id="Task_TalkBeneficiaryOthers" name="Talk to Beneficiary/Others" />
+    <task id="Task_TalkWitnessPolice" name="Talk to Witnesses &#38; Police" />
+    <task id="Task_InspectSite" name="Visit People &#38; Accident Site" />
+    <sequenceFlow id="IC_Flow9" sourceRef="Gateway_SplitObligedAndCost" targetRef="Task_TalkBeneficiaryOthers" />
+    <sequenceFlow id="IC_Flow10" sourceRef="Task_TalkBeneficiaryOthers" targetRef="Task_TalkWitnessPolice" />
+    <sequenceFlow id="IC_Flow11" sourceRef="Task_TalkWitnessPolice" targetRef="Task_InspectSite" />
+    <parallelGateway id="Gateway_JoinCostBlame" name="Info Gathering Done" />
+    <sequenceFlow id="IC_Flow12" sourceRef="Task_DecideRepairParts" targetRef="Gateway_JoinCostBlame" />
+    <sequenceFlow id="IC_Flow13" sourceRef="Task_InspectSite" targetRef="Gateway_JoinCostBlame" />
+    <dataObject id="DataObject_CaseFile" name="Case File" />
+    <dataObjectReference id="DataObjectRef_CaseFile" name="Case File" dataObjectRef="DataObject_CaseFile" />
+    <task id="Task_DecideCompensation" name="Decide on Compensation">
+      <dataInputAssociation id="Assoc3_CaseFile">
+        <sourceRef>DataObjectRef_CaseFile</sourceRef>
+        <targetRef>Task_DecideCompensation</targetRef>
+      </dataInputAssociation>
+    </task>
+    <sequenceFlow id="IC_Flow14" sourceRef="Gateway_JoinCostBlame" targetRef="Task_DecideCompensation" />
+    <task id="Task_NotifyParties" name="Notify Parties about Compensation" />
+    <sequenceFlow id="IC_Flow15" sourceRef="Task_DecideCompensation" targetRef="Task_NotifyParties" />
+    <eventBasedGateway id="Gateway_CompensationResponse" name="Wait Response" />
+    <sequenceFlow id="IC_Flow16" sourceRef="Task_NotifyParties" targetRef="Gateway_CompensationResponse" />
+    <intermediateCatchEvent id="MessageCatchEvent_Satisfied" name="Parties Satisfied">
+      <messageEventDefinition id="MessageEventDefinition_Satisfied" />
+    </intermediateCatchEvent>
+    <sequenceFlow id="IC_Flow17" sourceRef="Gateway_CompensationResponse" targetRef="MessageCatchEvent_Satisfied" />
+    <intermediateCatchEvent id="MessageCatchEvent_Lawsuit" name="Legal Measures Initiated">
+      <messageEventDefinition id="MessageEventDefinition_Lawsuit" />
+    </intermediateCatchEvent>
+    <sequenceFlow id="IC_Flow18" sourceRef="Gateway_CompensationResponse" targetRef="MessageCatchEvent_Lawsuit" />
+    <intermediateCatchEvent id="TimerEvent_40Days" name="40 days passed">
+      <timerEventDefinition />
+    </intermediateCatchEvent>
+    <sequenceFlow id="IC_Flow19" sourceRef="Gateway_CompensationResponse" targetRef="TimerEvent_40Days" />
+    <endEvent id="EndEvent_CaseClosed" name="Case Closed" />
+    <sequenceFlow id="IC_Flow20" sourceRef="MessageCatchEvent_Satisfied" targetRef="EndEvent_CaseClosed" />
+    <sequenceFlow id="IC_Flow21" sourceRef="TimerEvent_40Days" targetRef="EndEvent_CaseClosed" />
+    <task id="Task_ProcessLawsuit" name="Process Lawsuit (may take years)" />
+    <sequenceFlow id="IC_Flow22" sourceRef="MessageCatchEvent_Lawsuit" targetRef="Task_ProcessLawsuit" />
+    <endEvent id="EndEvent_AfterLawsuit" name="Case Closed After Lawsuit" />
+    <sequenceFlow id="IC_Flow23" sourceRef="Task_ProcessLawsuit" targetRef="EndEvent_AfterLawsuit" />
+    <dataObject id="DataStore_Payments"  />
+    <dataStoreReference id="DataStoreRef_Payments" dataStoreRef="DataStore_Payments" name="Payments Database"/>
+    <task id="Task_PayCompensation" name="Pay Compensation">
+      <dataInputAssociation id="Assoc4_Payments">
+        <sourceRef>DataStoreRef_Payments</sourceRef>
+        <targetRef>Task_PayCompensation</targetRef>
+      </dataInputAssociation>
+    </task>
+    <sequenceFlow id="IC_Flow24" sourceRef="EndEvent_CaseClosed" targetRef="Task_PayCompensation" />
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_InsuranceProcess">
+    <bpmndi:BPMNPlane id="BPMNPlane_InsuranceProcess" bpmnElement="Collaboration_InsuranceProcess">
+      <bpmndi:BPMNShape id="Participant_Beneficiary_di" bpmnElement="Participant_Beneficiary" isHorizontal="true">
+        <dc:Bounds x="160" y="80" width="620" height="180" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_BeneficiaryLane_di" bpmnElement="BeneficiaryLane" isHorizontal="true">
+        <dc:Bounds x="160" y="80" width="620" height="180" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="StartEvent_Accident_di" bpmnElement="StartEvent_Accident">
+        <dc:Bounds x="220" y="145" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="205" y="181" width="90" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_CallAgent_di" bpmnElement="Task_CallAgent">
+        <dc:Bounds x="300" y="130" width="100" height="66" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_BeneficiaryEnd_di" bpmnElement="EndEvent_BeneficiaryEnd">
+        <dc:Bounds x="540" y="147" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="531" y="183" width="54" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="MessageThrowEvent_NotifyAgent_di" bpmnElement="MessageThrowEvent_NotifyAgent">
+        <dc:Bounds x="440" y="147" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="428" y="183" width="60" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow1_di" bpmnElement="Flow1">
+        <di:waypoint x="256" y="163" />
+        <di:waypoint x="300" y="163" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow2_di" bpmnElement="Flow2">
+        <di:waypoint x="400" y="163" />
+        <di:waypoint x="440" y="165" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow3_di" bpmnElement="Flow3">
+        <di:waypoint x="476" y="165" />
+        <di:waypoint x="540" y="165" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Participant_Agent_di" bpmnElement="Participant_Agent" isHorizontal="true">
+        <dc:Bounds x="180" y="280" width="600" height="180" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_AgentLane_di" bpmnElement="AgentLane" isHorizontal="true">
+        <dc:Bounds x="180" y="280" width="600" height="180" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="StartEvent_WaitForBeneficiary_di" bpmnElement="StartEvent_WaitForBeneficiary">
+        <dc:Bounds x="220" y="345" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="211" y="381" width="55" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_ContactInsurance_di" bpmnElement="Task_ContactInsurance">
+        <dc:Bounds x="300" y="330" width="100" height="66" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="MessageThrowEvent_NotifyInsurance_di" bpmnElement="MessageThrowEvent_NotifyInsurance">
+        <dc:Bounds x="440" y="348" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="418" y="384" width="81" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_AgentEnd_di" bpmnElement="EndEvent_AgentEnd">
+        <dc:Bounds x="540" y="348" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="531" y="384" width="54" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="A_Flow1_di" bpmnElement="A_Flow1">
+        <di:waypoint x="256" y="363" />
+        <di:waypoint x="300" y="363" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A_Flow2_di" bpmnElement="A_Flow2">
+        <di:waypoint x="400" y="363" />
+        <di:waypoint x="440" y="366" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A_Flow3_di" bpmnElement="A_Flow3">
+        <di:waypoint x="476" y="366" />
+        <di:waypoint x="540" y="366" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Participant_InsuranceCompany_di" bpmnElement="Participant_InsuranceCompany" isHorizontal="true">
+        <dc:Bounds x="180" y="490" width="2750" height="350" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="RegulatorLane_di" bpmnElement="RegulatorLane" isHorizontal="true">
+        <dc:Bounds x="180" y="640" width="2750" height="200" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ClerkLane_di" bpmnElement="ClerkLane" isHorizontal="true">
+        <dc:Bounds x="180" y="490" width="2750" height="150" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="StartEvent_WaitForAgent_di" bpmnElement="StartEvent_WaitForAgent">
+        <dc:Bounds x="220" y="555" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="204" y="591" width="69" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataObjectRef_ClaimNotification_di" bpmnElement="DataObjectRef_ClaimNotification">
+        <dc:Bounds x="322" y="665" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="297" y="701" width="86" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_EnterClaimNotification_di" bpmnElement="Task_EnterClaimNotification">
+        <dc:Bounds x="320" y="540" width="120" height="66" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_AssignClerk_di" bpmnElement="Task_AssignClerk">
+        <dc:Bounds x="480" y="540" width="120" height="66" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataStoreRef_PolicyDB_di" bpmnElement="DataStoreRef_PolicyDB">
+        <dc:Bounds x="682" y="665" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="660" y="701" width="81" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_CheckPolicyValidity_di" bpmnElement="Task_CheckPolicyValidity">
+        <dc:Bounds x="640" y="540" width="120" height="66" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_PolicyValid_di" bpmnElement="Gateway_PolicyValid" isMarkerVisible="true">
+        <dc:Bounds x="789" y="560" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="783" y="610" width="63" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_InvalidPolicy_di" bpmnElement="EndEvent_InvalidPolicy">
+        <dc:Bounds x="920" y="525" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="906" y="561" width="65" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_SplitObligedAndCost_di" bpmnElement="Gateway_SplitObligedAndCost">
+        <dc:Bounds x="1020" y="560" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1006" y="610" width="78" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_TalkDoctorsAndVictims_di" bpmnElement="Task_TalkDoctorsAndVictims">
+        <dc:Bounds x="1120" y="530" width="140" height="66" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_CarRepairQuote_di" bpmnElement="Task_CarRepairQuote">
+        <dc:Bounds x="1290" y="530" width="130" height="66" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_DecideRepairParts_di" bpmnElement="Task_DecideRepairParts">
+        <dc:Bounds x="1460" y="530" width="120" height="66" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_TalkBeneficiaryOthers_di" bpmnElement="Task_TalkBeneficiaryOthers">
+        <dc:Bounds x="1120" y="650" width="140" height="66" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_TalkWitnessPolice_di" bpmnElement="Task_TalkWitnessPolice">
+        <dc:Bounds x="1290" y="650" width="140" height="66" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_InspectSite_di" bpmnElement="Task_InspectSite">
+        <dc:Bounds x="1460" y="650" width="140" height="66" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_JoinCostBlame_di" bpmnElement="Gateway_JoinCostBlame">
+        <dc:Bounds x="1620" y="538" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1610" y="500.5" width="70" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataObjectRef_CaseFile_di" bpmnElement="DataObjectRef_CaseFile">
+        <dc:Bounds x="1712" y="585" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1706" y="621" width="48" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_DecideCompensation_di" bpmnElement="Task_DecideCompensation">
+        <dc:Bounds x="1765" y="530" width="130" height="66" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_NotifyParties_di" bpmnElement="Task_NotifyParties">
+        <dc:Bounds x="1955" y="540" width="130" height="66" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_CompensationResponse_di" bpmnElement="Gateway_CompensationResponse">
+        <dc:Bounds x="2135" y="548" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2111.5" y="523" width="75" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="MessageCatchEvent_Satisfied_di" bpmnElement="MessageCatchEvent_Satisfied">
+        <dc:Bounds x="2282" y="545" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2260" y="581" width="80" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="MessageCatchEvent_Lawsuit_di" bpmnElement="MessageCatchEvent_Lawsuit">
+        <dc:Bounds x="2260" y="682" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2239" y="718" width="79" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TimerEvent_40Days_di" bpmnElement="TimerEvent_40Days">
+        <dc:Bounds x="2260" y="762" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2239" y="798" width="78" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_CaseClosed_di" bpmnElement="EndEvent_CaseClosed">
+        <dc:Bounds x="2555" y="545" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2541" y="521" width="63" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_ProcessLawsuit_di" bpmnElement="Task_ProcessLawsuit">
+        <dc:Bounds x="2350" y="667" width="100" height="66" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_AfterLawsuit_di" bpmnElement="EndEvent_AfterLawsuit">
+        <dc:Bounds x="2492" y="672" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2465" y="708" width="90" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataStoreRef_Payments_di" bpmnElement="DataStoreRef_Payments">
+        <dc:Bounds x="2642" y="525" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_PayCompensation_di" bpmnElement="Task_PayCompensation">
+        <dc:Bounds x="2700" y="540" width="120" height="66" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="IC_Flow0_di" bpmnElement="IC_Flow0">
+        <di:waypoint x="256" y="573" />
+        <di:waypoint x="320" y="573" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="IC_Flow1_di" bpmnElement="IC_Flow1">
+        <di:waypoint x="440" y="573" />
+        <di:waypoint x="480" y="573" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="IC_Flow2_di" bpmnElement="IC_Flow2">
+        <di:waypoint x="600" y="573" />
+        <di:waypoint x="640" y="573" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="IC_Flow3_di" bpmnElement="IC_Flow3">
+        <di:waypoint x="760" y="559" />
+        <di:waypoint x="775" y="559" />
+        <di:waypoint x="775" y="591" />
+        <di:waypoint x="795" y="591" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="IC_Flow4_di" bpmnElement="IC_Flow4">
+        <di:waypoint x="814" y="560" />
+        <di:waypoint x="814" y="542" />
+        <di:waypoint x="920" y="542" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="IC_Flow5_di" bpmnElement="IC_Flow5">
+        <di:waypoint x="839" y="585" />
+        <di:waypoint x="1020" y="585" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="IC_Flow6_di" bpmnElement="IC_Flow6">
+        <di:waypoint x="1070" y="585" />
+        <di:waypoint x="1120" y="563" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="IC_Flow7_di" bpmnElement="IC_Flow7">
+        <di:waypoint x="1260" y="563" />
+        <di:waypoint x="1290" y="563" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="IC_Flow8_di" bpmnElement="IC_Flow8">
+        <di:waypoint x="1420" y="563" />
+        <di:waypoint x="1460" y="563" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="IC_Flow9_di" bpmnElement="IC_Flow9">
+        <di:waypoint x="1045" y="610" />
+        <di:waypoint x="1120" y="683" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="IC_Flow10_di" bpmnElement="IC_Flow10">
+        <di:waypoint x="1260" y="683" />
+        <di:waypoint x="1290" y="683" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="IC_Flow11_di" bpmnElement="IC_Flow11">
+        <di:waypoint x="1430" y="683" />
+        <di:waypoint x="1460" y="683" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="IC_Flow12_di" bpmnElement="IC_Flow12">
+        <di:waypoint x="1580" y="563" />
+        <di:waypoint x="1620" y="563" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="IC_Flow13_di" bpmnElement="IC_Flow13">
+        <di:waypoint x="1600" y="683" />
+        <di:waypoint x="1645" y="683" />
+        <di:waypoint x="1645" y="588" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="IC_Flow14_di" bpmnElement="IC_Flow14">
+        <di:waypoint x="1670" y="563" />
+        <di:waypoint x="1765" y="563" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="IC_Flow15_di" bpmnElement="IC_Flow15">
+        <di:waypoint x="1895" y="573" />
+        <di:waypoint x="1955" y="573" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="IC_Flow16_di" bpmnElement="IC_Flow16">
+        <di:waypoint x="2085" y="558" />
+        <di:waypoint x="2110" y="558" />
+        <di:waypoint x="2110" y="579" />
+        <di:waypoint x="2141" y="579" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="IC_Flow17_di" bpmnElement="IC_Flow17">
+        <di:waypoint x="2185" y="573" />
+        <di:waypoint x="2229" y="573" />
+        <di:waypoint x="2229" y="563" />
+        <di:waypoint x="2282" y="563" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="IC_Flow18_di" bpmnElement="IC_Flow18">
+        <di:waypoint x="2160" y="598" />
+        <di:waypoint x="2160" y="696" />
+        <di:waypoint x="2260" y="696" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="IC_Flow19_di" bpmnElement="IC_Flow19">
+        <di:waypoint x="2160" y="598" />
+        <di:waypoint x="2160" y="785" />
+        <di:waypoint x="2261" y="785" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="IC_Flow20_di" bpmnElement="IC_Flow20">
+        <di:waypoint x="2318" y="563" />
+        <di:waypoint x="2555" y="563" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="IC_Flow21_di" bpmnElement="IC_Flow21">
+        <di:waypoint x="2296" y="780" />
+        <di:waypoint x="2573" y="780" />
+        <di:waypoint x="2573" y="581" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="IC_Flow22_di" bpmnElement="IC_Flow22">
+        <di:waypoint x="2296" y="697" />
+        <di:waypoint x="2323" y="697" />
+        <di:waypoint x="2323" y="709" />
+        <di:waypoint x="2350" y="709" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="IC_Flow23_di" bpmnElement="IC_Flow23">
+        <di:waypoint x="2450" y="693" />
+        <di:waypoint x="2492" y="693" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Assoc1_Task_Enter_Claim_di" bpmnElement="Assoc1_Task_Enter_Claim">
+        <di:waypoint x="348" y="665" />
+        <di:waypoint x="363" y="606" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Assoc2_PolicyDB_di" bpmnElement="Assoc2_PolicyDB">
+        <di:waypoint x="693" y="665" />
+        <di:waypoint x="698" y="606" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Assoc3_CaseFile_di" bpmnElement="Assoc3_CaseFile">
+        <di:waypoint x="1747" y="585" />
+        <di:waypoint x="1765" y="574" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Assoc4_Payments_di" bpmnElement="Assoc4_Payments">
+        <di:waypoint x="2678" y="558" />
+        <di:waypoint x="2700" y="569" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Message_BeneficiaryToAgent_di" bpmnElement="Message_BeneficiaryToAgent">
+        <di:waypoint x="453" y="182" />
+        <di:waypoint x="350" y="260" />
+        <di:waypoint x="252" y="351" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="340" y="233" width="60" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Message_AgentToInsurance_di" bpmnElement="Message_AgentToInsurance">
+        <di:waypoint x="455" y="383" />
+        <di:waypoint x="252" y="561" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="281" y="471" width="81" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

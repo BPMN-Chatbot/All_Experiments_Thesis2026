@@ -1,0 +1,352 @@
+<?xml version="1.0" encoding="UTF-8"?> <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_1" targetNamespace="http://bpmn.io/schema/bpmn"> 
+  <!-- Pools --> <collaboration id="Collaboration_1"> <participant id="Participant_Customer" name="Student" processRef="Process_Student"/> <participant id="Participant_Institute" name="Sports Institute" processRef="Process_Institute"/> <messageFlow id="MF_CourseSelection" sourceRef="Event_SelectCourseRequest" targetRef="Event_SelectCourseRequest_Receive"/> <messageFlow id="MF_ActivationReq" sourceRef="Event_RequestActivation" targetRef="Event_ReceiveActivationReq"/> <messageFlow id="MF_ActivationResponse" sourceRef="Event_ActivationResponse_Send" targetRef="Event_ActivationResponse_Receive"/> <messageFlow id="MF_CourseTicket" sourceRef="Event_ReceiveCourseTicket_Send" targetRef="Event_ReceiveCourseTicket"/> </collaboration> 
+  
+  <!-- Process: Student --> <process id="Process_Student" isExecutable="true"> 
+    <laneSet> <lane id="Lane_Student" name="Student"/> </laneSet> <startEvent id="StartEvent" name="Start Registration"/> <sequenceFlow id="SF1" sourceRef="StartEvent" targetRef="Event_SelectCourseRequest"/> <!-- Select Course --> <intermediateThrowEvent id="Event_SelectCourseRequest" name="Request Course Info"> <messageEventDefinition id="MED_SelectCourse"/> </intermediateThrowEvent> <sequenceFlow id="SF2" sourceRef="Event_SelectCourseRequest" targetRef="Event_SelectCourseRequest_Receive"/> <!-- Receive course info from Institute --> <intermediateCatchEvent id="Event_SelectCourseRequest_Receive" name="Receive Course/Slots Info"> <messageEventDefinition id="MED_ReceiveCourse"/> </intermediateCatchEvent> <sequenceFlow id="SF3" sourceRef="Event_SelectCourseRequest_Receive" targetRef="Task_SelectCourseDate"/> <task id="Task_SelectCourseDate" name="Select Course &amp; Date"/> <sequenceFlow id="SF4" sourceRef="Task_SelectCourseDate" targetRef="Gateway_HaveAccount"/> <!-- Account Check --> <exclusiveGateway id="Gateway_HaveAccount" name="Have Account?"/> <sequenceFlow id="SF5a" sourceRef="Gateway_HaveAccount" targetRef="Task_Login"> <conditionExpression xsi:type="tFormalExpression">yes</conditionExpression> </sequenceFlow> <sequenceFlow id="SF5b" sourceRef="Gateway_HaveAccount" targetRef="Gateway_UniversityRegistration"> <conditionExpression xsi:type="tFormalExpression">no</conditionExpression> </sequenceFlow> <exclusiveGateway id="Gateway_UniversityRegistration" name="Registered at Eligible University?"/> <sequenceFlow id="SF6a" sourceRef="Gateway_UniversityRegistration" targetRef="Task_RegisterAccount"> <conditionExpression xsi:type="tFormalExpression">yes</conditionExpression> </sequenceFlow> <sequenceFlow id="SF6b" sourceRef="Gateway_UniversityRegistration" targetRef="Event_RequestActivation"> <conditionExpression xsi:type="tFormalExpression">no</conditionExpression> </sequenceFlow> <!-- Register Account --> <task id="Task_RegisterAccount" name="Register Account"/> <sequenceFlow id="SF7" sourceRef="Task_RegisterAccount" targetRef="Task_Login"/> <!-- Request Activation from Institute --> <intermediateThrowEvent id="Event_RequestActivation" name="Request Activation"> <messageEventDefinition id="MED_Activation_Request"/> </intermediateThrowEvent> <sequenceFlow id="SF8" sourceRef="Event_RequestActivation" targetRef="Event_ActivationResponse_Receive"/> <intermediateCatchEvent id="Event_ActivationResponse_Receive" name="Receive Activation Response"> <messageEventDefinition id="MED_Activation_Response"/> </intermediateCatchEvent> <sequenceFlow id="SF9" sourceRef="Event_ActivationResponse_Receive" targetRef="Task_RegisterAccount"/> <!-- Login to account --> <task id="Task_Login" name="Log in to Account"/> <sequenceFlow id="SF10" sourceRef="Task_Login" targetRef="Task_TweetInvite"/> <!-- Parallel: Tweet to friends and Register for Course --> <parallelGateway id="PG_TweetRegister_Split"/> <sequenceFlow id="SF11" sourceRef="Task_TweetInvite" targetRef="PG_TweetRegister_Split"/> <sequenceFlow id="SF12a" sourceRef="PG_TweetRegister_Split" targetRef="Task_TweetToFriends"/> <sequenceFlow id="SF12b" sourceRef="PG_TweetRegister_Split" targetRef="Task_CompleteRegistration"/> <task id="Task_TweetInvite" name="Proceed to Registration"/> <task id="Task_TweetToFriends" name="Tweet to Friends"/> <task id="Task_CompleteRegistration" name="Complete Registration and Provide Payment"> <dataInputAssociation id="asso1"> <sourceRef>DataRef_CourseInfo</sourceRef> </dataInputAssociation> <dataInputAssociation id="asso2"> <sourceRef>DataRef_AccountInfo</sourceRef> </dataInputAssociation> </task> 
+<dataObject id="Data_CourseInfo" />
+<dataObjectReference id="DataRef_CourseInfo" dataObjectRef="Data_CourseInfo" name="Course Info"/>
+
+<dataObject id="Data_AccountInfo"/>
+<dataObjectReference id="DataRef_AccountInfo" dataObjectRef="Data_AccountInfo"  name="Account Info"/>
+
+    <sequenceFlow id="SF13a" sourceRef="Task_TweetToFriends" targetRef="PG_TweetRegister_Join"/> <sequenceFlow id="SF13b" sourceRef="Task_CompleteRegistration" targetRef="PG_TweetRegister_Join"/> <parallelGateway id="PG_TweetRegister_Join"/> <sequenceFlow id="SF14" sourceRef="PG_TweetRegister_Join" targetRef="Event_ReceiveCourseTicket"/> <!-- Receive Course Ticket --> <intermediateCatchEvent id="Event_ReceiveCourseTicket" name="Receive Course Ticket"> <messageEventDefinition id="MED_CourseTicket"/> </intermediateCatchEvent> <endEvent id="EndEvent" name="End Registration"/> <sequenceFlow id="SF15" sourceRef="Event_ReceiveCourseTicket" targetRef="EndEvent"/> 
+  </process> 
+  <!-- Process: Sports Institute --> <process id="Process_Institute" isExecutable="true"> 
+    <laneSet> <lane id="Lane_CourseManagement" name="Course Management"/> <lane id="Lane_AccountServices" name="Account Services"/> </laneSet> <!-- Course Selection - Course Management Lane --> <intermediateCatchEvent id="Event_SelectCourseRequest_Receive2" name="Receive Course Info Request"> <messageEventDefinition id="MED_SelectCourse_Receive"/> </intermediateCatchEvent> <task id="Task_CheckCourseSlots" name="Check Course Slots"><dataOutputAssociation id="asso3"> <targetRef>DataStore_CourseDB</targetRef> </dataOutputAssociation> </task>
+    
+<dataObject id="CourseDB" />
+<dataStoreReference id="DataStore_CourseDB" dataStoreRef="CourseDB" name="Course Database"/>
+<intermediateThrowEvent id="Event_SendCourseInfo" name="Send Course &amp; Dates"> <messageEventDefinition id="MED_SendCourseInfo"/> </intermediateThrowEvent> <sequenceFlow id="ISI1" sourceRef="Event_SelectCourseRequest_Receive" targetRef="Task_CheckCourseSlots"/> <sequenceFlow id="ISI2" sourceRef="Task_CheckCourseSlots" targetRef="Event_SendCourseInfo"/> <!-- Message flow linking: Event_SendCourseInfo → Event_SelectCourseRequest_Receive (Student) is implicit in message flows --> <!-- Account Creation & Activation - Account Services Lane --> <!-- Receive Activation Request from Student --> <intermediateCatchEvent id="Event_ReceiveActivationReq" name="Receive Activation Request"> <messageEventDefinition id="MED_Activation_Request_Receive"/> </intermediateCatchEvent> <task id="Task_CheckEligibility" name="Check Eligibility with University"/> <exclusiveGateway id="Gateway_Eligible" name="Eligible?"/> <task id="Task_ActivateAccount" name="Activate Account"/> <intermediateThrowEvent id="Event_ActivationResponse_Send" name="Send Activation Response"> <messageEventDefinition id="MED_Activation_Response_Send"/> </intermediateThrowEvent> <sequenceFlow id="ISI3" sourceRef="Event_ReceiveActivationReq" targetRef="Task_CheckEligibility"/> <sequenceFlow id="ISI4" sourceRef="Task_CheckEligibility" targetRef="Gateway_Eligible"/> <sequenceFlow id="ISI5a" sourceRef="Gateway_Eligible" targetRef="Task_ActivateAccount"> <conditionExpression xsi:type="tFormalExpression">yes</conditionExpression> </sequenceFlow> <sequenceFlow id="ISI5b" sourceRef="Gateway_Eligible" targetRef="Event_ActivationResponse_Send"> <conditionExpression xsi:type="tFormalExpression">no</conditionExpression> </sequenceFlow> <sequenceFlow id="ISI6" sourceRef="Task_ActivateAccount" targetRef="Event_ActivationResponse_Send" /> <!-- Registration Handling - Course Management Lane --> <task id="Task_ProcessRegistration" name="Process Course Registration"> <dataInputAssociation> <sourceRef>DataStore_CourseDB</sourceRef> </dataInputAssociation> </task> <task id="Task_ValidatePayment" name="Validate Payment"/> <task id="Task_IssueCourseTicket" name="Issue Course Ticket"/> <intermediateThrowEvent id="Event_ReceiveCourseTicket_Send" name="Send Course Ticket"> <messageEventDefinition id="MED_CourseTicket_Send"/> </intermediateThrowEvent> <sequenceFlow id="ISI7" sourceRef="Event_SendCourseInfo" targetRef="Task_ProcessRegistration"/> <sequenceFlow id="ISI8" sourceRef="Task_ProcessRegistration" targetRef="Task_ValidatePayment"/> <sequenceFlow id="ISI9" sourceRef="Task_ValidatePayment" targetRef="Task_IssueCourseTicket"/> <sequenceFlow id="ISI10" sourceRef="Task_IssueCourseTicket" targetRef="Event_ReceiveCourseTicket_Send"/> <!-- Message flow linking: Event_ReceiveCourseTicket_Send → Event_ReceiveCourseTicket (Student) --> 
+</process> 
+  <bpmndi:BPMNDiagram xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_1">
+      <bpmndi:BPMNShape id="Participant_Customer_di" bpmnElement="Participant_Customer" isHorizontal="true">
+        <omgdc:Bounds x="160" y="80" width="1610" height="500" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Student_di" bpmnElement="Lane_Student" isHorizontal="true">
+        <omgdc:Bounds x="180" y="80" width="1560" height="500" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="StartEvent_di" bpmnElement="StartEvent">
+        <omgdc:Bounds x="240" y="365" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="216" y="401" width="85" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_SelectCourseRequest_di" bpmnElement="Event_SelectCourseRequest">
+        <omgdc:Bounds x="330" y="370" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="307" y="332.5" width="81" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_SelectCourseRequest_Receive_di" bpmnElement="Event_SelectCourseRequest_Receive">
+        <omgdc:Bounds x="440" y="370" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="415" y="332.5" width="85" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_RequestActivation_di" bpmnElement="Event_RequestActivation">
+        <omgdc:Bounds x="880" y="160" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="874" y="122.5" width="48" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_ActivationResponse_Receive_di" bpmnElement="Event_ActivationResponse_Receive">
+        <omgdc:Bounds x="1010" y="160" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="1002" y="110" width="51" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="PG_TweetRegister_Split_di" bpmnElement="PG_TweetRegister_Split">
+        <omgdc:Bounds x="1010" y="375" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_TweetInvite_di" bpmnElement="Task_TweetInvite">
+        <omgdc:Bounds x="880" y="355" width="100" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_TweetToFriends_di" bpmnElement="Task_TweetToFriends">
+        <omgdc:Bounds x="1120" y="285" width="130" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_CompleteRegistration_di" bpmnElement="Task_CompleteRegistration">
+        <omgdc:Bounds x="1120" y="415" width="180" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataRef_CourseInfo_di" bpmnElement="DataRef_CourseInfo" isExpanded="false">
+        <omgdc:Bounds x="1220" y="500" width="40" height="50" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="1211" y="550" width="58" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataRef_AccountInfo_di" bpmnElement="DataRef_AccountInfo" isExpanded="false">
+        <omgdc:Bounds x="1300" y="505" width="40" height="50" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="1289" y="555" width="62" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="PG_TweetRegister_Join_di" bpmnElement="PG_TweetRegister_Join">
+        <omgdc:Bounds x="1340" y="375" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_ReceiveCourseTicket_di" bpmnElement="Event_ReceiveCourseTicket">
+        <omgdc:Bounds x="1440" y="378" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="1419" y="414" width="79" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_di" bpmnElement="EndEvent">
+        <omgdc:Bounds x="1530" y="378" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="1507" y="414" width="82" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_RegisterAccount_di" bpmnElement="Task_RegisterAccount">
+        <omgdc:Bounds x="790" y="230" width="100" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_UniversityRegistration_di" bpmnElement="Gateway_UniversityRegistration" isMarkerVisible="true">
+        <omgdc:Bounds x="660" y="230" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="584" y="235" width="66" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_Login_di" bpmnElement="Task_Login">
+        <omgdc:Bounds x="750" y="365" width="100" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_HaveAccount_di" bpmnElement="Gateway_HaveAccount" isMarkerVisible="true">
+        <omgdc:Bounds x="660" y="370" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="648" y="420" width="74" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_SelectCourseDate_di" bpmnElement="Task_SelectCourseDate">
+        <omgdc:Bounds x="520" y="362" width="100" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SF1_di" bpmnElement="SF1">
+        <omgdi:waypoint x="276" y="383" />
+        <omgdi:waypoint x="330" y="388" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SF2_di" bpmnElement="SF2">
+        <omgdi:waypoint x="366" y="388" />
+        <omgdi:waypoint x="440" y="388" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SF3_di" bpmnElement="SF3">
+        <omgdi:waypoint x="476" y="389" />
+        <omgdi:waypoint x="520" y="389" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SF4_di" bpmnElement="SF4">
+        <omgdi:waypoint x="620" y="382" />
+        <omgdi:waypoint x="640" y="382" />
+        <omgdi:waypoint x="640" y="400" />
+        <omgdi:waypoint x="665" y="400" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SF5a_di" bpmnElement="SF5a">
+        <omgdi:waypoint x="710" y="395" />
+        <omgdi:waypoint x="750" y="395" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SF5b_di" bpmnElement="SF5b">
+        <omgdi:waypoint x="685" y="370" />
+        <omgdi:waypoint x="685" y="280" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SF6a_di" bpmnElement="SF6a">
+        <omgdi:waypoint x="708" y="257" />
+        <omgdi:waypoint x="790" y="257" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SF6b_di" bpmnElement="SF6b">
+        <omgdi:waypoint x="685" y="230" />
+        <omgdi:waypoint x="685" y="178" />
+        <omgdi:waypoint x="880" y="178" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SF7_di" bpmnElement="SF7">
+        <omgdi:waypoint x="890" y="260" />
+        <omgdi:waypoint x="940" y="260" />
+        <omgdi:waypoint x="940" y="355" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SF8_di" bpmnElement="SF8">
+        <omgdi:waypoint x="916" y="178" />
+        <omgdi:waypoint x="1010" y="178" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SF9_di" bpmnElement="SF9">
+        <omgdi:waypoint x="1028" y="196" />
+        <omgdi:waypoint x="1028" y="250" />
+        <omgdi:waypoint x="890" y="250" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SF10_di" bpmnElement="SF10">
+        <omgdi:waypoint x="850" y="385" />
+        <omgdi:waypoint x="880" y="385" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SF11_di" bpmnElement="SF11">
+        <omgdi:waypoint x="980" y="385" />
+        <omgdi:waypoint x="1010" y="400" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SF12a_di" bpmnElement="SF12a">
+        <omgdi:waypoint x="1035" y="375" />
+        <omgdi:waypoint x="1035" y="320" />
+        <omgdi:waypoint x="1120" y="320" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SF12b_di" bpmnElement="SF12b">
+        <omgdi:waypoint x="1035" y="425" />
+        <omgdi:waypoint x="1120" y="445" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SF13a_di" bpmnElement="SF13a">
+        <omgdi:waypoint x="1250" y="315" />
+        <omgdi:waypoint x="1365" y="400" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SF13b_di" bpmnElement="SF13b">
+        <omgdi:waypoint x="1300" y="445" />
+        <omgdi:waypoint x="1365" y="400" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SF14_di" bpmnElement="SF14">
+        <omgdi:waypoint x="1390" y="400" />
+        <omgdi:waypoint x="1440" y="396" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SF15_di" bpmnElement="SF15">
+        <omgdi:waypoint x="1476" y="396" />
+        <omgdi:waypoint x="1530" y="396" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Participant_Institute_di" bpmnElement="Participant_Institute" isHorizontal="true">
+        <omgdc:Bounds x="160" y="657" width="1610" height="400" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_AccountServices_di" bpmnElement="Lane_AccountServices" isHorizontal="true">
+        <omgdc:Bounds x="180" y="887" width="1560" height="165" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_CourseManagement_di" bpmnElement="Lane_CourseManagement" isHorizontal="true">
+        <omgdc:Bounds x="180" y="662" width="1560" height="225" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_SelectCourseRequest_Receive2_di" bpmnElement="Event_SelectCourseRequest_Receive2">
+        <omgdc:Bounds x="310" y="727" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="289" y="763" width="79" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_CheckCourseSlots_di" bpmnElement="Task_CheckCourseSlots">
+        <omgdc:Bounds x="400" y="717" width="120" height="56" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_SendCourseInfo_di" bpmnElement="Event_SendCourseInfo">
+        <omgdc:Bounds x="560" y="732" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="540" y="768" width="76" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_ReceiveActivationReq_di" bpmnElement="Event_ReceiveActivationReq">
+        <omgdc:Bounds x="410" y="927" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="404" y="963" width="48" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_CheckEligibility_di" bpmnElement="Task_CheckEligibility">
+        <omgdc:Bounds x="510" y="922" width="120" height="56" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_Eligible_di" bpmnElement="Gateway_Eligible" isMarkerVisible="true">
+        <omgdc:Bounds x="660" y="935" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="664" y="911" width="42" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_ActivateAccount_di" bpmnElement="Task_ActivateAccount">
+        <omgdc:Bounds x="760" y="917" width="120" height="56" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_ActivationResponse_Send_di" bpmnElement="Event_ActivationResponse_Send">
+        <omgdc:Bounds x="930" y="932" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="972" y="946" width="76" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_ProcessRegistration_di" bpmnElement="Task_ProcessRegistration">
+        <omgdc:Bounds x="710" y="732" width="120" height="56" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_ValidatePayment_di" bpmnElement="Task_ValidatePayment">
+        <omgdc:Bounds x="870" y="732" width="120" height="56" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_IssueCourseTicket_di" bpmnElement="Task_IssueCourseTicket">
+        <omgdc:Bounds x="1030" y="732" width="120" height="56" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_ReceiveCourseTicket_Send_di" bpmnElement="Event_ReceiveCourseTicket_Send">
+        <omgdc:Bounds x="1190" y="742" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="1176" y="778" width="65" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataStore_CourseDB_di" bpmnElement="DataStore_CourseDB" isExpanded="false">
+        <omgdc:Bounds x="435" y="800" width="50" height="40" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="417" y="840" width="87" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="ISI2_di" bpmnElement="ISI2">
+        <omgdi:waypoint x="520" y="745" />
+        <omgdi:waypoint x="560" y="750" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ISI7_di" bpmnElement="ISI7">
+        <omgdi:waypoint x="596" y="750" />
+        <omgdi:waypoint x="710" y="750" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ISI3_di" bpmnElement="ISI3">
+        <omgdi:waypoint x="446" y="945" />
+        <omgdi:waypoint x="510" y="950" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ISI4_di" bpmnElement="ISI4">
+        <omgdi:waypoint x="630" y="950" />
+        <omgdi:waypoint x="660" y="960" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ISI5a_di" bpmnElement="ISI5a">
+        <omgdi:waypoint x="710" y="960" />
+        <omgdi:waypoint x="760" y="945" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ISI5b_di" bpmnElement="ISI5b">
+        <omgdi:waypoint x="685" y="985" />
+        <omgdi:waypoint x="685" y="1022" />
+        <omgdi:waypoint x="948" y="1022" />
+        <omgdi:waypoint x="948" y="968" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ISI6_di" bpmnElement="ISI6">
+        <omgdi:waypoint x="880" y="945" />
+        <omgdi:waypoint x="930" y="950" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ISI8_di" bpmnElement="ISI8">
+        <omgdi:waypoint x="830" y="750" />
+        <omgdi:waypoint x="870" y="760" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ISI9_di" bpmnElement="ISI9">
+        <omgdi:waypoint x="990" y="760" />
+        <omgdi:waypoint x="1030" y="760" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ISI10_di" bpmnElement="ISI10">
+        <omgdi:waypoint x="1150" y="760" />
+        <omgdi:waypoint x="1190" y="760" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="asso1_di" bpmnElement="asso1">
+        <omgdi:waypoint x="1220" y="525" />
+        <omgdi:waypoint x="1220" y="475" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="asso2_di" bpmnElement="asso2">
+        <omgdi:waypoint x="1300" y="530" />
+        <omgdi:waypoint x="1300" y="475" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="MF_CourseSelection_di" bpmnElement="MF_CourseSelection">
+        <omgdi:waypoint x="348" y="406" />
+        <omgdi:waypoint x="348" y="490" />
+        <omgdi:waypoint x="320" y="490" />
+        <omgdi:waypoint x="320" y="729" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="MF_ActivationReq_di" bpmnElement="MF_ActivationReq">
+        <omgdi:waypoint x="898" y="196" />
+        <omgdi:waypoint x="898" y="510" />
+        <omgdi:waypoint x="380" y="510" />
+        <omgdi:waypoint x="380" y="945" />
+        <omgdi:waypoint x="410" y="945" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="MF_ActivationResponse_di" bpmnElement="MF_ActivationResponse" messageVisibleKind="non-initiating">
+        <omgdi:waypoint x="948" y="932" />
+        <omgdi:waypoint x="948" y="568" />
+        <omgdi:waypoint x="990" y="568" />
+        <omgdi:waypoint x="990" y="178" />
+        <omgdi:waypoint x="1010" y="178" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="MF_CourseTicket_di" bpmnElement="MF_CourseTicket" messageVisibleKind="non-initiating">
+        <omgdi:waypoint x="1193" y="750" />
+        <omgdi:waypoint x="1193" y="630" />
+        <omgdi:waypoint x="1443" y="630" />
+        <omgdi:waypoint x="1443" y="406" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="asso3_di" bpmnElement="asso3">
+        <omgdi:waypoint x="460" y="773" />
+        <omgdi:waypoint x="460" y="800" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

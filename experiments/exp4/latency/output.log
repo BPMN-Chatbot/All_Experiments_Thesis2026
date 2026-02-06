@@ -1,0 +1,840 @@
+[2025-05-19T11:27:08.274Z] 🚀 Server running on port 8099
+[2025-05-19T11:27:48.400Z] OpenAI request started for:  R1DJVSFC
+[2025-05-19T11:27:53.931Z] OpenAI response in 5536ms for R1DJVSFC
+[2025-05-19T11:27:53.933Z] ❗ Client disconnected after 5.538s for: R1DJVSFC
+[2025-05-19T11:44:43.024Z] OpenAI request started for:  R1DJVSFC
+[2025-05-19T11:44:54.489Z] OpenAI response in 11466ms for R1DJVSFC
+[2025-05-19T11:44:54.490Z] ❗ Client disconnected after 11.467s for: R1DJVSFC
+[2025-05-19T11:45:23.176Z] OpenAI request started for:  R1DJVSFC
+[2025-05-19T11:45:30.004Z] OpenAI response in 6829ms for R1DJVSFC
+[2025-05-19T11:45:30.005Z] ❗ Client disconnected after 6.83s for: R1DJVSFC
+[2025-05-19T11:45:54.935Z] OpenAI request started for:  R1DJVSFC
+[2025-05-19T11:46:03.542Z] OpenAI response in 8608ms for R1DJVSFC
+[2025-05-19T11:46:03.542Z] ❗ Client disconnected after 8.608s for: R1DJVSFC
+[2025-05-19T11:46:31.325Z] Files received: [ 'task_R1DJVSFC.json' ]
+[2025-05-19T13:39:42.498Z] OpenAI request started for:  R1UDJTYD
+[2025-05-19T13:40:01.976Z] OpenAI response in 19479ms for R1UDJTYD
+[2025-05-19T13:40:01.977Z] ❗ Client disconnected after 19.48s for: R1UDJTYD
+[2025-05-19T13:41:04.779Z] OpenAI request started for:  R1UDJTYD
+[2025-05-19T13:41:15.574Z] OpenAI response in 10796ms for R1UDJTYD
+[2025-05-19T13:41:15.575Z] ❗ Client disconnected after 10.797s for: R1UDJTYD
+[2025-05-19T13:43:21.055Z] OpenAI request started for:  R1UDJTYD
+[2025-05-19T13:43:31.796Z] OpenAI response in 10742ms for R1UDJTYD
+[2025-05-19T13:43:31.796Z] ❗ Client disconnected after 10.742s for: R1UDJTYD
+[2025-05-19T13:44:20.484Z] OpenAI request started for:  R1UDJTYD
+[2025-05-19T13:44:27.384Z] OpenAI response in 6900ms for R1UDJTYD
+[2025-05-19T13:44:27.385Z] ❗ Client disconnected after 6.901s for: R1UDJTYD
+[2025-05-19T14:44:24.959Z] OpenAI request started for:  R1UDJTYD
+[2025-05-19T14:44:37.566Z] OpenAI response in 12608ms for R1UDJTYD
+[2025-05-19T14:44:37.566Z] ❗ Client disconnected after 12.608s for: R1UDJTYD
+[2025-05-19T14:48:22.764Z] OpenAI request started for:  R1UDJTYD
+[2025-05-19T14:48:30.329Z] OpenAI response in 7566ms for R1UDJTYD
+[2025-05-19T14:48:30.329Z] ❗ Client disconnected after 7.566s for: R1UDJTYD
+[2025-05-19T14:49:03.185Z] OpenAI request started for:  R1UDJTYD
+[2025-05-19T14:49:09.301Z] OpenAI response in 6117ms for R1UDJTYD
+[2025-05-19T14:49:09.301Z] ❗ Client disconnected after 6.117s for: R1UDJTYD
+[2025-05-19T14:50:42.706Z] OpenAI request started for:  R1UDJTYD
+[2025-05-19T14:50:50.580Z] OpenAI response in 7875ms for R1UDJTYD
+[2025-05-19T14:50:50.581Z] ❗ Client disconnected after 7.876s for: R1UDJTYD
+[2025-05-19T14:53:38.575Z] OpenAI request started for:  R1UDJTYD
+[2025-05-19T14:53:45.979Z] OpenAI response in 7405ms for R1UDJTYD
+[2025-05-19T14:53:45.980Z] ❗ Client disconnected after 7.406s for: R1UDJTYD
+[2025-05-19T14:56:28.762Z] OpenAI request started for:  R1UDJTYD
+[2025-05-19T14:56:38.564Z] OpenAI response in 9803ms for R1UDJTYD
+[2025-05-19T14:56:38.565Z] ❗ Client disconnected after 9.804s for: R1UDJTYD
+[2025-05-19T14:58:44.257Z] OpenAI request started for:  R1UDJTYD
+[2025-05-19T14:59:01.536Z] OpenAI response in 17280ms for R1UDJTYD
+[2025-05-19T14:59:01.536Z] ❗ Client disconnected after 17.28s for: R1UDJTYD
+[2025-05-19T15:00:21.881Z] OpenAI request started for:  R1UDJTYD
+[2025-05-19T15:00:32.425Z] OpenAI response in 10545ms for R1UDJTYD
+[2025-05-19T15:00:32.425Z] ❗ Client disconnected after 10.545s for: R1UDJTYD
+[2025-05-19T15:02:19.637Z] OpenAI request started for:  R1UDJTYD
+[2025-05-19T15:02:31.218Z] OpenAI response in 11582ms for R1UDJTYD
+[2025-05-19T15:02:31.218Z] ❗ Client disconnected after 11.582s for: R1UDJTYD
+[2025-05-19T15:03:18.448Z] OpenAI request started for:  R1UDJTYD
+[2025-05-19T15:03:30.753Z] OpenAI response in 12305ms for R1UDJTYD
+[2025-05-19T15:03:30.754Z] ❗ Client disconnected after 12.306s for: R1UDJTYD
+[2025-05-19T15:04:13.690Z] OpenAI request started for:  R1UDJTYD
+[2025-05-19T15:04:17.233Z] OpenAI response in 3543ms for R1UDJTYD
+[2025-05-19T15:04:17.233Z] ❗ Client disconnected after 3.543s for: R1UDJTYD
+[2025-05-19T15:04:28.466Z] OpenAI request started for:  R1UDJTYD
+[2025-05-19T15:04:30.350Z] OpenAI response in 1885ms for R1UDJTYD
+[2025-05-19T15:04:30.351Z] ❗ Client disconnected after 1.886s for: R1UDJTYD
+[2025-05-20T06:07:42.768Z] OpenAI request started for:  R2FNPLCG
+[2025-05-20T06:07:55.046Z] OpenAI response in 12279ms for R2FNPLCG
+[2025-05-20T06:07:55.046Z] ❗ Client disconnected after 12.279s for: R2FNPLCG
+[2025-05-20T06:08:50.359Z] OpenAI request started for:  R2FNPLCG
+[2025-05-20T06:08:57.306Z] OpenAI response in 6947ms for R2FNPLCG
+[2025-05-20T06:08:57.307Z] ❗ Client disconnected after 6.948s for: R2FNPLCG
+[2025-05-20T06:09:45.857Z] OpenAI request started for:  R2FNPLCG
+[2025-05-20T06:09:53.828Z] OpenAI response in 7971ms for R2FNPLCG
+[2025-05-20T06:09:53.829Z] ❗ Client disconnected after 7.972s for: R2FNPLCG
+[2025-05-20T06:10:41.509Z] OpenAI request started for:  R2FNPLCG
+[2025-05-20T06:10:48.653Z] OpenAI response in 7144ms for R2FNPLCG
+[2025-05-20T06:10:48.654Z] ❗ Client disconnected after 7.145s for: R2FNPLCG
+[2025-05-20T06:11:43.686Z] OpenAI request started for:  R2FNPLCG
+[2025-05-20T06:11:50.155Z] OpenAI response in 6470ms for R2FNPLCG
+[2025-05-20T06:11:50.156Z] ❗ Client disconnected after 6.471s for: R2FNPLCG
+[2025-05-20T06:11:53.833Z] OpenAI request started for:  R2FNPLCG
+[2025-05-20T06:12:11.395Z] OpenAI response in 17563ms for R2FNPLCG
+[2025-05-20T06:12:11.396Z] ❗ Client disconnected after 17.564s for: R2FNPLCG
+[2025-05-20T06:12:41.377Z] OpenAI request started for:  R2FNPLCG
+[2025-05-20T06:12:47.775Z] OpenAI response in 6399ms for R2FNPLCG
+[2025-05-20T06:12:47.775Z] ❗ Client disconnected after 6.399s for: R2FNPLCG
+[2025-05-20T06:15:14.627Z] OpenAI request started for:  R2FNPLCG
+[2025-05-20T06:15:22.251Z] OpenAI response in 7625ms for R2FNPLCG
+[2025-05-20T06:15:22.251Z] ❗ Client disconnected after 7.625s for: R2FNPLCG
+[2025-05-20T06:17:25.280Z] Files received: [ 'task_R2FNPLCG.json' ]
+[2025-05-20T07:41:13.780Z] OpenAI request started for:  R2EYARSS
+[2025-05-20T07:41:20.164Z] OpenAI response in 6384ms for R2EYARSS
+[2025-05-20T07:41:20.164Z] ❗ Client disconnected after 6.384s for: R2EYARSS
+[2025-05-20T07:42:36.517Z] OpenAI request started for:  R2EYARSS
+[2025-05-20T07:42:40.023Z] OpenAI response in 3507ms for R2EYARSS
+[2025-05-20T07:42:40.024Z] ❗ Client disconnected after 3.508s for: R2EYARSS
+[2025-05-20T07:43:45.396Z] OpenAI request started for:  R2EYARSS
+[2025-05-20T07:44:01.755Z] OpenAI response in 16359ms for R2EYARSS
+[2025-05-20T07:44:01.756Z] ❗ Client disconnected after 16.36s for: R2EYARSS
+[2025-05-20T07:45:08.134Z] Files received: [ 'task_R2EYARSS.json' ]
+[2025-05-20T09:23:35.086Z] OpenAI request started for:  S1DYVCPB
+[2025-05-20T09:23:46.594Z] OpenAI response in 11509ms for S1DYVCPB
+[2025-05-20T09:23:46.594Z] ❗ Client disconnected after 11.509s for: S1DYVCPB
+[2025-05-20T09:25:24.587Z] OpenAI request started for:  S1DYVCPB
+[2025-05-20T09:25:31.048Z] OpenAI response in 6461ms for S1DYVCPB
+[2025-05-20T09:25:31.048Z] ❗ Client disconnected after 6.461s for: S1DYVCPB
+[2025-05-20T09:26:27.214Z] OpenAI request started for:  S1DYVCPB
+[2025-05-20T09:26:34.466Z] OpenAI response in 7252ms for S1DYVCPB
+[2025-05-20T09:26:34.466Z] ❗ Client disconnected after 7.252s for: S1DYVCPB
+[2025-05-20T09:26:46.505Z] OpenAI request started for:  S1DYVCPB
+[2025-05-20T09:26:53.441Z] OpenAI response in 6937ms for S1DYVCPB
+[2025-05-20T09:26:53.441Z] ❗ Client disconnected after 6.937s for: S1DYVCPB
+[2025-05-20T09:27:09.448Z] OpenAI request started for:  S1DYVCPB
+[2025-05-20T09:27:21.277Z] OpenAI response in 11830ms for S1DYVCPB
+[2025-05-20T09:27:21.277Z] ❗ Client disconnected after 11.83s for: S1DYVCPB
+[2025-05-20T09:27:29.083Z] OpenAI request started for:  S1DYVCPB
+[2025-05-20T09:27:51.923Z] OpenAI response in 22841ms for S1DYVCPB
+[2025-05-20T09:27:51.923Z] ❗ Client disconnected after 22.841s for: S1DYVCPB
+[2025-05-20T09:28:06.129Z] Files received: [ 'task_S1DYVCPB.json' ]
+[2025-05-20T10:41:07.854Z] OpenAI request started for:  R1UDJTYD
+[2025-05-20T10:41:15.608Z] OpenAI response in 7754ms for R1UDJTYD
+[2025-05-20T10:41:15.609Z] ❗ Client disconnected after 7.755s for: R1UDJTYD
+[2025-05-20T10:44:01.755Z] OpenAI request started for:  R1UDJTYD
+[2025-05-20T10:44:18.552Z] OpenAI response in 16797ms for R1UDJTYD
+[2025-05-20T10:44:18.552Z] ❗ Client disconnected after 16.797s for: R1UDJTYD
+[2025-05-20T10:46:05.387Z] OpenAI request started for:  R1UDJTYD
+[2025-05-20T10:46:11.902Z] OpenAI response in 6515ms for R1UDJTYD
+[2025-05-20T10:46:11.903Z] ❗ Client disconnected after 6.516s for: R1UDJTYD
+[2025-05-20T10:48:08.567Z] OpenAI request started for:  R1UDJTYD
+[2025-05-20T10:48:21.195Z] OpenAI response in 12629ms for R1UDJTYD
+[2025-05-20T10:48:21.195Z] ❗ Client disconnected after 12.629s for: R1UDJTYD
+[2025-05-20T10:49:29.520Z] OpenAI request started for:  R1UDJTYD
+[2025-05-20T10:49:36.919Z] OpenAI response in 7399ms for R1UDJTYD
+[2025-05-20T10:49:36.920Z] ❗ Client disconnected after 7.4s for: R1UDJTYD
+[2025-05-20T10:50:25.705Z] OpenAI request started for:  R1UDJTYD
+[2025-05-20T10:50:33.527Z] OpenAI response in 7822ms for R1UDJTYD
+[2025-05-20T10:50:33.528Z] ❗ Client disconnected after 7.823s for: R1UDJTYD
+[2025-05-20T10:51:54.600Z] OpenAI request started for:  R1UDJTYD
+[2025-05-20T10:52:09.323Z] OpenAI response in 14723ms for R1UDJTYD
+[2025-05-20T10:52:09.323Z] ❗ Client disconnected after 14.723s for: R1UDJTYD
+[2025-05-20T10:53:53.871Z] OpenAI request started for:  R1UDJTYD
+[2025-05-20T10:54:01.102Z] OpenAI response in 7231ms for R1UDJTYD
+[2025-05-20T10:54:01.103Z] ❗ Client disconnected after 7.232s for: R1UDJTYD
+[2025-05-20T11:01:44.629Z] OpenAI request started for:  R1UDJTYD
+[2025-05-20T11:01:49.584Z] OpenAI response in 4956ms for R1UDJTYD
+[2025-05-20T11:01:49.584Z] ❗ Client disconnected after 4.956s for: R1UDJTYD
+[2025-05-20T11:02:46.000Z] OpenAI request started for:  R1UDJTYD
+[2025-05-20T11:03:09.838Z] OpenAI response in 23838ms for R1UDJTYD
+[2025-05-20T11:03:09.838Z] ❗ Client disconnected after 23.838s for: R1UDJTYD
+[2025-05-20T11:05:48.907Z] OpenAI request started for:  R1UDJTYD
+[2025-05-20T11:05:57.487Z] OpenAI response in 8580ms for R1UDJTYD
+[2025-05-20T11:05:57.488Z] ❗ Client disconnected after 8.581s for: R1UDJTYD
+[2025-05-20T11:06:10.463Z] OpenAI request started for:  R1UDJTYD
+[2025-05-20T11:06:18.264Z] OpenAI response in 7801ms for R1UDJTYD
+[2025-05-20T11:06:18.265Z] ❗ Client disconnected after 7.802s for: R1UDJTYD
+[2025-05-20T11:06:29.943Z] OpenAI request started for:  R1UDJTYD
+[2025-05-20T11:06:39.521Z] OpenAI response in 9578ms for R1UDJTYD
+[2025-05-20T11:06:39.521Z] ❗ Client disconnected after 9.578s for: R1UDJTYD
+[2025-05-20T11:08:53.590Z] OpenAI request started for:  R1UDJTYD
+[2025-05-20T11:09:01.963Z] OpenAI response in 8374ms for R1UDJTYD
+[2025-05-20T11:09:01.964Z] ❗ Client disconnected after 8.375s for: R1UDJTYD
+[2025-05-20T11:11:50.135Z] OpenAI request started for:  R1UDJTYD
+[2025-05-20T11:11:54.722Z] OpenAI response in 4588ms for R1UDJTYD
+[2025-05-20T11:11:54.722Z] ❗ Client disconnected after 4.588s for: R1UDJTYD
+[2025-05-20T11:12:17.342Z] OpenAI request started for:  R1UDJTYD
+[2025-05-20T11:12:30.391Z] OpenAI response in 13049ms for R1UDJTYD
+[2025-05-20T11:12:30.391Z] ❗ Client disconnected after 13.049s for: R1UDJTYD
+[2025-05-20T11:15:19.739Z] OpenAI request started for:  R1UDJTYD
+[2025-05-20T11:15:28.062Z] OpenAI response in 8323ms for R1UDJTYD
+[2025-05-20T11:15:28.062Z] ❗ Client disconnected after 8.323s for: R1UDJTYD
+[2025-05-20T11:16:18.169Z] OpenAI request started for:  R1UDJTYD
+[2025-05-20T11:16:25.314Z] OpenAI response in 7146ms for R1UDJTYD
+[2025-05-20T11:16:25.315Z] ❗ Client disconnected after 7.147s for: R1UDJTYD
+[2025-05-20T11:17:12.203Z] OpenAI request started for:  R1UDJTYD
+[2025-05-20T11:17:19.641Z] OpenAI response in 7438ms for R1UDJTYD
+[2025-05-20T11:17:19.642Z] ❗ Client disconnected after 7.439s for: R1UDJTYD
+[2025-05-20T11:18:23.322Z] OpenAI request started for:  R1UDJTYD
+[2025-05-20T11:18:36.979Z] OpenAI response in 13657ms for R1UDJTYD
+[2025-05-20T11:18:36.979Z] ❗ Client disconnected after 13.657s for: R1UDJTYD
+[2025-05-20T11:21:01.966Z] OpenAI request started for:  R1UDJTYD
+[2025-05-20T11:21:09.956Z] OpenAI response in 7990ms for R1UDJTYD
+[2025-05-20T11:21:09.957Z] ❗ Client disconnected after 7.991s for: R1UDJTYD
+[2025-05-20T11:23:17.780Z] OpenAI request started for:  R1UDJTYD
+[2025-05-20T11:23:26.628Z] OpenAI response in 8848ms for R1UDJTYD
+[2025-05-20T11:23:26.629Z] ❗ Client disconnected after 8.849s for: R1UDJTYD
+[2025-05-20T11:25:07.307Z] OpenAI request started for:  R1UDJTYD
+[2025-05-20T11:25:17.913Z] OpenAI response in 10607ms for R1UDJTYD
+[2025-05-20T11:25:17.913Z] ❗ Client disconnected after 10.607s for: R1UDJTYD
+[2025-05-20T11:26:28.398Z] OpenAI request started for:  R1UDJTYD
+[2025-05-20T11:26:37.274Z] OpenAI response in 8876ms for R1UDJTYD
+[2025-05-20T11:26:37.274Z] ❗ Client disconnected after 8.876s for: R1UDJTYD
+[2025-05-20T11:29:23.535Z] OpenAI request started for:  R1UDJTYD
+[2025-05-20T11:29:32.644Z] OpenAI response in 9110ms for R1UDJTYD
+[2025-05-20T11:29:32.644Z] ❗ Client disconnected after 9.11s for: R1UDJTYD
+[2025-05-20T11:30:27.552Z] Files received: [ 'task_R1UDJTYD.json' ]
+[2025-05-20T13:25:07.911Z] OpenAI request started for:  R1MLAFMY
+[2025-05-20T13:25:12.892Z] OpenAI response in 4982ms for R1MLAFMY
+[2025-05-20T13:25:12.893Z] ❗ Client disconnected after 4.983s for: R1MLAFMY
+[2025-05-20T13:29:43.616Z] OpenAI request started for:  R1MLAFMY
+[2025-05-20T13:29:51.663Z] OpenAI request started for:  R1MLAFMY
+[2025-05-20T13:29:51.982Z] OpenAI response in 8366ms for R1MLAFMY
+[2025-05-20T13:29:51.983Z] ❗ Client disconnected after 8.367s for: R1MLAFMY
+[2025-05-20T13:29:57.844Z] OpenAI response in 6182ms for R1MLAFMY
+[2025-05-20T13:29:57.845Z] ❗ Client disconnected after 6.183s for: R1MLAFMY
+[2025-05-20T13:31:19.951Z] OpenAI request started for:  R1MLAFMY
+[2025-05-20T13:31:24.731Z] OpenAI response in 4780ms for R1MLAFMY
+[2025-05-20T13:31:24.732Z] ❗ Client disconnected after 4.781s for: R1MLAFMY
+[2025-05-20T13:33:50.638Z] OpenAI request started for:  R1MLAFMY
+[2025-05-20T13:33:54.290Z] OpenAI response in 3653ms for R1MLAFMY
+[2025-05-20T13:33:54.290Z] ❗ Client disconnected after 3.653s for: R1MLAFMY
+[2025-05-20T13:35:23.421Z] OpenAI request started for:  R1MLAFMY
+[2025-05-20T13:35:29.958Z] OpenAI response in 6537ms for R1MLAFMY
+[2025-05-20T13:35:29.959Z] ❗ Client disconnected after 6.538s for: R1MLAFMY
+[2025-05-20T13:36:49.492Z] OpenAI request started for:  R1MLAFMY
+[2025-05-20T13:36:56.848Z] OpenAI response in 7356ms for R1MLAFMY
+[2025-05-20T13:36:56.848Z] ❗ Client disconnected after 7.356s for: R1MLAFMY
+[2025-05-20T13:38:48.200Z] OpenAI request started for:  R1MLAFMY
+[2025-05-20T13:38:52.743Z] OpenAI response in 4543ms for R1MLAFMY
+[2025-05-20T13:38:52.743Z] ❗ Client disconnected after 4.543s for: R1MLAFMY
+[2025-05-20T13:40:28.481Z] OpenAI request started for:  R1MLAFMY
+[2025-05-20T13:40:34.995Z] OpenAI response in 6514ms for R1MLAFMY
+[2025-05-20T13:40:34.995Z] ❗ Client disconnected after 6.515s for: R1MLAFMY
+[2025-05-20T13:41:15.792Z] OpenAI request started for:  R1MLAFMY
+[2025-05-20T13:42:15.500Z] OpenAI response in 59708ms for R1MLAFMY
+[2025-05-20T13:42:15.500Z] ❗ Client disconnected after 59.708s for: R1MLAFMY
+[2025-05-20T13:42:48.170Z] OpenAI request started for:  R1MLAFMY
+[2025-05-20T13:42:54.980Z] OpenAI response in 6810ms for R1MLAFMY
+[2025-05-20T13:42:54.980Z] ❗ Client disconnected after 6.81s for: R1MLAFMY
+[2025-05-20T13:44:26.309Z] OpenAI request started for:  R1MLAFMY
+[2025-05-20T13:44:33.912Z] OpenAI response in 7603ms for R1MLAFMY
+[2025-05-20T13:44:33.913Z] ❗ Client disconnected after 7.604s for: R1MLAFMY
+[2025-05-20T13:47:12.592Z] OpenAI request started for:  R1MLAFMY
+[2025-05-20T13:47:22.128Z] OpenAI response in 9536ms for R1MLAFMY
+[2025-05-20T13:47:22.129Z] ❗ Client disconnected after 9.537s for: R1MLAFMY
+[2025-05-20T13:48:48.360Z] OpenAI request started for:  R1MLAFMY
+[2025-05-20T13:48:55.518Z] OpenAI response in 7158ms for R1MLAFMY
+[2025-05-20T13:48:55.519Z] ❗ Client disconnected after 7.159s for: R1MLAFMY
+[2025-05-20T13:50:51.226Z] OpenAI request started for:  R1MLAFMY
+[2025-05-20T13:50:55.922Z] OpenAI response in 4697ms for R1MLAFMY
+[2025-05-20T13:50:55.923Z] ❗ Client disconnected after 4.698s for: R1MLAFMY
+[2025-05-20T13:51:28.458Z] OpenAI request started for:  R1MLAFMY
+[2025-05-20T13:51:32.871Z] OpenAI response in 4414ms for R1MLAFMY
+[2025-05-20T13:51:32.872Z] ❗ Client disconnected after 4.415s for: R1MLAFMY
+[2025-05-20T13:52:18.322Z] OpenAI request started for:  R1MLAFMY
+[2025-05-20T13:52:25.905Z] OpenAI response in 7584ms for R1MLAFMY
+[2025-05-20T13:52:25.906Z] ❗ Client disconnected after 7.585s for: R1MLAFMY
+[2025-05-20T13:53:08.383Z] OpenAI request started for:  R1MLAFMY
+[2025-05-20T13:53:15.057Z] OpenAI response in 6675ms for R1MLAFMY
+[2025-05-20T13:53:15.058Z] ❗ Client disconnected after 6.676s for: R1MLAFMY
+[2025-05-20T13:56:03.851Z] OpenAI request started for:  R1MLAFMY
+[2025-05-20T13:56:14.054Z] OpenAI response in 10203ms for R1MLAFMY
+[2025-05-20T13:56:14.055Z] ❗ Client disconnected after 10.204s for: R1MLAFMY
+[2025-05-20T13:57:44.935Z] OpenAI request started for:  R1MLAFMY
+[2025-05-20T13:57:51.697Z] OpenAI response in 6763ms for R1MLAFMY
+[2025-05-20T13:57:51.698Z] ❗ Client disconnected after 6.764s for: R1MLAFMY
+[2025-05-20T13:58:28.718Z] Files received: [ 'task_R1MLAFMY.json' ]
+[2025-05-20T14:08:07.032Z] OpenAI request started for:  R1MLAFMY
+[2025-05-20T14:08:16.396Z] OpenAI response in 9364ms for R1MLAFMY
+[2025-05-20T14:08:16.397Z] ❗ Client disconnected after 9.365s for: R1MLAFMY
+[2025-05-20T14:08:41.771Z] OpenAI request started for:  R1MLAFMY
+[2025-05-20T14:08:46.724Z] OpenAI response in 4954ms for R1MLAFMY
+[2025-05-20T14:08:46.725Z] ❗ Client disconnected after 4.955s for: R1MLAFMY
+[2025-05-20T18:45:21.228Z] OpenAI request started for:  R2SIXTHL
+[2025-05-20T18:45:27.683Z] OpenAI response in 6456ms for R2SIXTHL
+[2025-05-20T18:45:27.684Z] ❗ Client disconnected after 6.457s for: R2SIXTHL
+[2025-05-20T18:48:12.731Z] OpenAI request started for:  R2SIXTHL
+[2025-05-20T18:48:18.542Z] OpenAI response in 5812ms for R2SIXTHL
+[2025-05-20T18:48:18.543Z] ❗ Client disconnected after 5.813s for: R2SIXTHL
+[2025-05-20T18:51:38.258Z] OpenAI request started for:  R2SIXTHL
+[2025-05-20T18:51:46.123Z] OpenAI response in 7865ms for R2SIXTHL
+[2025-05-20T18:51:46.124Z] ❗ Client disconnected after 7.866s for: R2SIXTHL
+[2025-05-20T18:53:21.022Z] OpenAI request started for:  R2SIXTHL
+[2025-05-20T18:53:28.329Z] OpenAI response in 7307ms for R2SIXTHL
+[2025-05-20T18:53:28.329Z] ❗ Client disconnected after 7.307s for: R2SIXTHL
+[2025-05-20T18:54:48.720Z] OpenAI request started for:  R2SIXTHL
+[2025-05-20T18:54:55.836Z] OpenAI response in 7116ms for R2SIXTHL
+[2025-05-20T18:54:55.837Z] ❗ Client disconnected after 7.117s for: R2SIXTHL
+[2025-05-20T18:56:30.625Z] OpenAI request started for:  R2SIXTHL
+[2025-05-20T18:56:38.700Z] OpenAI response in 8075ms for R2SIXTHL
+[2025-05-20T18:56:38.701Z] ❗ Client disconnected after 8.076s for: R2SIXTHL
+[2025-05-20T18:59:05.861Z] OpenAI request started for:  R2SIXTHL
+[2025-05-20T18:59:28.524Z] OpenAI response in 22664ms for R2SIXTHL
+[2025-05-20T18:59:28.525Z] ❗ Client disconnected after 22.665s for: R2SIXTHL
+[2025-05-20T19:02:19.093Z] OpenAI request started for:  R2SIXTHL
+[2025-05-20T19:02:27.800Z] OpenAI response in 8708ms for R2SIXTHL
+[2025-05-20T19:02:27.801Z] ❗ Client disconnected after 8.709s for: R2SIXTHL
+[2025-05-20T19:03:59.357Z] OpenAI request started for:  R2SIXTHL
+[2025-05-20T19:04:17.646Z] OpenAI response in 18289ms for R2SIXTHL
+[2025-05-20T19:04:17.646Z] ❗ Client disconnected after 18.289s for: R2SIXTHL
+[2025-05-20T19:04:25.955Z] OpenAI request started for:  R2SIXTHL
+[2025-05-20T19:04:55.582Z] OpenAI response in 29628ms for R2SIXTHL
+[2025-05-20T19:04:55.583Z] ❗ Client disconnected after 29.629s for: R2SIXTHL
+[2025-05-20T19:07:05.004Z] Files received: [ 'task_R2SIXTHL.json' ]
+[2025-05-21T08:44:27.765Z] OpenAI request started for:  R2ZKDKCV
+[2025-05-21T08:44:36.319Z] OpenAI response in 8554ms for R2ZKDKCV
+[2025-05-21T08:44:36.319Z] ❗ Client disconnected after 8.555s for: R2ZKDKCV
+[2025-05-21T08:45:14.505Z] OpenAI request started for:  R2ZKDKCV
+[2025-05-21T08:45:21.483Z] OpenAI response in 6979ms for R2ZKDKCV
+[2025-05-21T08:45:21.484Z] ❗ Client disconnected after 6.98s for: R2ZKDKCV
+[2025-05-21T08:47:48.681Z] OpenAI request started for:  R2ZKDKCV
+[2025-05-21T08:47:53.918Z] OpenAI response in 5238ms for R2ZKDKCV
+[2025-05-21T08:47:53.919Z] ❗ Client disconnected after 5.239s for: R2ZKDKCV
+[2025-05-21T08:49:14.362Z] OpenAI request started for:  R2ZKDKCV
+[2025-05-21T08:49:18.695Z] OpenAI response in 4333ms for R2ZKDKCV
+[2025-05-21T08:49:18.695Z] ❗ Client disconnected after 4.333s for: R2ZKDKCV
+[2025-05-21T08:50:01.055Z] OpenAI request started for:  R2ZKDKCV
+[2025-05-21T08:50:06.311Z] OpenAI response in 5257ms for R2ZKDKCV
+[2025-05-21T08:50:06.311Z] ❗ Client disconnected after 5.257s for: R2ZKDKCV
+[2025-05-21T08:53:45.230Z] OpenAI request started for:  R2ZKDKCV
+[2025-05-21T08:53:49.452Z] OpenAI response in 4222ms for R2ZKDKCV
+[2025-05-21T08:53:49.453Z] ❗ Client disconnected after 4.223s for: R2ZKDKCV
+[2025-05-21T08:55:29.586Z] OpenAI request started for:  R2ZKDKCV
+[2025-05-21T08:55:45.371Z] OpenAI response in 15786ms for R2ZKDKCV
+[2025-05-21T08:55:45.371Z] ❗ Client disconnected after 15.786s for: R2ZKDKCV
+[2025-05-21T08:56:14.871Z] OpenAI request started for:  R2ZKDKCV
+[2025-05-21T08:56:20.862Z] OpenAI response in 5991ms for R2ZKDKCV
+[2025-05-21T08:56:20.862Z] ❗ Client disconnected after 5.991s for: R2ZKDKCV
+[2025-05-21T08:57:13.124Z] OpenAI request started for:  R2ZKDKCV
+[2025-05-21T08:57:20.779Z] OpenAI response in 7655ms for R2ZKDKCV
+[2025-05-21T08:57:20.779Z] ❗ Client disconnected after 7.655s for: R2ZKDKCV
+[2025-05-21T08:57:54.167Z] OpenAI request started for:  R2ZKDKCV
+[2025-05-21T08:58:06.219Z] OpenAI response in 12052ms for R2ZKDKCV
+[2025-05-21T08:58:06.220Z] ❗ Client disconnected after 12.053s for: R2ZKDKCV
+[2025-05-21T08:59:25.554Z] OpenAI request started for:  R2ZKDKCV
+[2025-05-21T08:59:30.621Z] OpenAI response in 5068ms for R2ZKDKCV
+[2025-05-21T08:59:30.622Z] ❗ Client disconnected after 5.069s for: R2ZKDKCV
+[2025-05-21T08:59:40.091Z] OpenAI request started for:  R2ZKDKCV
+[2025-05-21T08:59:43.795Z] OpenAI response in 3705ms for R2ZKDKCV
+[2025-05-21T08:59:43.796Z] ❗ Client disconnected after 3.706s for: R2ZKDKCV
+[2025-05-21T08:59:53.460Z] Files received: [ 'task_R2ZKDKCV.json' ]
+[2025-05-21T10:27:53.349Z] OpenAI request started for:  SKZEGUK
+[2025-05-21T10:28:20.322Z] OpenAI response in 26974ms for SKZEGUK
+[2025-05-21T10:28:20.322Z] ❗ Client disconnected after 26.974s for: SKZEGUK
+[2025-05-21T10:30:54.371Z] OpenAI request started for:  SKZEGUK
+[2025-05-21T10:31:00.901Z] OpenAI response in 6530ms for SKZEGUK
+[2025-05-21T10:31:00.901Z] ❗ Client disconnected after 6.53s for: SKZEGUK
+[2025-05-21T10:31:08.018Z] OpenAI request started for:  SKZEGUK
+[2025-05-21T10:31:18.415Z] OpenAI response in 10398ms for SKZEGUK
+[2025-05-21T10:31:18.416Z] ❗ Client disconnected after 10.399s for: SKZEGUK
+[2025-05-21T10:31:26.189Z] OpenAI request started for:  SKZEGUK
+[2025-05-21T10:31:33.425Z] OpenAI response in 7237ms for SKZEGUK
+[2025-05-21T10:31:33.425Z] ❗ Client disconnected after 7.237s for: SKZEGUK
+[2025-05-21T10:31:40.164Z] OpenAI request started for:  SKZEGUK
+[2025-05-21T10:31:48.298Z] OpenAI response in 8135ms for SKZEGUK
+[2025-05-21T10:31:48.298Z] ❗ Client disconnected after 8.135s for: SKZEGUK
+[2025-05-21T10:32:31.951Z] OpenAI request started for:  SKZEGUK
+[2025-05-21T10:32:37.950Z] OpenAI response in 6000ms for SKZEGUK
+[2025-05-21T10:32:37.950Z] ❗ Client disconnected after 6s for: SKZEGUK
+[2025-05-21T10:32:45.011Z] OpenAI request started for:  SKZEGUK
+[2025-05-21T10:32:49.650Z] OpenAI response in 4640ms for SKZEGUK
+[2025-05-21T10:32:49.650Z] ❗ Client disconnected after 4.64s for: SKZEGUK
+[2025-05-21T10:32:56.658Z] OpenAI request started for:  SKZEGUK
+[2025-05-21T10:33:04.491Z] OpenAI response in 7834ms for SKZEGUK
+[2025-05-21T10:33:04.492Z] ❗ Client disconnected after 7.835s for: SKZEGUK
+[2025-05-21T10:33:12.810Z] OpenAI request started for:  SKZEGUK
+[2025-05-21T10:33:18.561Z] OpenAI response in 5751ms for SKZEGUK
+[2025-05-21T10:33:18.561Z] ❗ Client disconnected after 5.751s for: SKZEGUK
+[2025-05-21T10:33:27.891Z] OpenAI request started for:  SKZEGUK
+[2025-05-21T10:33:35.154Z] OpenAI response in 7263ms for SKZEGUK
+[2025-05-21T10:33:35.154Z] ❗ Client disconnected after 7.263s for: SKZEGUK
+[2025-05-21T10:33:43.589Z] OpenAI request started for:  SKZEGUK
+[2025-05-21T10:33:50.463Z] OpenAI response in 6874ms for SKZEGUK
+[2025-05-21T10:33:50.464Z] ❗ Client disconnected after 6.875s for: SKZEGUK
+[2025-05-21T10:34:01.227Z] OpenAI request started for:  SKZEGUK
+[2025-05-21T10:34:14.045Z] OpenAI response in 12818ms for SKZEGUK
+[2025-05-21T10:34:14.046Z] ❗ Client disconnected after 12.819s for: SKZEGUK
+[2025-05-21T10:34:20.550Z] OpenAI request started for:  SKZEGUK
+[2025-05-21T10:34:27.153Z] OpenAI response in 6603ms for SKZEGUK
+[2025-05-21T10:34:27.153Z] ❗ Client disconnected after 6.603s for: SKZEGUK
+[2025-05-21T10:34:34.652Z] OpenAI request started for:  SKZEGUK
+[2025-05-21T10:34:42.900Z] OpenAI response in 8249ms for SKZEGUK
+[2025-05-21T10:34:42.900Z] ❗ Client disconnected after 8.249s for: SKZEGUK
+[2025-05-21T10:34:52.528Z] OpenAI request started for:  SKZEGUK
+[2025-05-21T10:35:09.692Z] OpenAI response in 17164ms for SKZEGUK
+[2025-05-21T10:35:09.692Z] ❗ Client disconnected after 17.164s for: SKZEGUK
+[2025-05-21T10:35:15.213Z] OpenAI request started for:  SKZEGUK
+[2025-05-21T10:35:21.628Z] OpenAI response in 6415ms for SKZEGUK
+[2025-05-21T10:35:21.629Z] ❗ Client disconnected after 6.416s for: SKZEGUK
+[2025-05-21T10:35:31.427Z] OpenAI request started for:  SKZEGUK
+[2025-05-21T10:35:36.611Z] OpenAI response in 5185ms for SKZEGUK
+[2025-05-21T10:35:36.611Z] ❗ Client disconnected after 5.185s for: SKZEGUK
+[2025-05-21T10:35:58.545Z] OpenAI request started for:  SKZEGUK
+[2025-05-21T10:36:08.820Z] OpenAI response in 10275ms for SKZEGUK
+[2025-05-21T10:36:08.820Z] ❗ Client disconnected after 10.275s for: SKZEGUK
+[2025-05-21T10:36:20.281Z] OpenAI request started for:  SKZEGUK
+[2025-05-21T10:36:26.958Z] OpenAI response in 6678ms for SKZEGUK
+[2025-05-21T10:36:26.958Z] ❗ Client disconnected after 6.678s for: SKZEGUK
+[2025-05-21T10:36:38.633Z] OpenAI request started for:  SKZEGUK
+[2025-05-21T10:36:47.635Z] OpenAI response in 9002ms for SKZEGUK
+[2025-05-21T10:36:47.636Z] ❗ Client disconnected after 9.003s for: SKZEGUK
+[2025-05-21T10:36:56.117Z] OpenAI request started for:  SKZEGUK
+[2025-05-21T10:37:06.406Z] OpenAI response in 10289ms for SKZEGUK
+[2025-05-21T10:37:06.407Z] ❗ Client disconnected after 10.29s for: SKZEGUK
+[2025-05-21T10:37:48.912Z] OpenAI request started for:  SKZEGUK
+[2025-05-21T10:37:57.332Z] OpenAI response in 8420ms for SKZEGUK
+[2025-05-21T10:37:57.333Z] ❗ Client disconnected after 8.421s for: SKZEGUK
+[2025-05-21T10:40:47.921Z] OpenAI request started for:  SKZEGUK
+[2025-05-21T10:40:55.353Z] OpenAI response in 7432ms for SKZEGUK
+[2025-05-21T10:40:55.353Z] ❗ Client disconnected after 7.432s for: SKZEGUK
+[2025-05-21T10:41:42.462Z] OpenAI request started for:  SKZEGUK
+[2025-05-21T10:41:47.548Z] OpenAI response in 5087ms for SKZEGUK
+[2025-05-21T10:41:47.548Z] ❗ Client disconnected after 5.087s for: SKZEGUK
+[2025-05-21T10:41:56.474Z] OpenAI request started for:  SKZEGUK
+[2025-05-21T10:42:04.188Z] OpenAI response in 7715ms for SKZEGUK
+[2025-05-21T10:42:04.188Z] ❗ Client disconnected after 7.715s for: SKZEGUK
+[2025-05-21T10:42:09.708Z] OpenAI request started for:  SKZEGUK
+[2025-05-21T10:42:17.961Z] OpenAI response in 8253ms for SKZEGUK
+[2025-05-21T10:42:17.961Z] ❗ Client disconnected after 8.253s for: SKZEGUK
+[2025-05-21T10:42:37.952Z] Files received: [ 'task_SKZEGUK.json' ]
+[2025-05-21T12:56:43.722Z] OpenAI request started for:  R2YCRAQK
+[2025-05-21T12:56:48.852Z] OpenAI response in 5130ms for R2YCRAQK
+[2025-05-21T12:56:48.852Z] ❗ Client disconnected after 5.13s for: R2YCRAQK
+[2025-05-21T12:59:45.872Z] OpenAI request started for:  R2YCRAQK
+[2025-05-21T12:59:50.215Z] OpenAI response in 4344ms for R2YCRAQK
+[2025-05-21T12:59:50.215Z] ❗ Client disconnected after 4.344s for: R2YCRAQK
+[2025-05-21T13:02:04.971Z] OpenAI request started for:  R2YCRAQK
+[2025-05-21T13:02:09.779Z] OpenAI response in 4809ms for R2YCRAQK
+[2025-05-21T13:02:09.779Z] ❗ Client disconnected after 4.809s for: R2YCRAQK
+[2025-05-21T13:14:09.843Z] OpenAI request started for:  R2YCRAQK
+[2025-05-21T13:14:22.634Z] OpenAI response in 12792ms for R2YCRAQK
+[2025-05-21T13:14:22.634Z] ❗ Client disconnected after 12.792s for: R2YCRAQK
+[2025-05-21T13:15:54.916Z] OpenAI request started for:  R2YCRAQK
+[2025-05-21T13:16:00.756Z] OpenAI response in 5840ms for R2YCRAQK
+[2025-05-21T13:16:00.756Z] ❗ Client disconnected after 5.84s for: R2YCRAQK
+[2025-05-21T13:24:34.331Z] OpenAI request started for:  R2YCRAQK
+[2025-05-21T13:24:38.293Z] OpenAI response in 3962ms for R2YCRAQK
+[2025-05-21T13:24:38.293Z] ❗ Client disconnected after 3.962s for: R2YCRAQK
+[2025-05-21T13:28:25.721Z] OpenAI request started for:  S1NXLPBL
+[2025-05-21T13:28:31.979Z] OpenAI response in 6259ms for S1NXLPBL
+[2025-05-21T13:28:31.980Z] ❗ Client disconnected after 6.26s for: S1NXLPBL
+[2025-05-21T13:29:26.165Z] OpenAI request started for:  R2YCRAQK
+[2025-05-21T13:29:27.472Z] Files received: [ 'task_S1NXLPBL.json' ]
+[2025-05-21T13:29:33.735Z] OpenAI response in 7571ms for R2YCRAQK
+[2025-05-21T13:29:33.735Z] ❗ Client disconnected after 7.571s for: R2YCRAQK
+[2025-05-21T13:32:27.033Z] OpenAI request started for:  R2YCRAQK
+[2025-05-21T13:32:35.947Z] OpenAI response in 8915ms for R2YCRAQK
+[2025-05-21T13:32:35.947Z] ❗ Client disconnected after 8.915s for: R2YCRAQK
+[2025-05-21T13:40:09.097Z] OpenAI request started for:  R2YCRAQK
+[2025-05-21T13:40:16.490Z] OpenAI response in 7393ms for R2YCRAQK
+[2025-05-21T13:40:16.491Z] ❗ Client disconnected after 7.394s for: R2YCRAQK
+[2025-05-21T13:51:33.591Z] Files received: [ 'task_R2YCRAQK.json' ]
+[2025-05-21T14:22:38.392Z] OpenAI request started for:  R1MISBBC
+[2025-05-21T14:22:43.774Z] OpenAI response in 5383ms for R1MISBBC
+[2025-05-21T14:22:43.775Z] ❗ Client disconnected after 5.384s for: R1MISBBC
+[2025-05-21T14:23:09.630Z] OpenAI request started for:  R1MISBBC
+[2025-05-21T14:23:16.744Z] OpenAI response in 7115ms for R1MISBBC
+[2025-05-21T14:23:16.744Z] ❗ Client disconnected after 7.115s for: R1MISBBC
+[2025-05-21T14:25:07.275Z] OpenAI request started for:  R1MISBBC
+[2025-05-21T14:25:13.905Z] OpenAI response in 6631ms for R1MISBBC
+[2025-05-21T14:25:13.905Z] ❗ Client disconnected after 6.631s for: R1MISBBC
+[2025-05-21T14:26:20.213Z] OpenAI request started for:  R1MISBBC
+[2025-05-21T14:26:25.854Z] OpenAI response in 5642ms for R1MISBBC
+[2025-05-21T14:26:25.855Z] ❗ Client disconnected after 5.643s for: R1MISBBC
+[2025-05-21T14:26:57.776Z] OpenAI request started for:  R1MISBBC
+[2025-05-21T14:27:22.612Z] OpenAI response in 24837ms for R1MISBBC
+[2025-05-21T14:27:22.613Z] ❗ Client disconnected after 24.838s for: R1MISBBC
+[2025-05-21T14:28:20.417Z] OpenAI request started for:  R1MISBBC
+[2025-05-21T14:28:33.991Z] OpenAI response in 13574ms for R1MISBBC
+[2025-05-21T14:28:33.991Z] ❗ Client disconnected after 13.574s for: R1MISBBC
+[2025-05-21T14:29:28.602Z] OpenAI request started for:  R1MISBBC
+[2025-05-21T14:29:33.400Z] OpenAI response in 4798ms for R1MISBBC
+[2025-05-21T14:29:33.401Z] ❗ Client disconnected after 4.799s for: R1MISBBC
+[2025-05-21T14:30:02.461Z] OpenAI request started for:  R1MISBBC
+[2025-05-21T14:30:07.624Z] OpenAI response in 5164ms for R1MISBBC
+[2025-05-21T14:30:07.624Z] ❗ Client disconnected after 5.164s for: R1MISBBC
+[2025-05-21T14:30:24.041Z] Files received: [ 'task_R1MISBBC.json' ]
+[2025-05-21T14:31:02.028Z] OpenAI request started for:  R1MISBBC
+[2025-05-21T14:31:15.483Z] OpenAI response in 13456ms for R1MISBBC
+[2025-05-21T14:31:15.483Z] ❗ Client disconnected after 13.456s for: R1MISBBC
+[2025-05-21T14:31:35.332Z] OpenAI request started for:  R1MISBBC
+[2025-05-21T14:31:50.502Z] OpenAI response in 15171ms for R1MISBBC
+[2025-05-21T14:31:50.503Z] ❗ Client disconnected after 15.172s for: R1MISBBC
+[2025-05-21T14:32:12.420Z] Files received: [ 'task_R1MISBBC.json' ]
+[2025-05-21T18:22:03.433Z] OpenAI request started for:  S1OZIEWV
+[2025-05-21T18:22:08.370Z] OpenAI response in 4938ms for S1OZIEWV
+[2025-05-21T18:22:08.371Z] ❗ Client disconnected after 4.939s for: S1OZIEWV
+[2025-05-21T18:23:44.287Z] OpenAI request started for:  S1OZIEWV
+[2025-05-21T18:23:56.654Z] OpenAI response in 12368ms for S1OZIEWV
+[2025-05-21T18:23:56.654Z] ❗ Client disconnected after 12.368s for: S1OZIEWV
+[2025-05-21T18:24:57.058Z] OpenAI request started for:  S1OZIEWV
+[2025-05-21T18:25:08.526Z] OpenAI response in 11469ms for S1OZIEWV
+[2025-05-21T18:25:08.527Z] ❗ Client disconnected after 11.47s for: S1OZIEWV
+[2025-05-21T18:26:09.349Z] OpenAI request started for:  S1OZIEWV
+[2025-05-21T18:26:14.585Z] OpenAI response in 5236ms for S1OZIEWV
+[2025-05-21T18:26:14.586Z] ❗ Client disconnected after 5.237s for: S1OZIEWV
+[2025-05-21T18:27:39.779Z] OpenAI request started for:  S1OZIEWV
+[2025-05-21T18:27:48.851Z] OpenAI response in 9073ms for S1OZIEWV
+[2025-05-21T18:27:48.851Z] ❗ Client disconnected after 9.073s for: S1OZIEWV
+[2025-05-21T18:28:39.146Z] OpenAI request started for:  S1OZIEWV
+[2025-05-21T18:28:44.260Z] OpenAI response in 5114ms for S1OZIEWV
+[2025-05-21T18:28:44.261Z] ❗ Client disconnected after 5.115s for: S1OZIEWV
+[2025-05-21T18:28:59.270Z] OpenAI request started for:  S1OZIEWV
+[2025-05-21T18:29:03.419Z] OpenAI response in 4149ms for S1OZIEWV
+[2025-05-21T18:29:03.420Z] ❗ Client disconnected after 4.15s for: S1OZIEWV
+[2025-05-21T18:29:28.552Z] OpenAI request started for:  S1OZIEWV
+[2025-05-21T18:29:37.277Z] OpenAI response in 8726ms for S1OZIEWV
+[2025-05-21T18:29:37.278Z] ❗ Client disconnected after 8.727s for: S1OZIEWV
+[2025-05-21T18:30:49.671Z] OpenAI request started for:  S1OZIEWV
+[2025-05-21T18:30:53.320Z] OpenAI response in 3649ms for S1OZIEWV
+[2025-05-21T18:30:53.321Z] ❗ Client disconnected after 3.65s for: S1OZIEWV
+[2025-05-21T18:34:41.363Z] OpenAI request started for:  S1OZIEWV
+[2025-05-21T18:35:06.405Z] OpenAI response in 25043ms for S1OZIEWV
+[2025-05-21T18:35:06.405Z] ❗ Client disconnected after 25.043s for: S1OZIEWV
+[2025-05-21T18:35:36.316Z] OpenAI request started for:  S1OZIEWV
+[2025-05-21T18:36:08.106Z] OpenAI response in 31791ms for S1OZIEWV
+[2025-05-21T18:36:08.106Z] ❗ Client disconnected after 31.791s for: S1OZIEWV
+[2025-05-21T18:36:50.766Z] Files received: [ 'task_S1OZIEWV.json' ]
+[2025-05-21T18:51:54.147Z] OpenAI request started for:  SBPNGPL
+[2025-05-21T18:52:00.432Z] OpenAI response in 6286ms for SBPNGPL
+[2025-05-21T18:52:00.432Z] ❗ Client disconnected after 6.286s for: SBPNGPL
+[2025-05-21T18:53:45.515Z] OpenAI request started for:  SBPNGPL
+[2025-05-21T18:57:23.545Z] OpenAI response in 218031ms for SBPNGPL
+[2025-05-21T18:57:23.547Z] ❗ Client disconnected after 218.033s for: SBPNGPL
+[2025-05-21T19:03:01.366Z] OpenAI request started for:  SBPNGPL
+[2025-05-21T19:05:32.200Z] ❗ Client disconnected after 150.835s for: SBPNGPL
+[2025-05-21T19:07:00.611Z] OpenAI response in 239246ms for SBPNGPL
+[2025-05-21T19:08:25.688Z] OpenAI request started for:  SBPNGPL
+[2025-05-21T19:08:40.939Z] OpenAI response in 15252ms for SBPNGPL
+[2025-05-21T19:08:40.939Z] ❗ Client disconnected after 15.252s for: SBPNGPL
+[2025-05-21T19:16:48.670Z] Files received: [ 'task_SBPNGPL.json' ]
+[2025-05-22T08:09:49.120Z] OpenAI request started for:  R1MXHSCE
+[2025-05-22T08:09:57.251Z] OpenAI response in 8132ms for R1MXHSCE
+[2025-05-22T08:09:57.251Z] ❗ Client disconnected after 8.132s for: R1MXHSCE
+[2025-05-22T08:11:53.585Z] OpenAI request started for:  R1MXHSCE
+[2025-05-22T08:12:00.880Z] OpenAI response in 7295ms for R1MXHSCE
+[2025-05-22T08:12:00.880Z] ❗ Client disconnected after 7.295s for: R1MXHSCE
+[2025-05-22T08:13:12.009Z] OpenAI request started for:  R1MXHSCE
+[2025-05-22T08:13:22.290Z] OpenAI response in 10282ms for R1MXHSCE
+[2025-05-22T08:13:22.291Z] ❗ Client disconnected after 10.283s for: R1MXHSCE
+[2025-05-22T08:17:10.210Z] OpenAI request started for:  R1MXHSCE
+[2025-05-22T08:17:22.328Z] OpenAI response in 12118ms for R1MXHSCE
+[2025-05-22T08:17:22.329Z] ❗ Client disconnected after 12.119s for: R1MXHSCE
+[2025-05-22T08:18:35.176Z] OpenAI request started for:  R1MXHSCE
+[2025-05-22T08:18:45.047Z] OpenAI response in 9871ms for R1MXHSCE
+[2025-05-22T08:18:45.047Z] ❗ Client disconnected after 9.871s for: R1MXHSCE
+[2025-05-22T08:19:05.939Z] OpenAI request started for:  R1MXHSCE
+[2025-05-22T08:19:12.959Z] OpenAI response in 7021ms for R1MXHSCE
+[2025-05-22T08:19:12.960Z] ❗ Client disconnected after 7.022s for: R1MXHSCE
+[2025-05-22T08:19:44.206Z] OpenAI request started for:  R1MXHSCE
+[2025-05-22T08:19:51.287Z] OpenAI response in 7081ms for R1MXHSCE
+[2025-05-22T08:19:51.287Z] ❗ Client disconnected after 7.081s for: R1MXHSCE
+[2025-05-22T08:20:08.481Z] OpenAI request started for:  R1MXHSCE
+[2025-05-22T08:20:20.977Z] OpenAI response in 12497ms for R1MXHSCE
+[2025-05-22T08:20:20.977Z] ❗ Client disconnected after 12.497s for: R1MXHSCE
+[2025-05-22T08:20:31.186Z] OpenAI request started for:  R1MXHSCE
+[2025-05-22T08:20:40.286Z] OpenAI response in 9101ms for R1MXHSCE
+[2025-05-22T08:20:40.286Z] ❗ Client disconnected after 9.101s for: R1MXHSCE
+[2025-05-22T08:21:01.681Z] OpenAI request started for:  R1MXHSCE
+[2025-05-22T08:21:11.950Z] OpenAI response in 10270ms for R1MXHSCE
+[2025-05-22T08:21:11.950Z] ❗ Client disconnected after 10.27s for: R1MXHSCE
+[2025-05-22T08:21:36.752Z] OpenAI request started for:  R1MXHSCE
+[2025-05-22T08:21:44.631Z] OpenAI response in 7879ms for R1MXHSCE
+[2025-05-22T08:21:44.631Z] ❗ Client disconnected after 7.879s for: R1MXHSCE
+[2025-05-22T08:21:57.221Z] OpenAI request started for:  R1MXHSCE
+[2025-05-22T08:22:02.150Z] OpenAI response in 4929ms for R1MXHSCE
+[2025-05-22T08:22:02.151Z] ❗ Client disconnected after 4.93s for: R1MXHSCE
+[2025-05-22T08:23:49.310Z] OpenAI request started for:  R1MXHSCE
+[2025-05-22T08:23:54.013Z] OpenAI response in 4704ms for R1MXHSCE
+[2025-05-22T08:23:54.013Z] ❗ Client disconnected after 4.704s for: R1MXHSCE
+[2025-05-22T08:24:59.803Z] OpenAI request started for:  R1MXHSCE
+[2025-05-22T08:25:06.266Z] OpenAI response in 6463ms for R1MXHSCE
+[2025-05-22T08:25:06.266Z] ❗ Client disconnected after 6.463s for: R1MXHSCE
+[2025-05-22T08:29:09.623Z] OpenAI request started for:  R1MXHSCE
+[2025-05-22T08:29:15.131Z] OpenAI response in 5509ms for R1MXHSCE
+[2025-05-22T08:29:15.132Z] ❗ Client disconnected after 5.509s for: R1MXHSCE
+[2025-05-22T08:31:51.905Z] OpenAI request started for:  R1MXHSCE
+[2025-05-22T08:32:05.855Z] OpenAI response in 13951ms for R1MXHSCE
+[2025-05-22T08:32:05.855Z] ❗ Client disconnected after 13.951s for: R1MXHSCE
+[2025-05-22T08:33:09.203Z] OpenAI request started for:  R1MXHSCE
+[2025-05-22T08:33:16.596Z] OpenAI response in 7394ms for R1MXHSCE
+[2025-05-22T08:33:16.597Z] ❗ Client disconnected after 7.395s for: R1MXHSCE
+[2025-05-22T08:34:38.724Z] OpenAI request started for:  R1MXHSCE
+[2025-05-22T08:34:45.444Z] OpenAI response in 6721ms for R1MXHSCE
+[2025-05-22T08:34:45.444Z] ❗ Client disconnected after 6.721s for: R1MXHSCE
+[2025-05-22T08:35:41.836Z] OpenAI request started for:  R1MXHSCE
+[2025-05-22T08:35:49.160Z] OpenAI response in 7325ms for R1MXHSCE
+[2025-05-22T08:35:49.160Z] ❗ Client disconnected after 7.325s for: R1MXHSCE
+[2025-05-22T08:36:32.200Z] OpenAI request started for:  R1MXHSCE
+[2025-05-22T08:36:42.220Z] OpenAI response in 10021ms for R1MXHSCE
+[2025-05-22T08:36:42.221Z] ❗ Client disconnected after 10.022s for: R1MXHSCE
+[2025-05-22T08:37:23.451Z] OpenAI request started for:  R1MXHSCE
+[2025-05-22T08:37:28.990Z] OpenAI response in 5540ms for R1MXHSCE
+[2025-05-22T08:37:28.990Z] ❗ Client disconnected after 5.54s for: R1MXHSCE
+[2025-05-22T08:39:17.905Z] OpenAI request started for:  R1MXHSCE
+[2025-05-22T08:39:24.607Z] OpenAI response in 6702ms for R1MXHSCE
+[2025-05-22T08:39:24.608Z] ❗ Client disconnected after 6.703s for: R1MXHSCE
+[2025-05-22T08:39:52.129Z] OpenAI request started for:  R1MXHSCE
+[2025-05-22T08:40:09.243Z] OpenAI response in 17114ms for R1MXHSCE
+[2025-05-22T08:40:09.244Z] ❗ Client disconnected after 17.115s for: R1MXHSCE
+[2025-05-22T08:41:22.498Z] OpenAI request started for:  R1MXHSCE
+[2025-05-22T08:41:38.262Z] OpenAI response in 15765ms for R1MXHSCE
+[2025-05-22T08:41:38.263Z] ❗ Client disconnected after 15.766s for: R1MXHSCE
+[2025-05-22T08:42:22.574Z] Files received: [ 'task_R1MXHSCE.json' ]
+[2025-05-22T11:17:47.497Z] OpenAI request started for:  R2YCRAQK
+[2025-05-22T11:17:55.345Z] OpenAI response in 7848ms for R2YCRAQK
+[2025-05-22T11:17:55.345Z] ❗ Client disconnected after 7.848s for: R2YCRAQK
+[2025-05-22T11:24:12.397Z] OpenAI request started for:  R2YCRAQK
+[2025-05-22T11:24:21.705Z] OpenAI response in 9309ms for R2YCRAQK
+[2025-05-22T11:24:21.706Z] ❗ Client disconnected after 9.31s for: R2YCRAQK
+[2025-05-22T11:25:58.440Z] OpenAI request started for:  R2YCRAQK
+[2025-05-22T11:26:03.685Z] OpenAI response in 5245ms for R2YCRAQK
+[2025-05-22T11:26:03.685Z] ❗ Client disconnected after 5.245s for: R2YCRAQK
+[2025-05-22T11:29:12.016Z] OpenAI request started for:  R2YCRAQK
+[2025-05-22T11:29:16.556Z] OpenAI response in 4540ms for R2YCRAQK
+[2025-05-22T11:29:16.557Z] ❗ Client disconnected after 4.541s for: R2YCRAQK
+[2025-05-22T11:31:55.533Z] OpenAI request started for:  R2YCRAQK
+[2025-05-22T11:32:01.960Z] OpenAI response in 6428ms for R2YCRAQK
+[2025-05-22T11:32:01.960Z] ❗ Client disconnected after 6.428s for: R2YCRAQK
+[2025-05-22T11:35:51.820Z] Files received: [ 'task_R2YCRAQK.json' ]
+[2025-05-22T15:26:25.862Z] OpenAI request started for:  S1BENGPC
+[2025-05-22T15:26:32.790Z] OpenAI response in 6928ms for S1BENGPC
+[2025-05-22T15:26:32.790Z] ❗ Client disconnected after 6.928s for: S1BENGPC
+[2025-05-22T15:27:45.911Z] OpenAI request started for:  S1BENGPC
+[2025-05-22T15:27:52.644Z] OpenAI response in 6734ms for S1BENGPC
+[2025-05-22T15:27:52.645Z] ❗ Client disconnected after 6.735s for: S1BENGPC
+[2025-05-22T15:29:04.634Z] OpenAI request started for:  S1BENGPC
+[2025-05-22T15:29:13.513Z] OpenAI response in 8880ms for S1BENGPC
+[2025-05-22T15:29:13.514Z] ❗ Client disconnected after 8.881s for: S1BENGPC
+[2025-05-22T15:29:27.835Z] OpenAI request started for:  S1BENGPC
+[2025-05-22T15:29:37.049Z] OpenAI response in 9214ms for S1BENGPC
+[2025-05-22T15:29:37.049Z] ❗ Client disconnected after 9.214s for: S1BENGPC
+[2025-05-22T15:30:00.843Z] OpenAI request started for:  S1BENGPC
+[2025-05-22T15:30:08.139Z] OpenAI response in 7296ms for S1BENGPC
+[2025-05-22T15:30:08.140Z] ❗ Client disconnected after 7.297s for: S1BENGPC
+[2025-05-22T15:30:31.777Z] OpenAI request started for:  S1BENGPC
+[2025-05-22T15:30:40.930Z] OpenAI response in 9153ms for S1BENGPC
+[2025-05-22T15:30:40.931Z] ❗ Client disconnected after 9.154s for: S1BENGPC
+[2025-05-22T15:30:52.237Z] OpenAI request started for:  S1BENGPC
+[2025-05-22T15:31:02.688Z] OpenAI response in 10451ms for S1BENGPC
+[2025-05-22T15:31:02.688Z] ❗ Client disconnected after 10.451s for: S1BENGPC
+[2025-05-22T15:31:34.596Z] OpenAI request started for:  S1BENGPC
+[2025-05-22T15:31:42.127Z] OpenAI response in 7532ms for S1BENGPC
+[2025-05-22T15:31:42.128Z] ❗ Client disconnected after 7.533s for: S1BENGPC
+[2025-05-22T15:32:11.324Z] OpenAI request started for:  S1BENGPC
+[2025-05-22T15:32:20.617Z] OpenAI response in 9293ms for S1BENGPC
+[2025-05-22T15:32:20.618Z] ❗ Client disconnected after 9.294s for: S1BENGPC
+[2025-05-22T15:32:32.571Z] Files received: [ 'task_S1BENGPC.json' ]
+[2025-05-22T15:47:48.111Z] OpenAI request started for:  R2LNEXLA
+[2025-05-22T15:47:52.464Z] OpenAI response in 4354ms for R2LNEXLA
+[2025-05-22T15:47:52.465Z] ❗ Client disconnected after 4.355s for: R2LNEXLA
+[2025-05-22T15:48:32.864Z] OpenAI request started for:  R2LNEXLA
+[2025-05-22T15:48:36.339Z] OpenAI response in 3476ms for R2LNEXLA
+[2025-05-22T15:48:36.339Z] ❗ Client disconnected after 3.476s for: R2LNEXLA
+[2025-05-22T15:49:06.224Z] OpenAI request started for:  R2LNEXLA
+[2025-05-22T15:49:09.012Z] OpenAI response in 2788ms for R2LNEXLA
+[2025-05-22T15:49:09.012Z] ❗ Client disconnected after 2.788s for: R2LNEXLA
+[2025-05-22T15:49:37.073Z] OpenAI request started for:  R2LNEXLA
+[2025-05-22T15:49:40.519Z] OpenAI response in 3447ms for R2LNEXLA
+[2025-05-22T15:49:40.520Z] ❗ Client disconnected after 3.448s for: R2LNEXLA
+[2025-05-22T15:57:55.356Z] OpenAI request started for:  R2LNEXLA
+[2025-05-22T15:57:58.063Z] OpenAI response in 2707ms for R2LNEXLA
+[2025-05-22T15:57:58.063Z] ❗ Client disconnected after 2.707s for: R2LNEXLA
+[2025-05-22T15:59:21.936Z] OpenAI request started for:  R2LNEXLA
+[2025-05-22T15:59:26.333Z] OpenAI response in 4398ms for R2LNEXLA
+[2025-05-22T15:59:26.334Z] ❗ Client disconnected after 4.399s for: R2LNEXLA
+[2025-05-22T15:59:53.342Z] OpenAI request started for:  R2LNEXLA
+[2025-05-22T15:59:56.958Z] OpenAI response in 3617ms for R2LNEXLA
+[2025-05-22T15:59:56.958Z] ❗ Client disconnected after 3.617s for: R2LNEXLA
+[2025-05-22T16:00:28.743Z] OpenAI request started for:  R2LNEXLA
+[2025-05-22T16:00:33.667Z] OpenAI response in 4925ms for R2LNEXLA
+[2025-05-22T16:00:33.668Z] ❗ Client disconnected after 4.926s for: R2LNEXLA
+[2025-05-22T16:01:03.949Z] OpenAI request started for:  R2LNEXLA
+[2025-05-22T16:01:09.851Z] OpenAI response in 5903ms for R2LNEXLA
+[2025-05-22T16:01:09.852Z] ❗ Client disconnected after 5.904s for: R2LNEXLA
+[2025-05-22T16:01:12.978Z] OpenAI request started for:  R2LNEXLA
+[2025-05-22T16:01:20.990Z] OpenAI response in 8012ms for R2LNEXLA
+[2025-05-22T16:01:20.991Z] ❗ Client disconnected after 8.013s for: R2LNEXLA
+[2025-05-22T16:02:24.724Z] OpenAI request started for:  R2LNEXLA
+[2025-05-22T16:02:29.117Z] OpenAI response in 4393ms for R2LNEXLA
+[2025-05-22T16:02:29.118Z] ❗ Client disconnected after 4.394s for: R2LNEXLA
+[2025-05-22T16:02:37.564Z] Files received: [ 'task_R2LNEXLA.json' ]
+[2025-05-22T16:02:44.995Z] OpenAI request started for:  R1XSJGHP
+[2025-05-22T16:03:08.963Z] OpenAI response in 23969ms for R1XSJGHP
+[2025-05-22T16:03:08.964Z] ❗ Client disconnected after 23.97s for: R1XSJGHP
+[2025-05-22T16:03:31.112Z] OpenAI request started for:  R1XSJGHP
+[2025-05-22T16:03:39.375Z] OpenAI response in 8264ms for R1XSJGHP
+[2025-05-22T16:03:39.375Z] ❗ Client disconnected after 8.264s for: R1XSJGHP
+[2025-05-22T16:06:57.152Z] OpenAI request started for:  R1XSJGHP
+[2025-05-22T16:07:03.739Z] OpenAI response in 6588ms for R1XSJGHP
+[2025-05-22T16:07:03.740Z] ❗ Client disconnected after 6.589s for: R1XSJGHP
+[2025-05-22T16:07:42.200Z] OpenAI request started for:  R1XSJGHP
+[2025-05-22T16:07:50.798Z] OpenAI response in 8599ms for R1XSJGHP
+[2025-05-22T16:07:50.798Z] ❗ Client disconnected after 8.599s for: R1XSJGHP
+[2025-05-22T16:07:55.706Z] Files received: [ 'task_R1XSJGHP.json' ]
+[2025-05-22T21:33:15.114Z] OpenAI request started for:  S1OXMNGE
+[2025-05-22T21:33:30.851Z] OpenAI response in 15738ms for S1OXMNGE
+[2025-05-22T21:33:30.851Z] ❗ Client disconnected after 15.738s for: S1OXMNGE
+[2025-05-22T21:35:01.198Z] OpenAI request started for:  S1OXMNGE
+[2025-05-22T21:35:13.601Z] OpenAI response in 12403ms for S1OXMNGE
+[2025-05-22T21:35:13.601Z] ❗ Client disconnected after 12.403s for: S1OXMNGE
+[2025-05-22T21:37:04.657Z] OpenAI request started for:  S1OXMNGE
+[2025-05-22T21:37:15.822Z] OpenAI response in 11166ms for S1OXMNGE
+[2025-05-22T21:37:15.822Z] ❗ Client disconnected after 11.166s for: S1OXMNGE
+[2025-05-22T21:39:20.223Z] OpenAI request started for:  S1OXMNGE
+[2025-05-22T21:39:25.037Z] OpenAI response in 4814ms for S1OXMNGE
+[2025-05-22T21:39:25.037Z] ❗ Client disconnected after 4.814s for: S1OXMNGE
+[2025-05-22T21:40:20.543Z] OpenAI request started for:  S1OXMNGE
+[2025-05-22T21:40:26.140Z] OpenAI response in 5597ms for S1OXMNGE
+[2025-05-22T21:40:26.140Z] ❗ Client disconnected after 5.597s for: S1OXMNGE
+[2025-05-22T21:41:00.619Z] OpenAI request started for:  S1OXMNGE
+[2025-05-22T21:41:12.374Z] OpenAI response in 11755ms for S1OXMNGE
+[2025-05-22T21:41:12.374Z] ❗ Client disconnected after 11.755s for: S1OXMNGE
+[2025-05-22T21:42:45.743Z] OpenAI request started for:  S1OXMNGE
+[2025-05-22T21:42:51.414Z] OpenAI response in 5671ms for S1OXMNGE
+[2025-05-22T21:42:51.415Z] ❗ Client disconnected after 5.672s for: S1OXMNGE
+[2025-05-22T21:44:28.985Z] OpenAI request started for:  S1OXMNGE
+[2025-05-22T21:44:35.402Z] OpenAI response in 6418ms for S1OXMNGE
+[2025-05-22T21:44:35.403Z] ❗ Client disconnected after 6.419s for: S1OXMNGE
+[2025-05-22T21:46:07.284Z] OpenAI request started for:  S1OXMNGE
+[2025-05-22T21:46:13.105Z] OpenAI response in 5822ms for S1OXMNGE
+[2025-05-22T21:46:13.106Z] ❗ Client disconnected after 5.823s for: S1OXMNGE
+[2025-05-22T21:47:41.306Z] Files received: [ 'task_S1OXMNGE.json' ]
+[2025-05-23T09:38:46.109Z] Invalid or expired session key:  S1SBJRyN
+[2025-05-23T09:38:46.109Z] ⚠️ Invalid sessionKey: S1SBJRyN
+[2025-05-23T09:38:46.109Z] ❗ Client disconnected after 0s for: S1SBJRyN
+[2025-05-23T09:50:04.431Z] OpenAI request started for:  S1SBJRYN
+[2025-05-23T09:50:12.083Z] OpenAI response in 7652ms for S1SBJRYN
+[2025-05-23T09:50:12.083Z] ❗ Client disconnected after 7.652s for: S1SBJRYN
+[2025-05-23T09:53:30.607Z] OpenAI request started for:  S1SBJRYN
+[2025-05-23T09:53:35.069Z] OpenAI response in 4463ms for S1SBJRYN
+[2025-05-23T09:53:35.069Z] ❗ Client disconnected after 4.463s for: S1SBJRYN
+[2025-05-23T10:01:35.618Z] OpenAI request started for:  S1SBJRYN
+[2025-05-23T10:01:41.645Z] OpenAI response in 6028ms for S1SBJRYN
+[2025-05-23T10:01:41.646Z] ❗ Client disconnected after 6.029s for: S1SBJRYN
+[2025-05-23T10:01:52.726Z] OpenAI request started for:  S1SBJRYN
+[2025-05-23T10:01:58.025Z] OpenAI response in 5299ms for S1SBJRYN
+[2025-05-23T10:01:58.025Z] ❗ Client disconnected after 5.299s for: S1SBJRYN
+[2025-05-23T10:02:10.012Z] OpenAI request started for:  S1SBJRYN
+[2025-05-23T10:02:15.334Z] OpenAI response in 5323ms for S1SBJRYN
+[2025-05-23T10:02:15.334Z] ❗ Client disconnected after 5.323s for: S1SBJRYN
+[2025-05-23T10:02:30.667Z] OpenAI request started for:  S1SBJRYN
+[2025-05-23T10:02:35.861Z] OpenAI response in 5195ms for S1SBJRYN
+[2025-05-23T10:02:35.861Z] ❗ Client disconnected after 5.195s for: S1SBJRYN
+[2025-05-23T10:02:59.777Z] OpenAI request started for:  S1SBJRYN
+[2025-05-23T10:03:05.484Z] OpenAI response in 5708ms for S1SBJRYN
+[2025-05-23T10:03:05.484Z] ❗ Client disconnected after 5.708s for: S1SBJRYN
+[2025-05-23T10:03:54.301Z] OpenAI request started for:  S1SBJRYN
+[2025-05-23T10:04:00.402Z] OpenAI response in 6101ms for S1SBJRYN
+[2025-05-23T10:04:00.403Z] ❗ Client disconnected after 6.102s for: S1SBJRYN
+[2025-05-23T10:05:45.146Z] Files received: [ 'task_S1SBJRYN.json' ]
+[2025-05-23T14:29:14.904Z] OpenAI request started for:  R2BVQTYK
+[2025-05-23T14:29:22.960Z] OpenAI response in 8056ms for R2BVQTYK
+[2025-05-23T14:29:22.961Z] ❗ Client disconnected after 8.057s for: R2BVQTYK
+[2025-05-23T14:31:09.658Z] OpenAI request started for:  R2BVQTYK
+[2025-05-23T14:31:11.487Z] OpenAI response in 1830ms for R2BVQTYK
+[2025-05-23T14:31:11.487Z] ❗ Client disconnected after 1.83s for: R2BVQTYK
+[2025-05-23T14:32:15.816Z] OpenAI request started for:  R2BVQTYK
+[2025-05-23T14:32:23.177Z] OpenAI response in 7362ms for R2BVQTYK
+[2025-05-23T14:32:23.178Z] ❗ Client disconnected after 7.363s for: R2BVQTYK
+[2025-05-23T14:32:54.865Z] OpenAI request started for:  R2BVQTYK
+[2025-05-23T14:33:01.510Z] OpenAI response in 6646ms for R2BVQTYK
+[2025-05-23T14:33:01.510Z] ❗ Client disconnected after 6.646s for: R2BVQTYK
+[2025-05-23T14:38:14.160Z] OpenAI request started for:  R2BVQTYK
+[2025-05-23T14:38:18.955Z] OpenAI response in 4796ms for R2BVQTYK
+[2025-05-23T14:38:18.955Z] ❗ Client disconnected after 4.796s for: R2BVQTYK
+[2025-05-23T14:38:53.206Z] OpenAI request started for:  R2BVQTYK
+[2025-05-23T14:38:59.800Z] OpenAI response in 6594ms for R2BVQTYK
+[2025-05-23T14:38:59.800Z] ❗ Client disconnected after 6.594s for: R2BVQTYK
+[2025-05-23T14:39:32.877Z] OpenAI request started for:  R2BVQTYK
+[2025-05-23T14:39:40.011Z] OpenAI response in 7135ms for R2BVQTYK
+[2025-05-23T14:39:40.012Z] ❗ Client disconnected after 7.136s for: R2BVQTYK
+[2025-05-23T14:39:55.785Z] OpenAI request started for:  R2BVQTYK
+[2025-05-23T14:40:02.723Z] OpenAI response in 6938ms for R2BVQTYK
+[2025-05-23T14:40:02.723Z] ❗ Client disconnected after 6.938s for: R2BVQTYK
+[2025-05-23T14:42:57.635Z] OpenAI request started for:  R2BVQTYK
+[2025-05-23T14:43:04.665Z] OpenAI response in 7031ms for R2BVQTYK
+[2025-05-23T14:43:04.665Z] ❗ Client disconnected after 7.031s for: R2BVQTYK
+[2025-05-23T14:45:24.289Z] OpenAI request started for:  R2BVQTYK
+[2025-05-23T14:45:35.122Z] OpenAI response in 10833ms for R2BVQTYK
+[2025-05-23T14:45:35.122Z] ❗ Client disconnected after 10.833s for: R2BVQTYK
+[2025-05-23T14:46:52.409Z] OpenAI request started for:  R2BVQTYK
+[2025-05-23T14:46:59.754Z] OpenAI response in 7346ms for R2BVQTYK
+[2025-05-23T14:46:59.754Z] ❗ Client disconnected after 7.346s for: R2BVQTYK
+[2025-05-23T14:48:05.585Z] OpenAI request started for:  R2BVQTYK
+[2025-05-23T14:48:10.026Z] OpenAI response in 4442ms for R2BVQTYK
+[2025-05-23T14:48:10.027Z] ❗ Client disconnected after 4.443s for: R2BVQTYK
+[2025-05-23T14:49:31.367Z] OpenAI request started for:  R2BVQTYK
+[2025-05-23T14:49:47.489Z] OpenAI response in 16122ms for R2BVQTYK
+[2025-05-23T14:49:47.489Z] ❗ Client disconnected after 16.122s for: R2BVQTYK
+[2025-05-23T14:57:38.469Z] OpenAI request started for:  R2BVQTYK
+[2025-05-23T14:57:49.060Z] OpenAI response in 10591ms for R2BVQTYK
+[2025-05-23T14:57:49.061Z] ❗ Client disconnected after 10.592s for: R2BVQTYK
+[2025-05-23T15:00:32.002Z] OpenAI request started for:  R2BVQTYK
+[2025-05-23T15:00:48.742Z] OpenAI response in 16742ms for R2BVQTYK
+[2025-05-23T15:00:48.742Z] ❗ Client disconnected after 16.742s for: R2BVQTYK
+[2025-05-23T15:02:45.579Z] OpenAI request started for:  R2BVQTYK
+[2025-05-23T15:02:51.326Z] OpenAI response in 5748ms for R2BVQTYK
+[2025-05-23T15:02:51.327Z] ❗ Client disconnected after 5.749s for: R2BVQTYK
+[2025-05-23T15:03:06.975Z] OpenAI request started for:  R2BVQTYK
+[2025-05-23T15:03:13.116Z] OpenAI response in 6141ms for R2BVQTYK
+[2025-05-23T15:03:13.116Z] ❗ Client disconnected after 6.141s for: R2BVQTYK
+[2025-05-23T15:08:00.940Z] OpenAI request started for:  R2BVQTYK
+[2025-05-23T15:08:06.106Z] OpenAI response in 5167ms for R2BVQTYK
+[2025-05-23T15:08:06.106Z] ❗ Client disconnected after 5.167s for: R2BVQTYK
+[2025-05-23T15:09:08.255Z] OpenAI request started for:  R2BVQTYK
+[2025-05-23T15:09:14.547Z] OpenAI response in 6293ms for R2BVQTYK
+[2025-05-23T15:09:14.547Z] ❗ Client disconnected after 6.293s for: R2BVQTYK
+[2025-05-23T15:10:46.654Z] OpenAI request started for:  R2BVQTYK
+[2025-05-23T15:10:54.842Z] OpenAI response in 8189ms for R2BVQTYK
+[2025-05-23T15:10:54.843Z] ❗ Client disconnected after 8.19s for: R2BVQTYK
+[2025-05-23T15:11:23.021Z] OpenAI request started for:  R2BVQTYK
+[2025-05-23T15:11:37.657Z] OpenAI response in 14637ms for R2BVQTYK
+[2025-05-23T15:11:37.657Z] ❗ Client disconnected after 14.637s for: R2BVQTYK
+[2025-05-23T15:19:37.821Z] OpenAI request started for:  R2BVQTYK
+[2025-05-23T15:19:44.593Z] OpenAI response in 6773ms for R2BVQTYK
+[2025-05-23T15:19:44.593Z] ❗ Client disconnected after 6.773s for: R2BVQTYK
+[2025-05-23T15:21:38.824Z] OpenAI request started for:  R2BVQTYK
+[2025-05-23T15:21:45.058Z] OpenAI response in 6234ms for R2BVQTYK
+[2025-05-23T15:21:45.059Z] ❗ Client disconnected after 6.235s for: R2BVQTYK
+[2025-05-23T15:24:49.995Z] OpenAI request started for:  R2BVQTYK
+[2025-05-23T15:25:17.680Z] OpenAI response in 27685ms for R2BVQTYK
+[2025-05-23T15:25:17.681Z] ❗ Client disconnected after 27.686s for: R2BVQTYK
+[2025-05-23T15:26:41.823Z] OpenAI request started for:  R2BVQTYK
+[2025-05-23T15:26:49.016Z] OpenAI response in 7193ms for R2BVQTYK
+[2025-05-23T15:26:49.016Z] ❗ Client disconnected after 7.193s for: R2BVQTYK
+[2025-05-23T15:27:01.555Z] OpenAI request started for:  R2BVQTYK
+[2025-05-23T15:27:10.120Z] OpenAI response in 8566ms for R2BVQTYK
+[2025-05-23T15:27:10.120Z] ❗ Client disconnected after 8.566s for: R2BVQTYK
+[2025-05-23T15:30:43.120Z] OpenAI request started for:  R2BVQTYK
+[2025-05-23T15:30:49.958Z] OpenAI response in 6839ms for R2BVQTYK
+[2025-05-23T15:30:49.958Z] ❗ Client disconnected after 6.839s for: R2BVQTYK
+[2025-05-23T15:31:46.725Z] OpenAI request started for:  R2BVQTYK
+[2025-05-23T15:31:57.375Z] OpenAI response in 10651ms for R2BVQTYK
+[2025-05-23T15:31:57.376Z] ❗ Client disconnected after 10.652s for: R2BVQTYK
+[2025-05-23T15:32:39.441Z] OpenAI request started for:  R2BVQTYK
+[2025-05-23T15:32:48.044Z] OpenAI response in 8604ms for R2BVQTYK
+[2025-05-23T15:32:48.045Z] ❗ Client disconnected after 8.605s for: R2BVQTYK
+[2025-05-23T15:34:43.855Z] OpenAI request started for:  R2BVQTYK
+[2025-05-23T15:34:50.617Z] OpenAI response in 6762ms for R2BVQTYK
+[2025-05-23T15:34:50.618Z] ❗ Client disconnected after 6.763s for: R2BVQTYK
+[2025-05-23T15:36:00.851Z] Files received: [ 'task_R2BVQTYK.json' ]
+[2025-05-25T14:07:01.592Z] Invalid or expired session key:  2XX
+[2025-05-25T14:07:01.592Z] ⚠️ Invalid sessionKey: 2XX
+[2025-05-25T14:07:01.592Z] ❗ Client disconnected after 0.001s for: 2XX
+[2025-05-28T12:22:39.085Z] OpenAI request started for:  S1SBJRYN
+[2025-05-28T12:22:41.590Z] OpenAI response in 2505ms for S1SBJRYN
+[2025-05-28T12:22:41.591Z] ❗ Client disconnected after 2.506s for: S1SBJRYN
+[2025-05-28T12:22:54.575Z] OpenAI request started for:  S1SBJRYN
+[2025-05-28T12:23:15.093Z] OpenAI response in 20519ms for S1SBJRYN
+[2025-05-28T12:23:15.094Z] ❗ Client disconnected after 20.52s for: S1SBJRYN
+[2025-05-28T12:26:59.181Z] OpenAI request started for:  S1SBJRYN
+[2025-05-28T12:27:05.667Z] OpenAI response in 6487ms for S1SBJRYN
+[2025-05-28T12:27:05.667Z] ❗ Client disconnected after 6.487s for: S1SBJRYN

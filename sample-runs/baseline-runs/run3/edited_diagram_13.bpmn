@@ -1,0 +1,374 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_1" targetNamespace="http://example.com/bpmn" exporter="Camunda Modeler" exporterVersion="5.34.0">
+  <process id="WorkAccidentReporting" isExecutable="true">
+    <laneSet id="LaneSet_Organization">
+      <lane id="Lane_SchoolDirectorate" name="School Directorate">
+        <flowNodeRef>Task_StudentReport</flowNodeRef>
+        <flowNodeRef>MsgThrow_SchoolDirectorate</flowNodeRef>
+        <flowNodeRef>Gateway_PrivateFatality</flowNodeRef>
+      </lane>
+      <lane id="Lane_PrivateInsurance" name="Private Insurance">
+        <flowNodeRef>Task_PrivateInsuredReport</flowNodeRef>
+        <flowNodeRef>MsgThrow_PrivateInsurance</flowNodeRef>
+        <flowNodeRef>Gateway_PrivateFatality</flowNodeRef>
+      </lane>
+      <lane id="Lane_EmergencyServices" name="Emergency Services">
+        <flowNodeRef>MsgThrow_EmergencyServices</flowNodeRef>
+      </lane>
+      <lane id="Lane_LabourInspectorate" name="Labour Inspectorate">
+        <flowNodeRef>MsgThrow_LabourInspectorate</flowNodeRef>
+      </lane>
+      <lane id="Lane_AIP" name="Accident Insurance Provider">
+        <flowNodeRef>MsgThrow_AIP</flowNodeRef>
+        <flowNodeRef>Task_SelfEmployedReport</flowNodeRef>
+        <flowNodeRef>MsgThrow_SelfEmployed_AIP</flowNodeRef>
+        <flowNodeRef>MsgThrow_School_AIP</flowNodeRef>
+      </lane>
+      <lane id="Lane_Employer" name="Employer">
+        <flowNodeRef>Task_AssessReport</flowNodeRef>
+        <flowNodeRef>Gateway_IncidentType</flowNodeRef>
+        <flowNodeRef>Gateway_SeriousOrFatal</flowNodeRef>
+        <flowNodeRef>Gateway_EmergencyServices</flowNodeRef>
+        <flowNodeRef>EndEvent_ProcessComplete</flowNodeRef>
+      </lane>
+      <lane id="Lane_Employees" name="Employees">
+        <flowNodeRef>StartEvent_Accident</flowNodeRef>
+        <flowNodeRef>Task_ReportToEmployer</flowNodeRef>
+      </lane>
+    </laneSet>
+    <laneSet id="LaneSet_AIP" />
+    <laneSet id="LaneSet_LabourInspectorate" />
+    <laneSet id="LaneSet_EmergencyServices" />
+    <laneSet id="LaneSet_PrivateInsurance" />
+    <laneSet id="LaneSet_SchoolDirectorate" />
+    <startEvent id="StartEvent_Accident" name="Accident or Incident Occurs" />
+    <task id="Task_ReportToEmployer" name="Report Accident/Incident to Employer" />
+    <dataObjectReference id="Data_AccidentReport" name="AccidentReport" dataObjectRef="AccidentReport" />
+    <task id="Task_AssessReport" name="Assess Report" />
+    <exclusiveGateway id="Gateway_IncidentType" name="Type of Incident?" />
+    <exclusiveGateway id="Gateway_SeriousOrFatal" name="Fatality or Serious Injury?" />
+    <intermediateThrowEvent id="MsgThrow_LabourInspectorate" name="Report to Labour Inspectorate">
+      <messageEventDefinition />
+    </intermediateThrowEvent>
+    <exclusiveGateway id="Gateway_EmergencyServices" name="Emergency Services Needed?" />
+    <intermediateThrowEvent id="MsgThrow_EmergencyServices" name="Report to Emergency Services">
+      <messageEventDefinition />
+    </intermediateThrowEvent>
+    <intermediateThrowEvent id="MsgThrow_AIP" name="Report to Accident Insurance Provider">
+      <messageEventDefinition />
+    </intermediateThrowEvent>
+    <task id="Task_SelfEmployedReport" name="Self-Employed: Report Accident to AIP" />
+    <intermediateThrowEvent id="MsgThrow_SelfEmployed_AIP" name="Send Report to AIP">
+      <messageEventDefinition />
+    </intermediateThrowEvent>
+    <task id="Task_StudentReport" name="Report Accident to School Directorate" />
+    <intermediateThrowEvent id="MsgThrow_SchoolDirectorate" name="Send Report to School Directorate">
+      <messageEventDefinition />
+    </intermediateThrowEvent>
+    <intermediateThrowEvent id="MsgThrow_School_AIP" name="School Directorate Reports to AIP">
+      <messageEventDefinition />
+    </intermediateThrowEvent>
+    <task id="Task_PrivateInsuredReport" name="Insured Reports Accident to Private Insurance" />
+    <intermediateThrowEvent id="MsgThrow_PrivateInsurance" name="Send Report to Private Insurance">
+      <messageEventDefinition />
+    </intermediateThrowEvent>
+    <exclusiveGateway id="Gateway_PrivateFatality" name="Fatality?" />
+    <endEvent id="EndEvent_ProcessComplete" name="Process Complete" />
+    <dataObject id="AccidentReport" name="Accident Report" />
+    <dataObject id="SeriousInjuryReport" name="Serious Injury Report" />
+    <dataObject id="NearMissReport" name="Near Miss Report" />
+    <dataObject id="DefectReport" name="Defect Report" />
+    <dataObject id="RiskReport" name="Risk Report" />
+    <dataStoreReference id="DataStore_AIP" name="AIP_Store" />
+    <dataStoreReference id="DataStore_PrivateInsurance" name="PrivateInsurance_Store" />
+    <dataStoreReference id="DataStore_School" name="School_Store" />
+    <sequenceFlow id="flow1" sourceRef="StartEvent_Accident" targetRef="Task_ReportToEmployer" />
+    <sequenceFlow id="flow2" sourceRef="Task_ReportToEmployer" targetRef="Task_AssessReport" />
+    <sequenceFlow id="flow3" sourceRef="Task_AssessReport" targetRef="Gateway_IncidentType" />
+    <sequenceFlow id="flow4" name="Work Accident" sourceRef="Gateway_IncidentType" targetRef="Gateway_SeriousOrFatal" />
+    <sequenceFlow id="flow5" name="Near Miss or Defect" sourceRef="Gateway_IncidentType" targetRef="EndEvent_ProcessComplete" />
+    <sequenceFlow id="flow6" name="Yes" sourceRef="Gateway_SeriousOrFatal" targetRef="MsgThrow_LabourInspectorate" />
+    <sequenceFlow id="flow7" name="No" sourceRef="Gateway_SeriousOrFatal" targetRef="Gateway_EmergencyServices" />
+    <sequenceFlow id="flow8" sourceRef="MsgThrow_LabourInspectorate" targetRef="Gateway_EmergencyServices" />
+    <sequenceFlow id="flow9" name="Yes" sourceRef="Gateway_EmergencyServices" targetRef="MsgThrow_EmergencyServices" />
+    <sequenceFlow id="flow10" name="No" sourceRef="Gateway_EmergencyServices" targetRef="MsgThrow_AIP" />
+    <sequenceFlow id="flow11" sourceRef="MsgThrow_EmergencyServices" targetRef="MsgThrow_AIP" />
+    <sequenceFlow id="flow12" sourceRef="MsgThrow_AIP" targetRef="EndEvent_ProcessComplete" />
+    <sequenceFlow id="flow13" sourceRef="StartEvent_Accident" targetRef="Task_SelfEmployedReport" />
+    <sequenceFlow id="flow14" sourceRef="Task_SelfEmployedReport" targetRef="MsgThrow_SelfEmployed_AIP" />
+    <sequenceFlow id="flow15" sourceRef="MsgThrow_SelfEmployed_AIP" targetRef="EndEvent_ProcessComplete" />
+    <sequenceFlow id="flow16" sourceRef="StartEvent_Accident" targetRef="Task_StudentReport" />
+    <sequenceFlow id="flow17" sourceRef="Task_StudentReport" targetRef="MsgThrow_SchoolDirectorate" />
+    <sequenceFlow id="flow18" sourceRef="MsgThrow_SchoolDirectorate" targetRef="MsgThrow_School_AIP" />
+    <sequenceFlow id="flow19" sourceRef="MsgThrow_School_AIP" targetRef="EndEvent_ProcessComplete" />
+    <sequenceFlow id="flow20" sourceRef="StartEvent_Accident" targetRef="Task_PrivateInsuredReport" />
+    <sequenceFlow id="flow21" sourceRef="Task_PrivateInsuredReport" targetRef="MsgThrow_PrivateInsurance" />
+    <sequenceFlow id="flow22" sourceRef="MsgThrow_PrivateInsurance" targetRef="Gateway_PrivateFatality" />
+    <sequenceFlow id="flow23" name="No" sourceRef="Gateway_PrivateFatality" targetRef="EndEvent_ProcessComplete" />
+    <sequenceFlow id="flow24" name="Yes (after 3 days)" sourceRef="Gateway_PrivateFatality" targetRef="EndEvent_ProcessComplete" />
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_WorkAccidentReporting">
+    <bpmndi:BPMNPlane id="BPMNPlane_WorkAccidentReporting" bpmnElement="WorkAccidentReporting">
+      <bpmndi:BPMNShape id="Lane_SchoolDirectorate_di" bpmnElement="Lane_SchoolDirectorate" isHorizontal="true">
+        <dc:Bounds x="160" y="610" width="1800" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_PrivateInsurance_di" bpmnElement="Lane_PrivateInsurance" isHorizontal="true">
+        <dc:Bounds x="160" y="540" width="1800" height="60" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_EmergencyServices_di" bpmnElement="Lane_EmergencyServices" isHorizontal="true">
+        <dc:Bounds x="160" y="470" width="1800" height="60" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_LabourInspectorate_di" bpmnElement="Lane_LabourInspectorate" isHorizontal="true">
+        <dc:Bounds x="160" y="400" width="1800" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_AIP_di" bpmnElement="Lane_AIP" isHorizontal="true">
+        <dc:Bounds x="160" y="300" width="1800" height="90" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Employer_di" bpmnElement="Lane_Employer" isHorizontal="true">
+        <dc:Bounds x="160" y="150" width="1800" height="140" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Employees_di" bpmnElement="Lane_Employees" isHorizontal="true">
+        <dc:Bounds x="160" y="50" width="1800" height="100" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="StartEvent_Accident_di" bpmnElement="StartEvent_Accident">
+        <dc:Bounds x="220" y="90" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="200" y="126" width="77" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_ReportToEmployer_di" bpmnElement="Task_ReportToEmployer">
+        <dc:Bounds x="330" y="80" width="100" height="56" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Data_AccidentReport_di" bpmnElement="Data_AccidentReport" isExpanded="true">
+        <dc:Bounds x="320" y="40" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="301" y="76" width="75" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_AssessReport_di" bpmnElement="Task_AssessReport">
+        <dc:Bounds x="480" y="170" width="100" height="56" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_IncidentType_di" bpmnElement="Gateway_IncidentType" isMarkerVisible="true">
+        <dc:Bounds x="620" y="185" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="603" y="235" width="84" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_SeriousOrFatal_di" bpmnElement="Gateway_SeriousOrFatal" isMarkerVisible="true">
+        <dc:Bounds x="740" y="185" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="720" y="235" width="90" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="MsgThrow_LabourInspectorate_di" bpmnElement="MsgThrow_LabourInspectorate">
+        <dc:Bounds x="880" y="410" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="856" y="446" width="84" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_EmergencyServices_di" bpmnElement="Gateway_EmergencyServices" isMarkerVisible="true">
+        <dc:Bounds x="990" y="185" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="970" y="235" width="90" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="MsgThrow_EmergencyServices_di" bpmnElement="MsgThrow_EmergencyServices">
+        <dc:Bounds x="1110" y="480" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1100" y="516" width="57" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="MsgThrow_AIP_di" bpmnElement="MsgThrow_AIP">
+        <dc:Bounds x="1310" y="330" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1304" y="366" width="49" height="53" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_SelfEmployedReport_di" bpmnElement="Task_SelfEmployedReport">
+        <dc:Bounds x="360" y="330" width="120" height="56" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="MsgThrow_SelfEmployed_AIP_di" bpmnElement="MsgThrow_SelfEmployed_AIP">
+        <dc:Bounds x="530" y="330" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="511" y="366" width="75" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_StudentReport_di" bpmnElement="Task_StudentReport">
+        <dc:Bounds x="360" y="620" width="110" height="56" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="MsgThrow_SchoolDirectorate_di" bpmnElement="MsgThrow_SchoolDirectorate">
+        <dc:Bounds x="500" y="620" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="481" y="656" width="75" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="MsgThrow_School_AIP_di" bpmnElement="MsgThrow_School_AIP">
+        <dc:Bounds x="650" y="330" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="633" y="366" width="71" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_PrivateInsuredReport_di" bpmnElement="Task_PrivateInsuredReport">
+        <dc:Bounds x="330" y="560" width="110" height="56" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="MsgThrow_PrivateInsurance_di" bpmnElement="MsgThrow_PrivateInsurance">
+        <dc:Bounds x="480" y="560" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="455" y="596" width="87" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_PrivateFatality_di" bpmnElement="Gateway_PrivateFatality" isMarkerVisible="true">
+        <dc:Bounds x="610" y="560" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="614" y="610" width="42" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_ProcessComplete_di" bpmnElement="EndEvent_ProcessComplete">
+        <dc:Bounds x="1510" y="230" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1504" y="266" width="48" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataStore_AIP_di" bpmnElement="DataStore_AIP" isExpanded="true">
+        <dc:Bounds x="1510" y="310" width="50" height="40" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1510" y="350" width="51" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataStore_PrivateInsurance_di" bpmnElement="DataStore_PrivateInsurance" isExpanded="true">
+        <dc:Bounds x="770" y="550" width="50" height="40" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="753" y="590" width="84" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataStore_School_di" bpmnElement="DataStore_School" isExpanded="true">
+        <dc:Bounds x="770" y="600" width="50" height="40" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="762" y="640" width="67" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="flow1_di" bpmnElement="flow1">
+        <di:waypoint x="256" y="108" />
+        <di:waypoint x="330" y="108" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow2_di" bpmnElement="flow2">
+        <di:waypoint x="430" y="108" />
+        <di:waypoint x="480" y="198" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow3_di" bpmnElement="flow3">
+        <di:waypoint x="580" y="198" />
+        <di:waypoint x="620" y="210" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow4_di" bpmnElement="flow4">
+        <di:waypoint x="670" y="210" />
+        <di:waypoint x="740" y="210" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="670" y="185" width="70" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow5_di" bpmnElement="flow5">
+        <di:waypoint x="645" y="210" />
+        <di:waypoint x="1510" y="248" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1046" y="204" width="64" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow6_di" bpmnElement="flow6">
+        <di:waypoint x="765" y="210" />
+        <di:waypoint x="880" y="428" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="814" y="294" width="18" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow7_di" bpmnElement="flow7">
+        <di:waypoint x="790" y="210" />
+        <di:waypoint x="990" y="210" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="883" y="185" width="15" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow8_di" bpmnElement="flow8">
+        <di:waypoint x="898" y="428" />
+        <di:waypoint x="1015" y="210" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow9_di" bpmnElement="flow9">
+        <di:waypoint x="1015" y="210" />
+        <di:waypoint x="1128" y="498" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1063" y="329" width="18" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow10_di" bpmnElement="flow10">
+        <di:waypoint x="1040" y="210" />
+        <di:waypoint x="1328" y="348" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1177" y="254" width="15" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow11_di" bpmnElement="flow11">
+        <di:waypoint x="1146" y="498" />
+        <di:waypoint x="1328" y="348" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow12_di" bpmnElement="flow12">
+        <di:waypoint x="1346" y="348" />
+        <di:waypoint x="1510" y="248" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow13_di" bpmnElement="flow13">
+        <di:waypoint x="256" y="108" />
+        <di:waypoint x="360" y="358" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow14_di" bpmnElement="flow14">
+        <di:waypoint x="480" y="358" />
+        <di:waypoint x="530" y="348" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow15_di" bpmnElement="flow15">
+        <di:waypoint x="566" y="348" />
+        <di:waypoint x="1510" y="248" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow16_di" bpmnElement="flow16">
+        <di:waypoint x="256" y="108" />
+        <di:waypoint x="360" y="648" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow17_di" bpmnElement="flow17">
+        <di:waypoint x="470" y="648" />
+        <di:waypoint x="518" y="638" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow18_di" bpmnElement="flow18">
+        <di:waypoint x="536" y="638" />
+        <di:waypoint x="668" y="348" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow19_di" bpmnElement="flow19">
+        <di:waypoint x="686" y="348" />
+        <di:waypoint x="1510" y="248" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow20_di" bpmnElement="flow20">
+        <di:waypoint x="256" y="108" />
+        <di:waypoint x="330" y="588" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow21_di" bpmnElement="flow21">
+        <di:waypoint x="440" y="588" />
+        <di:waypoint x="516" y="578" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow22_di" bpmnElement="flow22">
+        <di:waypoint x="516" y="578" />
+        <di:waypoint x="635" y="585" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow23_di" bpmnElement="flow23">
+        <di:waypoint x="660" y="585" />
+        <di:waypoint x="1510" y="248" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1078" y="392" width="15" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow24_di" bpmnElement="flow24">
+        <di:waypoint x="660" y="585" />
+        <di:waypoint x="1510" y="248" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1042" y="392" width="86" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

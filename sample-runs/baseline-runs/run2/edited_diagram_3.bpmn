@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+             xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+             targetNamespace="http://example.com/bpmn">
+
+  <process id="CreditRequestProcess" isExecutable="true">
+    <laneSet>
+      <lane id="l_ProcessingDepartment" name="Processing Department">
+        <flowNodeRef>event_NotifyCustomer</flowNodeRef>
+        <flowNodeRef>task_OrganizeDisbursement</flowNodeRef>
+      </lane>
+      <lane id="l_RiskDepartment" name="Risk Department">
+        <flowNodeRef>task_AssessRisk</flowNodeRef>
+        <flowNodeRef>task_AdvancedRiskAssessment</flowNodeRef>
+        <flowNodeRef>task_SimpleRiskAssessment</flowNodeRef>
+      </lane>
+    </laneSet>
+
+    <!-- Start Event -->
+    <startEvent id="startEvent_CreditRequestReceived" name="Credit Request Received">
+      <outgoing>flow_start_assessRisk</outgoing>
+    </startEvent>
+
+    <!-- Assess Risk Task -->
+    <task id="task_AssessRisk" name="Assess Risk">
+      <incoming>flow_start_assessRisk</incoming>
+      <outgoing>flow_assessRisk_gateway</outgoing>
+    </task>
+
+    <!-- Exclusive Gateway: Risk Level -->
+    <exclusiveGateway id="gateway_RiskLevel" name="Risk Above Threshold?">
+      <incoming>flow_assessRisk_gateway</incoming>
+      <outgoing>flow_highRisk_advancedAssessment</outgoing>
+      <outgoing>flow_lowRisk_simpleAssessment</outgoing>
+    </exclusiveGateway>
+
+    <!-- Advanced Risk Assessment -->
+    <task id="task_AdvancedRiskAssessment" name="Advanced Risk Assessment">
+      <incoming>flow_highRisk_advancedAssessment</incoming>
+      <outgoing>flow_advancedAssessment_merge</outgoing>
+    </task>
+
+    <!-- Simple Risk Assessment -->
+    <task id="task_SimpleRiskAssessment" name="Simple Risk Assessment">
+      <incoming>flow_lowRisk_simpleAssessment</incoming>
+      <outgoing>flow_simpleAssessment_merge</outgoing>
+    </task>
+
+    <!-- Parallel Gateway: Merge Assessments -->
+    <parallelGateway id="gateway_parallel_merge" name="Assessment Completed">
+      <incoming>flow_simpleAssessment_merge</incoming>
+      <incoming>flow_advancedAssessment_merge</incoming>
+      <outgoing>flow_merge_notifyCustomer</outgoing>
+      <outgoing>flow_merge_organizeDisbursement</outgoing>
+    </parallelGateway>
+
+    <!-- Notify Customer -->
+    <intermediateThrowEvent id="event_NotifyCustomer" name="Notify Customer (Send Result)">
+      <incoming>flow_merge_notifyCustomer</incoming>
+      <outgoing>flow_notifyCustomer_end</outgoing>
+      <messageEventDefinition id="msgDef_NotifyCustomer"/>
+    </intermediateThrowEvent>
+
+    <!-- Organize Disbursement -->
+    <task id="task_OrganizeDisbursement" name="Organize Disbursement">
+      <incoming>flow_merge_organizeDisbursement</incoming>
+      <outgoing>flow_disbursement_end</outgoing>
+    </task>
+
+    <!-- End Events -->
+    <endEvent id="endEvent_NotifyCustomer" name="Customer Notified">
+      <incoming>flow_notifyCustomer_end</incoming>
+    </endEvent>
+
+    <endEvent id="endEvent_DisbursementOrganized" name="Disbursement Organized">
+      <incoming>flow_disbursement_end</incoming>
+    </endEvent>
+
+    <!-- Sequence Flows -->
+    <sequenceFlow id="flow_start_assessRisk" sourceRef="startEvent_CreditRequestReceived" targetRef="task_AssessRisk"/>
+    <sequenceFlow id="flow_assessRisk_gateway" sourceRef="task_AssessRisk" targetRef="gateway_RiskLevel"/>
+    <sequenceFlow id="flow_highRisk_advancedAssessment" sourceRef="gateway_RiskLevel" targetRef="task_AdvancedRiskAssessment">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[risk > threshold]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow_lowRisk_simpleAssessment" sourceRef="gateway_RiskLevel" targetRef="task_SimpleRiskAssessment">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[risk <= threshold]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow_simpleAssessment_merge" sourceRef="task_SimpleRiskAssessment" targetRef="gateway_parallel_merge"/>
+    <sequenceFlow id="flow_advancedAssessment_merge" sourceRef="task_AdvancedRiskAssessment" targetRef="gateway_parallel_merge"/>
+    <sequenceFlow id="flow_merge_notifyCustomer" sourceRef="gateway_parallel_merge" targetRef="event_NotifyCustomer"/>
+    <sequenceFlow id="flow_merge_organizeDisbursement" sourceRef="gateway_parallel_merge" targetRef="task_OrganizeDisbursement"/>
+    <sequenceFlow id="flow_notifyCustomer_end" sourceRef="event_NotifyCustomer" targetRef="endEvent_NotifyCustomer"/>
+    <sequenceFlow id="flow_disbursement_end" sourceRef="task_OrganizeDisbursement" targetRef="endEvent_DisbursementOrganized"/>
+  </process>
+
+  <!-- Collaboration -->
+  <collaboration id="collab_CreditProcess">
+    <participant id="pool_Company" name="Company" processRef="CreditRequestProcess"/>
+        <participant id="pool_CustomerProcess" name="CustomerProcess" processRef="CustomerProcess"/>
+
+    <messageFlow id="msgFlow_NotifyCustomer" name="Assessment Result" sourceRef="event_NotifyCustomer" targetRef="event_ReceiveNotification"/>
+  </collaboration>
+
+  <!-- Customer Process -->
+  <process id="CustomerProcess" isExecutable="false">
+    <laneSet>
+      <lane id="l_Customer" name="Customer">
+        <flowNodeRef>event_ReceiveNotification</flowNodeRef>
+      </lane>
+    </laneSet>
+
+    <intermediateCatchEvent id="event_ReceiveNotification" name="Receive Assessment Result">
+      <messageEventDefinition id="msgDef_ReceiveNotification"/>
+    </intermediateCatchEvent>
+  </process>
+
+  
+  <bpmndi:BPMNDiagram id="BPMNDiagram_CreditRequestProcess">
+    <bpmndi:BPMNPlane id="BPMNPlane_CreditRequestProcess" bpmnElement="collab_CreditProcess">
+      <bpmndi:BPMNShape id="BPMNShape_pool_Company" bpmnElement="pool_Company" isHorizontal="true">
+        <dc:Bounds x="160" y="100" width="1580" height="320" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_l_RiskDepartment" bpmnElement="l_RiskDepartment" isHorizontal="true">
+        <dc:Bounds x="160" y="100" width="1580" height="170" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_l_ProcessingDepartment" bpmnElement="l_ProcessingDepartment" isHorizontal="true">
+        <dc:Bounds x="160" y="270" width="1580" height="150" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_startEvent_CreditRequestReceived" bpmnElement="startEvent_CreditRequestReceived">
+        <dc:Bounds x="240" y="170" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="221" y="206" width="74" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_task_AssessRisk" bpmnElement="task_AssessRisk">
+        <dc:Bounds x="320" y="158" width="100" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_gateway_RiskLevel" bpmnElement="gateway_RiskLevel" isMarkerVisible="true">
+        <dc:Bounds x="450" y="168" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="447" y="218" width="56" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_task_AdvancedRiskAssessment" bpmnElement="task_AdvancedRiskAssessment">
+        <dc:Bounds x="580" y="120" width="120" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_task_SimpleRiskAssessment" bpmnElement="task_SimpleRiskAssessment">
+        <dc:Bounds x="580" y="210" width="120" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_gateway_parallel_merge" bpmnElement="gateway_parallel_merge" isMarkerVisible="true">
+        <dc:Bounds x="760" y="168" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="755" y="218" width="60" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_event_NotifyCustomer" bpmnElement="event_NotifyCustomer">
+        <dc:Bounds x="930" y="295" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="908" y="331" width="80" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_task_OrganizeDisbursement" bpmnElement="task_OrganizeDisbursement">
+        <dc:Bounds x="1060" y="290" width="140" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_endEvent_DisbursementOrganized" bpmnElement="endEvent_DisbursementOrganized">
+        <dc:Bounds x="1240" y="295" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1224" y="331" width="69" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_endEvent_NotifyCustomer" bpmnElement="endEvent_NotifyCustomer">
+        <dc:Bounds x="1092" y="352" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1066" y="388" width="89" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow_start_assessRisk" bpmnElement="flow_start_assessRisk">
+        <di:waypoint x="276" y="188" />
+        <di:waypoint x="320" y="188" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow_assessRisk_gateway" bpmnElement="flow_assessRisk_gateway">
+        <di:waypoint x="420" y="188" />
+        <di:waypoint x="450" y="188" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow_highRisk_advancedAssessment" bpmnElement="flow_highRisk_advancedAssessment">
+        <di:waypoint x="475" y="168" />
+        <di:waypoint x="475" y="150" />
+        <di:waypoint x="580" y="150" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow_lowRisk_simpleAssessment" bpmnElement="flow_lowRisk_simpleAssessment">
+        <di:waypoint x="500" y="193" />
+        <di:waypoint x="580" y="240" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow_simpleAssessment_merge" bpmnElement="flow_simpleAssessment_merge">
+        <di:waypoint x="700" y="240" />
+        <di:waypoint x="785" y="218" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow_advancedAssessment_merge" bpmnElement="flow_advancedAssessment_merge">
+        <di:waypoint x="700" y="150" />
+        <di:waypoint x="785" y="168" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow_merge_notifyCustomer" bpmnElement="flow_merge_notifyCustomer">
+        <di:waypoint x="785" y="218" />
+        <di:waypoint x="950" y="313" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow_merge_organizeDisbursement" bpmnElement="flow_merge_organizeDisbursement">
+        <di:waypoint x="785" y="218" />
+        <di:waypoint x="1060" y="315" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow_notifyCustomer_end" bpmnElement="flow_notifyCustomer_end">
+        <di:waypoint x="966" y="313" />
+        <di:waypoint x="1029" y="313" />
+        <di:waypoint x="1029" y="370" />
+        <di:waypoint x="1092" y="370" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow_disbursement_end" bpmnElement="flow_disbursement_end">
+        <di:waypoint x="1200" y="315" />
+        <di:waypoint x="1240" y="313" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="BPMNShape_pool_Customer" bpmnElement="pool_CustomerProcess" isHorizontal="true">
+        <dc:Bounds x="160" y="460" width="1580" height="120" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_l_Customer" bpmnElement="l_Customer" isHorizontal="true">
+        <dc:Bounds x="160" y="460" width="1580" height="120" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_event_ReceiveNotification" bpmnElement="event_ReceiveNotification">
+        <dc:Bounds x="1010" y="510" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="998" y="546" width="60" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_msgFlow_NotifyCustomer" bpmnElement="msgFlow_NotifyCustomer">
+        <di:waypoint x="966" y="331" />
+        <di:waypoint x="1020" y="390" />
+        <di:waypoint x="1035" y="421" />
+        <di:waypoint x="1035" y="512" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1009" y="447" width="60" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

@@ -1,0 +1,1 @@
+Management orders a cash-out report which of the year and month is given by management, that an accountant filters out cash transactions from the cash database. If the query is not empty, the accountant prints a cash-out report, gives it to management; otherwise, there is no cash-out.

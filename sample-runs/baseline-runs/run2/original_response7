@@ -1,0 +1,36 @@
+{
+  "id": "chatcmpl-BTeguQ8cfC5R6HzisLzlQqInlVaeb",
+  "object": "chat.completion",
+  "created": 1746407628,
+  "model": "gpt-4.1-2025-04-14",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "```xml\n<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<definitions xmlns=\"http://www.omg.org/spec/BPMN/20100524/MODEL\"\n             xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n             xmlns:bpmndi=\"http://www.omg.org/spec/BPMN/20100524/DI\"\n             xmlns:omgdi=\"http://www.omg.org/spec/DD/20100524/DI\"\n             xmlns:omgdc=\"http://www.omg.org/spec/DD/20100524/DC\"\n             xmlns:dc=\"http://www.omg.org/spec/DD/20100524/DC\"\n             targetNamespace=\"http://example.org/police-car-service\">\n  <process id=\"PoliceAppProcess\" isExecutable=\"true\">\n    <laneSet>\n      <lane id=\"PoliceSystemLane\" name=\"Police System\"/>\n    </laneSet>\n    <startEvent id=\"StartServiceEvent\" name=\"Service Successful\">\n      <outgoing>Flow1</outgoing>\n    </startEvent>\n    <sequenceFlow id=\"Flow1\" sourceRef=\"StartServiceEvent\" targetRef=\"CheckServiceNeeded\" />\n    <task id=\"CheckServiceNeeded\" name=\"Check if Service Reminder Needed\">\n      <incoming>Flow1</incoming>\n      <outgoing>Flow2</outgoing>\n    </task>\n    <sequenceFlow id=\"Flow2\" sourceRef=\"CheckServiceNeeded\" targetRef=\"CheckCarRegistration\" />\n    <exclusiveGateway id=\"ExclusiveGateway_CarRegistered\"/>\n    <sequenceFlow id=\"Flow3\" sourceRef=\"CheckCarRegistration\" targetRef=\"ExclusiveGateway_CarRegistered\"/>\n    <task id=\"CheckCarRegistration\" name=\"Check Car Registration Status\">\n      <incoming>Flow2</incoming>\n      <outgoing>Flow3</outgoing>\n    </task>\n    <sequenceFlow id=\"Flow4\" sourceRef=\"ExclusiveGateway_CarRegistered\" targetRef=\"SendNotification\">\n      <conditionExpression xsi:type=\"tFormalExpression\">Car is Registered</conditionExpression>\n    </sequenceFlow>\n    <sequenceFlow id=\"Flow5\" sourceRef=\"ExclusiveGateway_CarRegistered\" targetRef=\"EndEvent_Process\">\n      <conditionExpression xsi:type=\"tFormalExpression\">Car is Unregistered</conditionExpression>\n    </sequenceFlow>\n    <intermediateThrowEvent id=\"SendNotification\" name=\"Notify Car Owner\">\n      <incoming>Flow4</incoming>\n      <outgoing>Flow6</outgoing>\n      <messageEventDefinition id=\"MessageDefinition1\"/>\n    </intermediateThrowEvent>\n    <sequenceFlow id=\"Flow6\" sourceRef=\"SendNotification\" targetRef=\"TimerEvent_WaitForServiceOrFine\" />\n    <intermediateCatchEvent id=\"TimerEvent_WaitForServiceOrFine\" name=\"Wait 30 Days for Service\">\n      <incoming>Flow6</incoming>\n      <outgoing>Flow7</outgoing>\n      <timerEventDefinition>\n        <timeDuration>PT30D</timeDuration>\n      </timerEventDefinition>\n    </intermediateCatchEvent>\n    <sequenceFlow id=\"Flow7\" sourceRef=\"TimerEvent_WaitForServiceOrFine\" targetRef=\"SendFine\"/>\n    <task id=\"SendFine\" name=\"Issue Fine to Owner\">\n      <incoming>Flow7</incoming>\n      <outgoing>Flow8</outgoing>\n    </task>\n    <sequenceFlow id=\"Flow8\" sourceRef=\"SendFine\" targetRef=\"EndEvent_Process\" />\n    <endEvent id=\"EndEvent_Process\" name=\"Process Ended\">\n      <incoming>Flow5</incoming>\n      <incoming>Flow8</incoming>\n    </endEvent>\n  </process>\n  <process id=\"CarServiceFacility\" isExecutable=\"true\">\n    <laneSet>\n      <lane id=\"MechanicLane\" name=\"Mechanic\"/>\n      <lane id=\"ReceptionLane\" name=\"Reception\"/>\n    </laneSet>\n    <startEvent id=\"ReceivedCar\" name=\"Car Arrived for Service\">\n      <outgoing>FlowM1</outgoing>\n    </startEvent>\n    <sequenceFlow id=\"FlowM1\" sourceRef=\"ReceivedCar\" targetRef=\"EnterProblemsTask\"/>\n    <task id=\"EnterProblemsTask\" name=\"Enter Problems for Reference\">\n      <incoming>FlowM1</incoming>\n      <outgoing>FlowM2</outgoing>\n    </task>\n    <sequenceFlow id=\"FlowM2\" sourceRef=\"EnterProblemsTask\" targetRef=\"RepairCarTask\"/>\n    <task id=\"RepairCarTask\" name=\"Repair Car\">\n      <incoming>FlowM2</incoming>\n      <outgoing>FlowM3</outgoing>\n    </task>\n    <sequenceFlow id=\"FlowM3\" sourceRef=\"RepairCarTask\" targetRef=\"SendStatusUpdatesTask\"/>\n    <task id=\"SendStatusUpdatesTask\" name=\"Send Status Updates\">\n      <incoming>FlowM3</incoming>\n      <outgoing>FlowM4</outgoing>\n    </task>\n    <sequenceFlow id=\"FlowM4\" sourceRef=\"SendStatusUpdatesTask\" targetRef=\"EnterRepairDoneTask\"/>\n    <task id=\"EnterRepairDoneTask\" name=\"Enter Repair Completed and Pickerl Given\">\n      <incoming>FlowM4</incoming>\n      <outgoing>FlowM5</outgoing>\n    </task>\n    <sequenceFlow id=\"FlowM5\" sourceRef=\"EnterRepairDoneTask\" targetRef=\"ReceivePaymentTask\"/>\n    <task id=\"ReceivePaymentTask\" name=\"Receive Payment via App\">\n      <incoming>FlowM5</incoming>\n      <outgoing>FlowM6</outgoing>\n    </task>\n    <sequenceFlow id=\"FlowM6\" sourceRef=\"ReceivePaymentTask\" targetRef=\"EnterNextServiceTask\"/>\n    <task id=\"EnterNextServiceTask\" name=\"Enter Time for Next Service\">\n      <incoming>FlowM6</incoming>\n      <outgoing>FlowM7</outgoing>\n      <dataOutputAssociation>\n        <dataOutputRef>NextServiceDateData</dataOutputRef>\n        <targetRef>NextServiceDateObject</targetRef>\n      </dataOutputAssociation>\n    </task>\n    <sequenceFlow id=\"FlowM7\" sourceRef=\"EnterNextServiceTask\" targetRef=\"EndServiceProcess\"/>\n    <endEvent id=\"EndServiceProcess\" name=\"Service Complete\">\n      <incoming>FlowM7</incoming>\n    </endEvent>\n    <dataObject id=\"NextServiceDateObject\" name=\"Next Service Date\"/>\n  </process>\n  <collaboration id=\"PoliceCarServiceCollab\">\n    <participant id=\"PoliceAppPool\" processRef=\"PoliceAppProcess\" name=\"Police System\"/>\n    <participant id=\"ServiceFacilityPool\" processRef=\"CarServiceFacility\" name=\"Car Service Facility\"/>\n    <messageFlow id=\"NotifyOwnerFlow\" sourceRef=\"SendNotification\" targetRef=\"ReceivedCar\" name=\"Service Reminder\"/>\n  </collaboration>\n</definitions>\n```",
+        "refusal": null,
+        "annotations": []
+      },
+      "logprobs": null,
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 633,
+    "completion_tokens": 1470,
+    "total_tokens": 2103,
+    "prompt_tokens_details": {
+      "cached_tokens": 0,
+      "audio_tokens": 0
+    },
+    "completion_tokens_details": {
+      "reasoning_tokens": 0,
+      "audio_tokens": 0,
+      "accepted_prediction_tokens": 0,
+      "rejected_prediction_tokens": 0
+    }
+  },
+  "service_tier": "default",
+  "system_fingerprint": "fp_cf18407276"
+}

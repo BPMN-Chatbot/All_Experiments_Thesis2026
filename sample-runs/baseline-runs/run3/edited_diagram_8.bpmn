@@ -1,0 +1,294 @@
+<?xml version="1.0" encoding="UTF-8"?> <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://bpmn.io/schema/bpmn"> 
+  <!-- Pools: Beneficiary, Insurance Agent, Insurance Company --> <collaboration id="Collaboration_1"> <participant id="Participant_Beneficiary" name="Beneficiary" processRef="Process_Beneficiary"/> <participant id="Participant_InsuranceAgent" name="Insurance Agent" processRef="Process_InsuranceAgent"/> <participant id="Participant_InsuranceCompany" name="Insurance Company" processRef="Process_InsuranceCompany"/> <!-- Message Flows between Pools --> <messageFlow id="MsgFlow_BenToAgent" sourceRef="StartCallAccident_Beneficiary" targetRef="CatchCall_InsuranceAgent" name="Call insurance agent"/> <messageFlow id="MsgFlow_AgentToCompany" sourceRef="ThrowNotifyCompany_InsuranceAgent" targetRef="CatchNotifyClaim_InsuranceCompany" name="Notify Company of Claim"/> </collaboration> 
+  <!-- Beneficiary pool (single lane, simple process) --> <process id="Process_Beneficiary" isExecutable="true"> 
+    <laneSet> <lane id="Lane_Beneficiary" name="Beneficiary"/> </laneSet> <startEvent id="StartCallAccident_Beneficiary" name="Accident Occurred"/> <task id="Task_CallInsuranceAgent" name="Call Insurance Agent"/> <endEvent id="End_Beneficiary" name="Process Complete"/> <sequenceFlow id="SF1" sourceRef="StartCallAccident_Beneficiary" targetRef="Task_CallInsuranceAgent"/> <sequenceFlow id="SF2" sourceRef="Task_CallInsuranceAgent" targetRef="End_Beneficiary"/> </process> 
+  <!-- Insurance Agent pool (single lane) --> <process id="Process_InsuranceAgent" isExecutable="true"> 
+    <laneSet> <lane id="Lane_InsuranceAgent" name="Agent"/> </laneSet> <startEvent id="CatchCall_InsuranceAgent" name="Receive Call from Beneficiary" > <messageEventDefinition/> </startEvent> <task id="Task_CollectClaimInfo" name="Collect Claim Information"/> <intermediateThrowEvent id="ThrowNotifyCompany_InsuranceAgent" name="Notify Insurance Company"> <messageEventDefinition/> </intermediateThrowEvent> <endEvent id="End_Agent" name="Process Complete"/> <sequenceFlow id="SF3" sourceRef="CatchCall_InsuranceAgent" targetRef="Task_CollectClaimInfo"/> <sequenceFlow id="SF4" sourceRef="Task_CollectClaimInfo" targetRef="ThrowNotifyCompany_InsuranceAgent"/> <sequenceFlow id="SF5" sourceRef="ThrowNotifyCompany_InsuranceAgent" targetRef="End_Agent"/> </process> 
+  <!-- Insurance Company pool (lanes: Clerical Staff, Regulator) --> <process id="Process_InsuranceCompany" isExecutable="true"> 
+    <laneSet> <lane id="Lane_Clerk" name="Clerical Staff"/> <lane id="Lane_Regulator" name="Regulator"/> </laneSet> <!-- Start: Wait for claim notification (from agent) --> <startEvent id="CatchNotifyClaim_InsuranceCompany" name="Receive Notification of Claim"> <messageEventDefinition/> </startEvent> <intermediateCatchEvent id="Timer_UpToThreeDays" name="Up to 3 days delay"> <timerEventDefinition/> </intermediateCatchEvent> <task id="Task_EnterClaimAssignClerk" name="Enter Claim & Assign Clerk"/> <task id="Task_CheckPolicyValidity" name="Check Policy Validity"/> <exclusiveGateway id="XOR_IsPolicyValid" name="Is Policy Valid?"/> <endEvent id="End_InvalidPolicy" name="Claim Rejected"/> <task id="Task_EstimateCost" name="Estimate Cost of Treatment & Repairs" /> <dataObjectReference id="DO_CostEstimation" dataObjectRef="DataObj_Cost" name="Cost Estimation"/> <task id="Task_AssessLiability" name="Assess Liability"/> <dataObjectReference id="DO_LiabilityAssessment" dataObjectRef="DataObj_Liability" name="Liability Assessment"/> <task id="Task_GatherAllInformation" name="Gather All Information">
+          <dataInputAssociation id="DA_CostToGather"> <sourceRef>DO_CostEstimation</sourceRef> </dataInputAssociation> <dataInputAssociation id="DA_LiabilityToGather"> <sourceRef>DO_LiabilityAssessment</sourceRef>  </dataInputAssociation> <dataOutputAssociation id="DA_GatherToClaimFile">  <targetRef>DS_ClaimFile</targetRef> </dataOutputAssociation> 
+    </task> <exclusiveGateway id="XOR_DecideCompensation" name="Decide on Compensation"/> <task id="Task_PayCompensation" name="Pay Compensation (3500€)"/> <task id="Task_CloseFile" name="Close File"/> <endEvent id="End_Closed" name="Process Complete"/> <exclusiveGateway id="XOR_Satisfaction" name="All Parties Satisfied?"/> <task id="Task_InitiateLegalMeasures" name="Initiate Legal Measures"/>  <endEvent id="End_Lawsuit" name="Process Complete after Lawsuit"/> <dataObject id="DataObj_Cost" /> <dataObject id="DataObj_Liability" /> <dataStoreReference id="DS_ClaimFile" dataStoreRef="DS_Claim"  name="Claim File"/> <dataObject id="DS_Claim"/> <task id="Task_AccumulateInternalCosts" name="Accumulate Internal Costs (500€ avg)">
+      <dataOutputAssociation id="DA_InternalCostsToClaimFile">  <targetRef>DS_ClaimFile</targetRef> </dataOutputAssociation>
+    </task> <!-- Sequence Flow and Data Associations for Insurance Company Pool --> <!-- Clerk lane --> <sequenceFlow id="SF6" sourceRef="CatchNotifyClaim_InsuranceCompany" targetRef="Timer_UpToThreeDays"/> <sequenceFlow id="SF7" sourceRef="Timer_UpToThreeDays" targetRef="Task_EnterClaimAssignClerk"/> <sequenceFlow id="SF8" sourceRef="Task_EnterClaimAssignClerk" targetRef="Task_CheckPolicyValidity"/> <sequenceFlow id="SF9" sourceRef="Task_CheckPolicyValidity" targetRef="XOR_IsPolicyValid"/> <sequenceFlow id="SF10" sourceRef="XOR_IsPolicyValid" targetRef="End_InvalidPolicy"> <conditionExpression xsi:type="tFormalExpression"><![CDATA[not valid]]></conditionExpression> </sequenceFlow> <sequenceFlow id="SF11" sourceRef="XOR_IsPolicyValid" targetRef="Task_EstimateCost"> <conditionExpression xsi:type="tFormalExpression"><![CDATA[valid]]></conditionExpression> </sequenceFlow> <!-- Regulator lane: Estimate cost and assess liability (in parallel), gather all info --> <sequenceFlow id="SF12" sourceRef="Task_EstimateCost" targetRef="Task_AssessLiability"/> <sequenceFlow id="SF13" sourceRef="Task_AssessLiability" targetRef="Task_GatherAllInformation"/> <!-- Data flows between cost and liability to gather information --> 
+
+    
+    <sequenceFlow id="SF14" sourceRef="Task_GatherAllInformation" targetRef="XOR_DecideCompensation"/> <sequenceFlow id="SF15" sourceRef="XOR_DecideCompensation" targetRef="Task_PayCompensation"> <conditionExpression xsi:type="tFormalExpression"><![CDATA[payment]]></conditionExpression> </sequenceFlow> <sequenceFlow id="SF16" sourceRef="XOR_DecideCompensation" targetRef="Task_CloseFile"> <conditionExpression xsi:type="tFormalExpression"><![CDATA[no payment]]></conditionExpression> </sequenceFlow> <sequenceFlow id="SF17" sourceRef="Task_PayCompensation" targetRef="Task_CloseFile"/> <sequenceFlow id="SF18" sourceRef="Task_CloseFile" targetRef="XOR_Satisfaction"/> <sequenceFlow id="SF19" sourceRef="XOR_Satisfaction" targetRef="End_Closed"> <conditionExpression xsi:type="tFormalExpression"><![CDATA[satisfied]]></conditionExpression> </sequenceFlow> <sequenceFlow id="SF20" sourceRef="XOR_Satisfaction" targetRef="Task_InitiateLegalMeasures"> <conditionExpression xsi:type="tFormalExpression"><![CDATA[not satisfied]]></conditionExpression> </sequenceFlow> <sequenceFlow id="SF21" sourceRef="Task_InitiateLegalMeasures" targetRef="End_Lawsuit"/> <!-- Internal cost tracking (clerk lane) --> <sequenceFlow id="SF22" sourceRef="Task_EnterClaimAssignClerk" targetRef="Task_AccumulateInternalCosts"/>  </process>
+  
+  <bpmndi:BPMNDiagram id="BPMNDiagram_ClaimProcess">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_1">
+      <bpmndi:BPMNShape id="ParticipantShape_Beneficiary" bpmnElement="Participant_Beneficiary" isHorizontal="true">
+        <omgdc:Bounds x="120" y="60" width="840" height="120" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Beneficiary_Shape" bpmnElement="Lane_Beneficiary" isHorizontal="true">
+        <omgdc:Bounds x="120" y="60" width="840" height="120" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="StartCallAccident_Beneficiary_di" bpmnElement="StartCallAccident_Beneficiary">
+        <omgdc:Bounds x="200" y="105" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="173" y="141" width="90" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_CallInsuranceAgent_di" bpmnElement="Task_CallInsuranceAgent">
+        <omgdc:Bounds x="280" y="95" width="100" height="56" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="End_Beneficiary_di" bpmnElement="End_Beneficiary">
+        <omgdc:Bounds x="420" y="105" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="414" y="141" width="48" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SF1_di" bpmnElement="SF1">
+        <omgdi:waypoint x="236" y="123" />
+        <omgdi:waypoint x="280" y="123" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SF2_di" bpmnElement="SF2">
+        <omgdi:waypoint x="380" y="123" />
+        <omgdi:waypoint x="420" y="123" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ParticipantShape_InsuranceAgent" bpmnElement="Participant_InsuranceAgent" isHorizontal="true">
+        <omgdc:Bounds x="160" y="220" width="900" height="120" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_InsuranceAgent_Shape" bpmnElement="Lane_InsuranceAgent" isHorizontal="true">
+        <omgdc:Bounds x="160" y="220" width="900" height="120" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CatchCall_InsuranceAgent_di" bpmnElement="CatchCall_InsuranceAgent" isInterrupting="true">
+        <omgdc:Bounds x="220" y="265" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="195" y="301" width="87" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_CollectClaimInfo_di" bpmnElement="Task_CollectClaimInfo">
+        <omgdc:Bounds x="300" y="255" width="120" height="56" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ThrowNotifyCompany_InsuranceAgent_di" bpmnElement="ThrowNotifyCompany_InsuranceAgent">
+        <omgdc:Bounds x="460" y="265" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="437" y="227.5" width="81" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="End_Agent_di" bpmnElement="End_Agent">
+        <omgdc:Bounds x="540" y="265" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="534" y="301" width="48" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SF3_di" bpmnElement="SF3">
+        <omgdi:waypoint x="256" y="283" />
+        <omgdi:waypoint x="300" y="283" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SF4_di" bpmnElement="SF4">
+        <omgdi:waypoint x="420" y="283" />
+        <omgdi:waypoint x="460" y="283" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SF5_di" bpmnElement="SF5">
+        <omgdi:waypoint x="496" y="283" />
+        <omgdi:waypoint x="540" y="283" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ParticipantShape_InsuranceCompany" bpmnElement="Participant_InsuranceCompany" isHorizontal="true">
+        <omgdc:Bounds x="160" y="380" width="2260" height="370" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Regulator_Shape" bpmnElement="Lane_Regulator" isHorizontal="true">
+        <omgdc:Bounds x="160" y="530" width="2260" height="220" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Clerk_Shape" bpmnElement="Lane_Clerk" isHorizontal="true">
+        <omgdc:Bounds x="160" y="380" width="2260" height="150" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CatchNotifyClaim_InsuranceCompany_di" bpmnElement="CatchNotifyClaim_InsuranceCompany">
+        <omgdc:Bounds x="231" y="446" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="215" y="482" width="68" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Timer_UpToThreeDays_di" bpmnElement="Timer_UpToThreeDays">
+        <omgdc:Bounds x="320" y="440" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="307" y="476" width="63" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_EnterClaimAssignClerk_di" bpmnElement="Task_EnterClaimAssignClerk">
+        <omgdc:Bounds x="400" y="430" width="140" height="56" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_CheckPolicyValidity_di" bpmnElement="Task_CheckPolicyValidity">
+        <omgdc:Bounds x="580" y="430" width="120" height="56" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="XOR_IsPolicyValid_di" bpmnElement="XOR_IsPolicyValid" isMarkerVisible="true">
+        <omgdc:Bounds x="750" y="443" width="40" height="40" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="783" y="483" width="74" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="End_InvalidPolicy_di" bpmnElement="End_InvalidPolicy">
+        <omgdc:Bounds x="870" y="412" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="851" y="448" width="75" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_EstimateCost_di" bpmnElement="Task_EstimateCost">
+        <omgdc:Bounds x="920" y="560" width="150" height="56" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DO_CostEstimation_di" bpmnElement="DO_CostEstimation">
+        <omgdc:Bounds x="1192" y="655" width="36" height="30" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="1171" y="685" width="78" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_AssessLiability_di" bpmnElement="Task_AssessLiability">
+        <omgdc:Bounds x="1120" y="560" width="150" height="56" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DO_LiabilityAssessment_di" bpmnElement="DO_LiabilityAssessment">
+        <omgdc:Bounds x="1300" y="655" width="36" height="30" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="1288" y="685" width="60" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_GatherAllInformation_di" bpmnElement="Task_GatherAllInformation">
+        <omgdc:Bounds x="1330" y="560" width="180" height="56" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="XOR_DecideCompensation_di" bpmnElement="XOR_DecideCompensation" isMarkerVisible="true">
+        <omgdc:Bounds x="1540" y="573" width="40" height="40" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="1525" y="613" width="71" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_PayCompensation_di" bpmnElement="Task_PayCompensation">
+        <omgdc:Bounds x="1630" y="560" width="180" height="56" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_CloseFile_di" bpmnElement="Task_CloseFile">
+        <omgdc:Bounds x="1830" y="560" width="120" height="56" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="End_Closed_di" bpmnElement="End_Closed">
+        <omgdc:Bounds x="2060" y="571" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="2054" y="607" width="48" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="XOR_Satisfaction_di" bpmnElement="XOR_Satisfaction" isMarkerVisible="true">
+        <omgdc:Bounds x="1970" y="573" width="40" height="40" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="1965" y="613" width="50" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_InitiateLegalMeasures_di" bpmnElement="Task_InitiateLegalMeasures">
+        <omgdc:Bounds x="2060" y="652" width="180" height="56" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="End_Lawsuit_di" bpmnElement="End_Lawsuit">
+        <omgdc:Bounds x="2292" y="662" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="2273" y="698" width="74" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DS_ClaimFile_di" bpmnElement="DS_ClaimFile">
+        <omgdc:Bounds x="1542" y="692" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="1535" y="668" width="50" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_AccumulateInternalCosts_di" bpmnElement="Task_AccumulateInternalCosts">
+        <omgdc:Bounds x="490" y="560" width="140" height="56" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SF6_di" bpmnElement="SF6">
+        <omgdi:waypoint x="267" y="461" />
+        <omgdi:waypoint x="320" y="461" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SF7_di" bpmnElement="SF7">
+        <omgdi:waypoint x="356" y="461" />
+        <omgdi:waypoint x="378" y="461" />
+        <omgdi:waypoint x="378" y="447" />
+        <omgdi:waypoint x="400" y="447" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SF8_di" bpmnElement="SF8">
+        <omgdi:waypoint x="540" y="458" />
+        <omgdi:waypoint x="580" y="458" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SF9_di" bpmnElement="SF9">
+        <omgdi:waypoint x="700" y="458" />
+        <omgdi:waypoint x="750" y="463" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SF10_di" bpmnElement="SF10">
+        <omgdi:waypoint x="770" y="443" />
+        <omgdi:waypoint x="770" y="430" />
+        <omgdi:waypoint x="870" y="430" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SF11_di" bpmnElement="SF11">
+        <omgdi:waypoint x="770" y="483" />
+        <omgdi:waypoint x="770" y="590" />
+        <omgdi:waypoint x="920" y="588" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SF12_di" bpmnElement="SF12">
+        <omgdi:waypoint x="1070" y="588" />
+        <omgdi:waypoint x="1120" y="588" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SF13_di" bpmnElement="SF13">
+        <omgdi:waypoint x="1270" y="588" />
+        <omgdi:waypoint x="1330" y="588" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SF14_di" bpmnElement="SF14">
+        <omgdi:waypoint x="1510" y="588" />
+        <omgdi:waypoint x="1540" y="593" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SF15_di" bpmnElement="SF15">
+        <omgdi:waypoint x="1580" y="593" />
+        <omgdi:waypoint x="1630" y="588" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SF16_di" bpmnElement="SF16">
+        <omgdi:waypoint x="1570" y="603" />
+        <omgdi:waypoint x="1570" y="660" />
+        <omgdi:waypoint x="1890" y="660" />
+        <omgdi:waypoint x="1890" y="616" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SF17_di" bpmnElement="SF17">
+        <omgdi:waypoint x="1810" y="588" />
+        <omgdi:waypoint x="1830" y="588" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SF18_di" bpmnElement="SF18">
+        <omgdi:waypoint x="1950" y="588" />
+        <omgdi:waypoint x="1970" y="593" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SF19_di" bpmnElement="SF19">
+        <omgdi:waypoint x="2008" y="591" />
+        <omgdi:waypoint x="2060" y="591" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SF20_di" bpmnElement="SF20">
+        <omgdi:waypoint x="1998" y="605" />
+        <omgdi:waypoint x="1998" y="680" />
+        <omgdi:waypoint x="2060" y="680" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SF21_di" bpmnElement="SF21">
+        <omgdi:waypoint x="2240" y="680" />
+        <omgdi:waypoint x="2292" y="680" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SF22_di" bpmnElement="SF22">
+        <omgdi:waypoint x="434" y="486" />
+        <omgdi:waypoint x="434" y="588" />
+        <omgdi:waypoint x="490" y="588" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DA_CostToGather_di" bpmnElement="DA_CostToGather">
+        <omgdi:waypoint x="1228" y="678" />
+        <omgdi:waypoint x="1333" y="613" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DA_LiabilityToGather_di" bpmnElement="DA_LiabilityToGather">
+        <omgdi:waypoint x="1320" y="655" />
+        <omgdi:waypoint x="1330" y="588" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DA_GatherToClaimFile_di" bpmnElement="DA_GatherToClaimFile">
+        <omgdi:waypoint x="1495" y="616" />
+        <omgdi:waypoint x="1547" y="692" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DA_InternalCostsToClaimFile_di" bpmnElement="DA_InternalCostsToClaimFile">
+        <omgdi:waypoint x="622" y="615" />
+        <omgdi:waypoint x="810" y="720" />
+        <omgdi:waypoint x="1542" y="712" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="MsgFlow_AgentToCompany_di" bpmnElement="MsgFlow_AgentToCompany">
+        <omgdi:waypoint x="478" y="301" />
+        <omgdi:waypoint x="478" y="373" />
+        <omgdi:waypoint x="249" y="373" />
+        <omgdi:waypoint x="249" y="446" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="225" y="398" width="79" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="MsgFlow_BenToAgent_di" bpmnElement="MsgFlow_BenToAgent"> <omgdi:waypoint x="226" y="123"/> <omgdi:waypoint x="228" y="283"/></bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

@@ -1,0 +1,372 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:tns="http://example.com/bpmn" targetNamespace="http://example.com/bpmn" exporter="Camunda Modeler" exporterVersion="5.34.0">
+  <process id="BankAccountOpeningProcess" isExecutable="true">
+    <laneSet>
+      <lane id="CustomerLane" name="Customer">
+        <flowNodeRef>CustomerApplicationSubmitted</flowNodeRef>
+        <flowNodeRef>CustomerSendsApplication</flowNodeRef>
+      </lane>
+      <lane id="BackOfficeLane" name="Bank Back Office">
+        <flowNodeRef>BankCatchApplication</flowNodeRef>
+        <flowNodeRef>EvaluateApplication</flowNodeRef>
+        <flowNodeRef>DecisionGateway</flowNodeRef>
+        <flowNodeRef>NotifyRejection</flowNodeRef>
+        <flowNodeRef>CreateBankAccount</flowNodeRef>
+        <flowNodeRef>ParallelPackGateway</flowNodeRef>
+        <flowNodeRef>SendWelcomePack</flowNodeRef>
+        <flowNodeRef>SendBankCard</flowNodeRef>
+        <flowNodeRef>SendPinNumber</flowNodeRef>
+        <flowNodeRef>BankCardSent</flowNodeRef>
+        <flowNodeRef>PinSent</flowNodeRef>
+        <flowNodeRef>MergeParallelEnd</flowNodeRef>
+        <flowNodeRef>ApprovedEnd</flowNodeRef>
+        <flowNodeRef>SendRejectionToCustomer</flowNodeRef>
+        <flowNodeRef>RejectedEnd</flowNodeRef>
+        <flowNodeRef>WelcomePackSent</flowNodeRef>
+      </lane>
+    </laneSet>
+    <startEvent id="BankReceiveApplication" name="Receive Application">
+      <outgoing>flow_eval</outgoing>
+    </startEvent>
+    <startEvent id="CustomerApplicationSubmitted" name="Submit Application">
+      <outgoing>flow_customer_submit</outgoing>
+    </startEvent>
+    <intermediateThrowEvent id="CustomerSendsApplication" name="Send Application">
+      <incoming>flow_customer_submit</incoming>
+      <incoming>Flow_1cpnfvj</incoming>
+      <incoming>Flow_1acpn76</incoming>
+      <incoming>Flow_0yswhfd</incoming>
+      <incoming>Flow_0ygg6w1</incoming>
+      <outgoing>flow_to_bank</outgoing>
+      <outgoing>Flow_1dmoe17</outgoing>
+      <messageEventDefinition />
+    </intermediateThrowEvent>
+    <intermediateCatchEvent id="BankCatchApplication" name="Receive Application Message">
+      <incoming>flow_to_bank</incoming>
+      <incoming>Flow_1dmoe17</incoming>
+      <outgoing>flow_eval</outgoing>
+      <messageEventDefinition />
+    </intermediateCatchEvent>
+    <task id="EvaluateApplication" name="Evaluate Application">
+      <incoming>flow_eval</incoming>
+      <outgoing>flow_decide</outgoing>
+    </task>
+    <exclusiveGateway id="DecisionGateway" name="Application Approved?">
+      <incoming>flow_decide</incoming>
+      <outgoing>flow_approved</outgoing>
+      <outgoing>flow_rejected</outgoing>
+    </exclusiveGateway>
+    <task id="NotifyRejection" name="Notify Rejection by Email">
+      <incoming>flow_rejected</incoming>
+      <outgoing>flow_notify_customer</outgoing>
+    </task>
+    <task id="CreateBankAccount" name="Create Bank Account">
+      <incoming>flow_approved</incoming>
+      <outgoing>flow_parallel_pack</outgoing>
+    </task>
+    <parallelGateway id="ParallelPackGateway" name="Send Welcome Pack, Card, PIN">
+      <incoming>flow_parallel_pack</incoming>
+      <outgoing>flow_pack</outgoing>
+      <outgoing>flow_card</outgoing>
+      <outgoing>flow_pin</outgoing>
+    </parallelGateway>
+    <task id="SendWelcomePack" name="Send Welcome Pack Letter">
+      <incoming>flow_pack</incoming>
+      <outgoing>flow_welc_pack_msg</outgoing>
+    </task>
+    <task id="SendBankCard" name="Send Bank Card Letter">
+      <incoming>flow_card</incoming>
+      <outgoing>flow_card_msg</outgoing>
+    </task>
+    <task id="SendPinNumber" name="Send PIN Number Letter">
+      <incoming>flow_pin</incoming>
+      <outgoing>flow_pin_msg</outgoing>
+    </task>
+    <intermediateThrowEvent id="BankCardSent" name="Send Bank Card">
+      <incoming>flow_card_msg</incoming>
+      <outgoing>flow_merge_end</outgoing>
+      <outgoing>Flow_1acpn76</outgoing>
+      <messageEventDefinition />
+    </intermediateThrowEvent>
+    <intermediateThrowEvent id="PinSent" name="Send PIN Number">
+      <incoming>flow_pin_msg</incoming>
+      <outgoing>flow_merge_end</outgoing>
+      <outgoing>Flow_1cpnfvj</outgoing>
+      <messageEventDefinition />
+    </intermediateThrowEvent>
+    <parallelGateway id="MergeParallelEnd" name="Merge Letters">
+      <incoming>flow_merge_end</incoming>
+      <incoming>flow_merge_end</incoming>
+      <incoming>flow_merge_end</incoming>
+      <outgoing>flow_final_finish</outgoing>
+    </parallelGateway>
+    <endEvent id="ApprovedEnd" name="End (Approved)">
+      <incoming>flow_final_finish</incoming>
+    </endEvent>
+    <intermediateThrowEvent id="SendRejectionToCustomer" name="Send Rejection Notification">
+      <incoming>flow_notify_customer</incoming>
+      <outgoing>flow_reject_end</outgoing>
+      <outgoing>Flow_0ygg6w1</outgoing>
+      <messageEventDefinition />
+    </intermediateThrowEvent>
+    <endEvent id="RejectedEnd" name="End (Rejected)">
+      <incoming>flow_reject_end</incoming>
+    </endEvent>
+    <intermediateThrowEvent id="WelcomePackSent" name="Send Welcome Pack">
+      <incoming>flow_welc_pack_msg</incoming>
+      <outgoing>flow_merge_end</outgoing>
+      <outgoing>Flow_0yswhfd</outgoing>
+      <messageEventDefinition />
+    </intermediateThrowEvent>
+    <sequenceFlow id="flow_customer_submit" sourceRef="CustomerApplicationSubmitted" targetRef="CustomerSendsApplication" />
+    <sequenceFlow id="Flow_1cpnfvj" sourceRef="PinSent" targetRef="CustomerSendsApplication" />
+    <sequenceFlow id="Flow_1acpn76" sourceRef="BankCardSent" targetRef="CustomerSendsApplication" />
+    <sequenceFlow id="Flow_0yswhfd" sourceRef="WelcomePackSent" targetRef="CustomerSendsApplication" />
+    <sequenceFlow id="Flow_0ygg6w1" sourceRef="SendRejectionToCustomer" targetRef="CustomerSendsApplication" />
+    <sequenceFlow id="flow_to_bank" sourceRef="CustomerSendsApplication" targetRef="BankCatchApplication" />
+    <sequenceFlow id="Flow_1dmoe17" sourceRef="CustomerSendsApplication" targetRef="BankCatchApplication" />
+    <sequenceFlow id="flow_eval" sourceRef="BankCatchApplication" targetRef="EvaluateApplication" />
+    <sequenceFlow id="flow_decide" sourceRef="EvaluateApplication" targetRef="DecisionGateway" />
+    <sequenceFlow id="flow_rejected" name="No" sourceRef="DecisionGateway" targetRef="NotifyRejection" />
+    <sequenceFlow id="flow_approved" name="Yes" sourceRef="DecisionGateway" targetRef="CreateBankAccount" />
+    <sequenceFlow id="flow_notify_customer" sourceRef="NotifyRejection" targetRef="SendRejectionToCustomer" />
+    <sequenceFlow id="flow_parallel_pack" sourceRef="CreateBankAccount" targetRef="ParallelPackGateway" />
+    <sequenceFlow id="flow_pack" sourceRef="ParallelPackGateway" targetRef="SendWelcomePack" />
+    <sequenceFlow id="flow_card" sourceRef="ParallelPackGateway" targetRef="SendBankCard" />
+    <sequenceFlow id="flow_pin" sourceRef="ParallelPackGateway" targetRef="SendPinNumber" />
+    <sequenceFlow id="flow_welc_pack_msg" sourceRef="SendWelcomePack" targetRef="WelcomePackSent" />
+    <sequenceFlow id="flow_card_msg" sourceRef="SendBankCard" targetRef="BankCardSent" />
+    <sequenceFlow id="flow_pin_msg" sourceRef="SendPinNumber" targetRef="PinSent" />
+    <sequenceFlow id="flow_merge_end_2" sourceRef="BankCardSent" targetRef="MergeParallelEnd" />
+    <sequenceFlow id="flow_merge_end_3" sourceRef="PinSent" targetRef="MergeParallelEnd" />
+    <sequenceFlow id="flow_merge_end" sourceRef="WelcomePackSent" targetRef="MergeParallelEnd" />
+    <sequenceFlow id="flow_final_finish" sourceRef="MergeParallelEnd" targetRef="ApprovedEnd" />
+    <sequenceFlow id="flow_reject_end" sourceRef="SendRejectionToCustomer" targetRef="RejectedEnd" />
+  </process>
+  <collaboration id="BankAccountOpeningCollaboration">
+    <participant id="CustomerPool" name="Customer" processRef="BankAccountOpeningProcess" />
+    <participant id="BankPool" name="Bank" processRef="BankAccountOpeningProcess" />
+  </collaboration>
+  <bpmndi:BPMNDiagram id="BankAccountOpeningDiagram">
+    <bpmndi:BPMNPlane bpmnElement="BankAccountOpeningCollaboration">
+      <bpmndi:BPMNShape id="CustomerPool_di" bpmnElement="CustomerPool" isHorizontal="true">
+        <omgdc:Bounds x="160" y="120" width="2700" height="600" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CustomerLane_di" bpmnElement="CustomerLane" isHorizontal="true">
+        <omgdc:Bounds x="200" y="140" width="2620" height="190" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BackOfficeLane_di" bpmnElement="BackOfficeLane" isHorizontal="true">
+        <omgdc:Bounds x="200" y="330" width="2620" height="380" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CustomerApplicationSubmitted_di" bpmnElement="CustomerApplicationSubmitted">
+        <omgdc:Bounds x="250" y="215" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="241" y="251" width="54" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CustomerSendsApplication_di" bpmnElement="CustomerSendsApplication">
+        <omgdc:Bounds x="410" y="217" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="387" y="193" width="82" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BankCatchApplication_di" bpmnElement="BankCatchApplication">
+        <omgdc:Bounds x="640" y="435" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="631" y="471" width="54" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EvaluateApplication_di" bpmnElement="EvaluateApplication">
+        <omgdc:Bounds x="820" y="425" width="100" height="56" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DecisionGateway_di" bpmnElement="DecisionGateway" isMarkerVisible="true">
+        <omgdc:Bounds x="1010" y="433" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="1008" y="483" width="54" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="NotifyRejection_di" bpmnElement="NotifyRejection">
+        <omgdc:Bounds x="1180" y="395" width="110" height="56" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CreateBankAccount_di" bpmnElement="CreateBankAccount">
+        <omgdc:Bounds x="1180" y="500" width="110" height="56" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ParallelPackGateway_di" bpmnElement="ParallelPackGateway">
+        <omgdc:Bounds x="1370" y="513" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="1356" y="563" width="79" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="SendWelcomePack_di" bpmnElement="SendWelcomePack">
+        <omgdc:Bounds x="1560" y="430" width="110" height="56" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="SendBankCard_di" bpmnElement="SendBankCard">
+        <omgdc:Bounds x="1560" y="515" width="110" height="56" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="SendPinNumber_di" bpmnElement="SendPinNumber">
+        <omgdc:Bounds x="1560" y="600" width="110" height="56" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BankCardSent_di" bpmnElement="BankCardSent">
+        <omgdc:Bounds x="1750" y="530" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="1728" y="566" width="81" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="PinSent_di" bpmnElement="PinSent">
+        <omgdc:Bounds x="1750" y="615" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="1776" y="645.5" width="48" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="MergeParallelEnd_di" bpmnElement="MergeParallelEnd">
+        <omgdc:Bounds x="1930" y="510" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="1921" y="560" width="69" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ApprovedEnd_di" bpmnElement="ApprovedEnd">
+        <omgdc:Bounds x="2110" y="522" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="2089" y="558" width="78" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="SendRejectionToCustomer_di" bpmnElement="SendRejectionToCustomer">
+        <omgdc:Bounds x="1350" y="382" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="1331" y="418" width="75" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="RejectedEnd_di" bpmnElement="RejectedEnd">
+        <omgdc:Bounds x="1492" y="382" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="1473" y="418" width="74" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="WelcomePackSent_di" bpmnElement="WelcomePackSent">
+        <omgdc:Bounds x="1852" y="440" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="1833" y="476" width="75" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="flow_customer_submit_di" bpmnElement="flow_customer_submit">
+        <omgdi:waypoint x="286" y="233" />
+        <omgdi:waypoint x="410" y="235" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1cpnfvj_di" bpmnElement="Flow_1cpnfvj">
+        <omgdi:waypoint x="1768" y="651" />
+        <omgdi:waypoint x="1768" y="670" />
+        <omgdi:waypoint x="630" y="670" />
+        <omgdi:waypoint x="428" y="253" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1acpn76_di" bpmnElement="Flow_1acpn76">
+        <omgdi:waypoint x="1768" y="530" />
+        <omgdi:waypoint x="1770" y="253" />
+        <omgdi:waypoint x="428" y="253" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0yswhfd_di" bpmnElement="Flow_0yswhfd">
+        <omgdi:waypoint x="1870" y="440" />
+        <omgdi:waypoint x="1870" y="235" />
+        <omgdi:waypoint x="446" y="235" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0ygg6w1_di" bpmnElement="Flow_0ygg6w1">
+        <omgdi:waypoint x="1368" y="382" />
+        <omgdi:waypoint x="1370" y="220" />
+        <omgdi:waypoint x="438" y="220" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_to_bank_di" bpmnElement="flow_to_bank">
+        <omgdi:waypoint x="428" y="253" />
+        <omgdi:waypoint x="428" y="435" />
+        <omgdi:waypoint x="658" y="435" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1dmoe17_di" bpmnElement="Flow_1dmoe17">
+        <omgdi:waypoint x="428" y="253" />
+        <omgdi:waypoint x="428" y="453" />
+        <omgdi:waypoint x="640" y="453" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_eval_di" bpmnElement="flow_eval">
+        <omgdi:waypoint x="676" y="453" />
+        <omgdi:waypoint x="820" y="453" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_decide_di" bpmnElement="flow_decide">
+        <omgdi:waypoint x="920" y="453" />
+        <omgdi:waypoint x="1010" y="458" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_rejected_di" bpmnElement="flow_rejected">
+        <omgdi:waypoint x="1060" y="458" />
+        <omgdi:waypoint x="1060" y="419" />
+        <omgdi:waypoint x="1180" y="419" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="1114" y="394" width="15" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_approved_di" bpmnElement="flow_approved">
+        <omgdi:waypoint x="1060" y="458" />
+        <omgdi:waypoint x="1060" y="548" />
+        <omgdi:waypoint x="1181" y="548" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="1067" y="491" width="18" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_notify_customer_di" bpmnElement="flow_notify_customer">
+        <omgdi:waypoint x="1290" y="423" />
+        <omgdi:waypoint x="1320" y="423" />
+        <omgdi:waypoint x="1320" y="400" />
+        <omgdi:waypoint x="1350" y="400" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_reject_end_di" bpmnElement="flow_reject_end">
+        <omgdi:waypoint x="1386" y="400" />
+        <omgdi:waypoint x="1492" y="400" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_parallel_pack_di" bpmnElement="flow_parallel_pack">
+        <omgdi:waypoint x="1290" y="528" />
+        <omgdi:waypoint x="1370" y="538" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_pack_di" bpmnElement="flow_pack">
+        <omgdi:waypoint x="1395" y="513" />
+        <omgdi:waypoint x="1395" y="436" />
+        <omgdi:waypoint x="1561" y="436" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_card_di" bpmnElement="flow_card">
+        <omgdi:waypoint x="1420" y="538" />
+        <omgdi:waypoint x="1560" y="543" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_pin_di" bpmnElement="flow_pin">
+        <omgdi:waypoint x="1420" y="538" />
+        <omgdi:waypoint x="1420" y="628" />
+        <omgdi:waypoint x="1560" y="628" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_welc_pack_msg_di" bpmnElement="flow_welc_pack_msg">
+        <omgdi:waypoint x="1670" y="455" />
+        <omgdi:waypoint x="1852" y="455" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_card_msg_di" bpmnElement="flow_card_msg">
+        <omgdi:waypoint x="1670" y="543" />
+        <omgdi:waypoint x="1750" y="548" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_pin_msg_di" bpmnElement="flow_pin_msg">
+        <omgdi:waypoint x="1670" y="628" />
+        <omgdi:waypoint x="1750" y="633" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_merge_end_di" bpmnElement="flow_merge_end">
+        <omgdi:waypoint x="1888" y="458" />
+        <omgdi:waypoint x="1955" y="458" />
+        <omgdi:waypoint x="1955" y="510" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_merge_end_2_di" bpmnElement="flow_merge_end_2">
+        <omgdi:waypoint x="1786" y="548" />
+        <omgdi:waypoint x="1930" y="535" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_merge_end_3_di" bpmnElement="flow_merge_end_3">
+        <omgdi:waypoint x="1786" y="633" />
+        <omgdi:waypoint x="1930" y="535" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_final_finish_di" bpmnElement="flow_final_finish">
+        <omgdi:waypoint x="1980" y="535" />
+        <omgdi:waypoint x="2110" y="540" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="BankPool_di" bpmnElement="BankPool" isHorizontal="true">
+        <omgdc:Bounds x="190" y="760" width="300" height="340" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

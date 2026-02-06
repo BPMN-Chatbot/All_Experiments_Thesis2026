@@ -1,0 +1,828 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+             xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+             xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+             id="Definitions_1"
+             targetNamespace="http://example.com/bpmn">
+
+  <process id="SwitchOverProcess" isExecutable="true">
+    <!-- Pools and Lanes -->
+    <laneSet id="LaneSet_1">
+      <lane id="Lane_Customer" name="Customer"/>
+    </laneSet>
+    <laneSet id="LaneSet_2">
+      <lane id="Lane_CustomerService" name="Customer Service"/>
+      <lane id="Lane_Sales" name="Sales"/>
+      <lane id="Lane_Distribution" name="Distribution"/>
+    </laneSet>
+    <laneSet id="LaneSet_3">
+      <lane id="Lane_GridOperator" name="Grid Operator"/>
+    </laneSet>
+    <laneSet id="LaneSet_4">
+      <lane id="Lane_OldSupplier" name="Old Supplier"/>
+    </laneSet>
+
+    <!-- Data Objects and Stores -->
+    <dataObjectReference id="CustomerData" dataObjectRef="CustomerDataObj"/>
+    <dataObject id="CustomerDataObj" name="Customer Data"/>
+    <dataStoreReference id="CRMSystem" dataStoreRef="CRMSystemStore"/>
+    <dataStore id="CRMSystemStore" name="CRM System"/>
+    <dataStoreReference id="CustomerDB" dataStoreRef="CustomerDBStore"/>
+    <dataStore id="CustomerDBStore" name="Customer Database"/>
+    <dataObjectReference id="ErrorList" dataObjectRef="ErrorListObj"/>
+    <dataObject id="ErrorListObj" name="Error List"/>
+    <dataObjectReference id="CustomerObject" dataObjectRef="CustomerObjectObj"/>
+    <dataObject id="CustomerObjectObj" name="Customer Object"/>
+    <dataObjectReference id="ContractDocuments" dataObjectRef="ContractDocumentsObj"/>
+    <dataObject id="ContractDocumentsObj" name="Contract Documents"/>
+    <dataStoreReference id="CISSystem" dataStoreRef="CISSystemStore"/>
+    <dataStore id="CISSystemStore" name="CIS System"/>
+    <dataObjectReference id="ConfirmationDoc" dataObjectRef="ConfirmationDocObj"/>
+    <dataObject id="ConfirmationDocObj" name="Confirmation Document"/>
+    <dataObjectReference id="MeterData" dataObjectRef="MeterDataObj"/>
+    <dataObject id="MeterDataObj" name="Meter Data"/>
+    <dataObjectReference id="FinalBilling" dataObjectRef="FinalBillingObj"/>
+    <dataObject id="FinalBillingObj" name="Final Billing"/>
+    <dataObjectReference id="ServiceConsumptionReport" dataObjectRef="ServiceConsumptionReportObj"/>
+    <dataObject id="ServiceConsumptionReportObj" name="Service Consumption Report"/>
+
+    <!-- Customer Pool -->
+    <startEvent id="StartEvent_Customer" name="Initiate Switch-Over Request"/>
+    <task id="Task_SendCustomerData" name="Transmit Customer Data"/>
+    <endEvent id="EndEvent_Customer" name="End Customer Process"/>
+    <intermediateCatchEvent id="Catch_ContractConfirmation" name="Receive Confirmation Document">
+      <messageEventDefinition messageRef="Message_ConfirmationDoc"/>
+    </intermediateCatchEvent>
+    <intermediateCatchEvent id="Catch_ContractDetails" name="Receive Contract Details">
+      <messageEventDefinition messageRef="Message_ContractDetails"/>
+    </intermediateCatchEvent>
+    <exclusiveGateway id="Gateway_ReviewContract" name="Review Contract"/>
+    <intermediateThrowEvent id="Throw_Withdraw" name="Withdraw from Contract">
+      <messageEventDefinition messageRef="Message_Withdraw"/>
+    </intermediateThrowEvent>
+    <intermediateThrowEvent id="Throw_Confirm" name="Confirm Contract">
+      <messageEventDefinition messageRef="Message_Confirm"/>
+    </intermediateThrowEvent>
+    <intermediateCatchEvent id="Timer_7Days" name="7 Day Timeout">
+      <timerEventDefinition>
+        <timeDuration>PT7D</timeDuration>
+      </timerEventDefinition>
+    </intermediateCatchEvent>
+    <intermediateCatchEvent id="Catch_FinalBilling" name="Receive Final Billing">
+      <messageEventDefinition messageRef="Message_FinalBilling"/>
+    </intermediateCatchEvent>
+    <intermediateCatchEvent id="Catch_ServiceConsumptionReport" name="Receive Service Consumption Report">
+      <messageEventDefinition messageRef="Message_ServiceConsumptionReport"/>
+    </intermediateCatchEvent>
+
+    <!-- Customer Service Pool (shared between Sales and Distribution) -->
+    <startEvent id="StartEvent_CS" name="Receive Switch-Over Request">
+      <messageEventDefinition messageRef="Message_CustomerData"/>
+    </startEvent>
+    <task id="Task_EnterCustomerData" name="Enter Customer Data into CRM"/>
+    <task id="Task_CompareCustomerData" name="Compare with Customer Database"/>
+    <exclusiveGateway id="Gateway_DataCheck" name="Data Complete and Plausible?"/>
+    <task id="Task_CorrectErrors" name="Correct Errors"/>
+    <task id="Task_CreateCustomerObject" name="Create New Customer Object"/>
+    <task id="Task_PrepareContractDocs" name="Prepare Contract Documents"/>
+    <callActivity id="Call_CheckContractDocs" name="Automated Check of Contract Documents"/>
+    <exclusiveGateway id="Gateway_ContractDocsOK" name="Contract Documents OK?"/>
+    <task id="Task_AnalyzeResolveIssues" name="Analyze and Resolve Issues"/>
+    <task id="Task_RegenerateContractDocs" name="Regenerate Contract Documents"/>
+    <task id="Task_SendConfirmationDoc" name="Send Confirmation Document"/>
+    <intermediateThrowEvent id="Throw_ConfirmationDoc" name="Send Confirmation Document">
+      <messageEventDefinition messageRef="Message_ConfirmationDoc"/>
+    </intermediateThrowEvent>
+    <intermediateThrowEvent id="Throw_ContractDetails" name="Send Contract Details">
+      <messageEventDefinition messageRef="Message_ContractDetails"/>
+    </intermediateThrowEvent>
+    <intermediateCatchEvent id="Catch_Withdraw" name="Receive Withdrawal">
+      <messageEventDefinition messageRef="Message_Withdraw"/>
+    </intermediateCatchEvent>
+    <intermediateCatchEvent id="Catch_Confirm" name="Receive Confirmation">
+      <messageEventDefinition messageRef="Message_Confirm"/>
+    </intermediateCatchEvent>
+    <intermediateCatchEvent id="Timer_7Days_CS" name="7 Day Timeout">
+      <timerEventDefinition>
+        <timeDuration>PT7D</timeDuration>
+      </timerEventDefinition>
+    </intermediateCatchEvent>
+    <exclusiveGateway id="Gateway_WithdrawOrConfirm" name="Withdraw or Confirm?"/>
+    <task id="Task_CreateCISContract" name="Create CIS Contract"/>
+    <intermediateThrowEvent id="Throw_SwitchRequest" name="Send Switch Request to Grid Operator">
+      <messageEventDefinition messageRef="Message_SwitchRequest"/>
+    </intermediateThrowEvent>
+    <intermediateCatchEvent id="Catch_GridOperatorResponse" name="Receive Grid Operator Response">
+      <messageEventDefinition messageRef="Message_GridOperatorResponse"/>
+    </intermediateCatchEvent>
+    <exclusiveGateway id="Gateway_SupplierConcurrence" name="Supplier Concurrence?"/>
+    <endEvent id="EndEvent_CS" name="End Customer Service Process"/>
+    <task id="Task_ImportMeterData" name="Import Meter Data"/>
+    <intermediateCatchEvent id="Catch_MeterData" name="Receive Meter Data">
+      <messageEventDefinition messageRef="Message_MeterData"/>
+    </intermediateCatchEvent>
+
+    <!-- Grid Operator Pool -->
+    <startEvent id="StartEvent_GridOperator" name="Receive Switch Request">
+      <messageEventDefinition messageRef="Message_SwitchRequest"/>
+    </startEvent>
+    <task id="Task_CheckSupplierConcurrence" name="Check Supplier Concurrence"/>
+    <intermediateThrowEvent id="Throw_GridOperatorResponse" name="Send Response to New Supplier">
+      <messageEventDefinition messageRef="Message_GridOperatorResponse"/>
+    </intermediateThrowEvent>
+    <exclusiveGateway id="Gateway_Concurrence" name="Supplier Concurrence?"/>
+    <task id="Task_InformSuppliers" name="Inform All Suppliers"/>
+    <task id="Task_ResolveConflict" name="Demand Conflict Resolution"/>
+    <task id="Task_TerminateOldContract" name="Terminate Old Sales Agreement"/>
+    <intermediateThrowEvent id="Throw_MeterData" name="Send Meter Data">
+      <messageEventDefinition messageRef="Message_MeterData"/>
+    </intermediateThrowEvent>
+    <intermediateThrowEvent id="Throw_ServiceConsumptionReport" name="Send Service Consumption Report">
+      <messageEventDefinition messageRef="Message_ServiceConsumptionReport"/>
+    </intermediateThrowEvent>
+    <task id="Task_ComputeFinalBilling" name="Compute Final Billing"/>
+    <intermediateThrowEvent id="Throw_FinalBilling" name="Send Final Billing to Old Supplier">
+      <messageEventDefinition messageRef="Message_FinalBilling"/>
+    </intermediateThrowEvent>
+    <endEvent id="EndEvent_GridOperator" name="End Grid Operator Process"/>
+    <intermediateCatchEvent id="Timer_10Days" name="10 Day Timeout">
+      <timerEventDefinition>
+        <timeDuration>PT10D</timeDuration>
+      </timerEventDefinition>
+    </intermediateCatchEvent>
+
+    <!-- Old Supplier Pool -->
+    <startEvent id="StartEvent_OldSupplier" name="Receive Notification from Grid Operator"/>
+    <intermediateCatchEvent id="Catch_FinalBilling_OS" name="Receive Final Billing">
+      <messageEventDefinition messageRef="Message_FinalBilling"/>
+    </intermediateCatchEvent>
+    <intermediateCatchEvent id="Catch_ServiceConsumptionReport_OS" name="Receive Service Consumption Report">
+      <messageEventDefinition messageRef="Message_ServiceConsumptionReport"/>
+    </intermediateCatchEvent>
+    <task id="Task_CreateFinalBilling" name="Create Final Billing for Customer"/>
+    <intermediateThrowEvent id="Throw_FinalBillingToCustomer" name="Send Final Billing to Customer">
+      <messageEventDefinition messageRef="Message_FinalBilling"/>
+    </intermediateThrowEvent>
+    <endEvent id="EndEvent_OldSupplier" name="End Old Supplier Process"/>
+
+    <!-- Sequence Flows: Customer -->
+    <sequenceFlow id="SF_C1" sourceRef="StartEvent_Customer" targetRef="Task_SendCustomerData"/>
+    <sequenceFlow id="SF_C2" sourceRef="Task_SendCustomerData" targetRef="EndEvent_Customer"/>
+    <sequenceFlow id="SF_C3" sourceRef="Catch_ContractDetails" targetRef="Gateway_ReviewContract"/>
+    <sequenceFlow id="SF_C4" sourceRef="Gateway_ReviewContract" targetRef="Throw_Withdraw">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[withdraw]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="SF_C5" sourceRef="Gateway_ReviewContract" targetRef="Throw_Confirm">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[confirm]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="SF_C6" sourceRef="Gateway_ReviewContract" targetRef="Timer_7Days"/>
+    <sequenceFlow id="SF_C7" sourceRef="Throw_Withdraw" targetRef="EndEvent_Customer"/>
+    <sequenceFlow id="SF_C8" sourceRef="Throw_Confirm" targetRef="EndEvent_Customer"/>
+    <sequenceFlow id="SF_C9" sourceRef="Timer_7Days" targetRef="EndEvent_Customer"/>
+    <sequenceFlow id="SF_C10" sourceRef="Catch_ContractConfirmation" targetRef="EndEvent_Customer"/>
+    <sequenceFlow id="SF_C11" sourceRef="Catch_FinalBilling" targetRef="EndEvent_Customer"/>
+    <sequenceFlow id="SF_C12" sourceRef="Catch_ServiceConsumptionReport" targetRef="EndEvent_Customer"/>
+
+    <!-- Sequence Flows: Customer Service -->
+    <sequenceFlow id="SF_CS1" sourceRef="StartEvent_CS" targetRef="Task_EnterCustomerData"/>
+    <sequenceFlow id="SF_CS2" sourceRef="Task_EnterCustomerData" targetRef="Task_CompareCustomerData"/>
+    <sequenceFlow id="SF_CS3" sourceRef="Task_CompareCustomerData" targetRef="Gateway_DataCheck"/>
+    <sequenceFlow id="SF_CS4" sourceRef="Gateway_DataCheck" targetRef="Task_CorrectErrors">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[errors]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="SF_CS5" sourceRef="Gateway_DataCheck" targetRef="Task_CreateCustomerObject">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[no errors]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="SF_CS6" sourceRef="Task_CorrectErrors" targetRef="Task_CompareCustomerData"/>
+    <sequenceFlow id="SF_CS7" sourceRef="Task_CreateCustomerObject" targetRef="Task_PrepareContractDocs"/>
+    <sequenceFlow id="SF_CS8" sourceRef="Task_PrepareContractDocs" targetRef="Call_CheckContractDocs"/>
+    <sequenceFlow id="SF_CS9" sourceRef="Call_CheckContractDocs" targetRef="Gateway_ContractDocsOK"/>
+    <sequenceFlow id="SF_CS10" sourceRef="Gateway_ContractDocsOK" targetRef="Task_AnalyzeResolveIssues">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[not ok]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="SF_CS11" sourceRef="Gateway_ContractDocsOK" targetRef="Task_SendConfirmationDoc">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[ok]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="SF_CS12" sourceRef="Task_AnalyzeResolveIssues" targetRef="Task_RegenerateContractDocs"/>
+    <sequenceFlow id="SF_CS13" sourceRef="Task_RegenerateContractDocs" targetRef="Call_CheckContractDocs"/>
+    <sequenceFlow id="SF_CS14" sourceRef="Task_SendConfirmationDoc" targetRef="Throw_ConfirmationDoc"/>
+    <sequenceFlow id="SF_CS15" sourceRef="Throw_ConfirmationDoc" targetRef="Throw_ContractDetails"/>
+    <sequenceFlow id="SF_CS16" sourceRef="Throw_ContractDetails" targetRef="Catch_Withdraw"/>
+    <sequenceFlow id="SF_CS17" sourceRef="Throw_ContractDetails" targetRef="Catch_Confirm"/>
+    <sequenceFlow id="SF_CS18" sourceRef="Throw_ContractDetails" targetRef="Timer_7Days_CS"/>
+    <sequenceFlow id="SF_CS19" sourceRef="Catch_Withdraw" targetRef="Gateway_WithdrawOrConfirm"/>
+    <sequenceFlow id="SF_CS20" sourceRef="Catch_Confirm" targetRef="Gateway_WithdrawOrConfirm"/>
+    <sequenceFlow id="SF_CS21" sourceRef="Timer_7Days_CS" targetRef="Gateway_WithdrawOrConfirm"/>
+    <sequenceFlow id="SF_CS22" sourceRef="Gateway_WithdrawOrConfirm" targetRef="EndEvent_CS">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[withdraw]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="SF_CS23" sourceRef="Gateway_WithdrawOrConfirm" targetRef="Task_CreateCISContract">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[confirm or timeout]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="SF_CS24" sourceRef="Task_CreateCISContract" targetRef="Throw_SwitchRequest"/>
+    <sequenceFlow id="SF_CS25" sourceRef="Throw_SwitchRequest" targetRef="Catch_GridOperatorResponse"/>
+    <sequenceFlow id="SF_CS26" sourceRef="Catch_GridOperatorResponse" targetRef="Gateway_SupplierConcurrence"/>
+    <sequenceFlow id="SF_CS27" sourceRef="Gateway_SupplierConcurrence" targetRef="EndEvent_CS">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[concurrence]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="SF_CS28" sourceRef="Gateway_SupplierConcurrence" targetRef="Task_CreateCISContract">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[no concurrence]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="SF_CS29" sourceRef="Catch_MeterData" targetRef="Task_ImportMeterData"/>
+    <sequenceFlow id="SF_CS30" sourceRef="Task_ImportMeterData" targetRef="EndEvent_CS"/>
+
+    <!-- Sequence Flows: Grid Operator -->
+    <sequenceFlow id="SF_GO1" sourceRef="StartEvent_GridOperator" targetRef="Task_CheckSupplierConcurrence"/>
+    <sequenceFlow id="SF_GO2" sourceRef="Task_CheckSupplierConcurrence" targetRef="Throw_GridOperatorResponse"/>
+    <sequenceFlow id="SF_GO3" sourceRef="Throw_GridOperatorResponse" targetRef="Gateway_Concurrence"/>
+    <sequenceFlow id="SF_GO4" sourceRef="Gateway_Concurrence" targetRef="Task_InformSuppliers">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[concurrence]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="SF_GO5" sourceRef="Gateway_Concurrence" targetRef="Task_TerminateOldContract">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[no concurrence]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="SF_GO6" sourceRef="Task_InformSuppliers" targetRef="Task_ResolveConflict"/>
+    <sequenceFlow id="SF_GO7" sourceRef="Task_ResolveConflict" targetRef="EndEvent_GridOperator"/>
+    <sequenceFlow id="SF_GO8" sourceRef="Task_TerminateOldContract" targetRef="Throw_MeterData"/>
+    <sequenceFlow id="SF_GO9" sourceRef="Throw_MeterData" targetRef="Throw_ServiceConsumptionReport"/>
+    <sequenceFlow id="SF_GO10" sourceRef="Throw_ServiceConsumptionReport" targetRef="Task_ComputeFinalBilling"/>
+    <sequenceFlow id="SF_GO11" sourceRef="Task_ComputeFinalBilling" targetRef="Throw_FinalBilling"/>
+    <sequenceFlow id="SF_GO12" sourceRef="Throw_FinalBilling" targetRef="EndEvent_GridOperator"/>
+    <sequenceFlow id="SF_GO13" sourceRef="Throw_MeterData" targetRef="Timer_10Days"/>
+    <sequenceFlow id="SF_GO14" sourceRef="Timer_10Days" targetRef="EndEvent_GridOperator"/>
+
+    <!-- Sequence Flows: Old Supplier -->
+    <sequenceFlow id="SF_OS1" sourceRef="StartEvent_OldSupplier" targetRef="Catch_FinalBilling_OS"/>
+    <sequenceFlow id="SF_OS2" sourceRef="Catch_FinalBilling_OS" targetRef="Catch_ServiceConsumptionReport_OS"/>
+    <sequenceFlow id="SF_OS3" sourceRef="Catch_ServiceConsumptionReport_OS" targetRef="Task_CreateFinalBilling"/>
+    <sequenceFlow id="SF_OS4" sourceRef="Task_CreateFinalBilling" targetRef="Throw_FinalBillingToCustomer"/>
+    <sequenceFlow id="SF_OS5" sourceRef="Throw_FinalBillingToCustomer" targetRef="EndEvent_OldSupplier"/>
+
+    <!-- Data Associations: Customer Service -->
+    <dataInputAssociation id="DA_CS1">
+      <sourceRef>Task_EnterCustomerData</sourceRef>
+      <targetRef>CustomerData</targetRef>
+    </dataInputAssociation>
+    <dataOutputAssociation id="DA_CS2">
+      <sourceRef>CustomerData</sourceRef>
+      <targetRef>CRMSystem</targetRef>
+    </dataOutputAssociation>
+    <dataInputAssociation id="DA_CS3">
+      <sourceRef>Task_CompareCustomerData</sourceRef>
+      <targetRef>CustomerDB</targetRef>
+    </dataInputAssociation>
+    <dataInputAssociation id="DA_CS4">
+      <sourceRef>Task_CorrectErrors</sourceRef>
+      <targetRef>ErrorList</targetRef>
+    </dataInputAssociation>
+    <dataOutputAssociation id="DA_CS5">
+      <sourceRef>Task_CreateCustomerObject</sourceRef>
+      <targetRef>CustomerObject</targetRef>
+    </dataOutputAssociation>
+    <dataInputAssociation id="DA_CS6">
+      <sourceRef>Task_PrepareContractDocs</sourceRef>
+      <targetRef>CustomerObject</targetRef>
+    </dataInputAssociation>
+    <dataOutputAssociation id="DA_CS7">
+      <sourceRef>Task_PrepareContractDocs</sourceRef>
+      <targetRef>ContractDocuments</targetRef>
+    </dataOutputAssociation>
+    <dataInputAssociation id="DA_CS8">
+      <sourceRef>Call_CheckContractDocs</sourceRef>
+      <targetRef>ContractDocuments</targetRef>
+    </dataInputAssociation>
+    <dataOutputAssociation id="DA_CS9">
+      <sourceRef>Task_SendConfirmationDoc</sourceRef>
+      <targetRef>ConfirmationDoc</targetRef>
+    </dataOutputAssociation>
+    <dataInputAssociation id="DA_CS10">
+      <sourceRef>Task_ImportMeterData</sourceRef>
+      <targetRef>MeterData</targetRef>
+    </dataInputAssociation>
+
+    <!-- Data Associations: Grid Operator -->
+    <dataInputAssociation id="DA_GO1">
+      <sourceRef>Task_ComputeFinalBilling</sourceRef>
+      <targetRef>MeterData</targetRef>
+    </dataInputAssociation>
+    <dataOutputAssociation id="DA_GO2">
+      <sourceRef>Task_ComputeFinalBilling</sourceRef>
+      <targetRef>FinalBilling</targetRef>
+    </dataOutputAssociation>
+    <dataOutputAssociation id="DA_GO3">
+      <sourceRef>Throw_ServiceConsumptionReport</sourceRef>
+      <targetRef>ServiceConsumptionReport</targetRef>
+    </dataOutputAssociation>
+
+    <!-- Data Associations: Old Supplier -->
+    <dataInputAssociation id="DA_OS1">
+      <sourceRef>Task_CreateFinalBilling</sourceRef>
+      <targetRef>ServiceConsumptionReport</targetRef>
+    </dataInputAssociation>
+    <dataOutputAssociation id="DA_OS2">
+      <sourceRef>Task_CreateFinalBilling</sourceRef>
+      <targetRef>FinalBilling</targetRef>
+    </dataOutputAssociation>
+
+    <!-- Messages -->
+    <message id="Message_CustomerData" name="Customer Data"/>
+    <message id="Message_ConfirmationDoc" name="Confirmation Document"/>
+    <message id="Message_ContractDetails" name="Contract Details"/>
+    <message id="Message_Withdraw" name="Withdraw"/>
+    <message id="Message_Confirm" name="Confirm"/>
+    <message id="Message_SwitchRequest" name="Switch Request"/>
+    <message id="Message_GridOperatorResponse" name="Grid Operator Response"/>
+    <message id="Message_MeterData" name="Meter Data"/>
+    <message id="Message_ServiceConsumptionReport" name="Service Consumption Report"/>
+    <message id="Message_FinalBilling" name="Final Billing"/>
+
+    <!-- Message Flows -->
+    <messageFlow id="MF1" sourceRef="Task_SendCustomerData" targetRef="StartEvent_CS" messageRef="Message_CustomerData"/>
+    <messageFlow id="MF2" sourceRef="Throw_ConfirmationDoc" targetRef="Catch_ContractConfirmation" messageRef="Message_ConfirmationDoc"/>
+    <messageFlow id="MF3" sourceRef="Throw_ContractDetails" targetRef="Catch_ContractDetails" messageRef="Message_ContractDetails"/>
+    <messageFlow id="MF4" sourceRef="Throw_Withdraw" targetRef="Catch_Withdraw" messageRef="Message_Withdraw"/>
+    <messageFlow id="MF5" sourceRef="Throw_Confirm" targetRef="Catch_Confirm" messageRef="Message_Confirm"/>
+    <messageFlow id="MF6" sourceRef="Throw_SwitchRequest" targetRef="StartEvent_GridOperator" messageRef="Message_SwitchRequest"/>
+    <messageFlow id="MF7" sourceRef="Throw_GridOperatorResponse" targetRef="Catch_GridOperatorResponse" messageRef="Message_GridOperatorResponse"/>
+    <messageFlow id="MF8" sourceRef="Throw_MeterData" targetRef="Catch_MeterData" messageRef="Message_MeterData"/>
+    <messageFlow id="MF9" sourceRef="Throw_MeterData" targetRef="Catch_ServiceConsumptionReport_OS" messageRef="Message_ServiceConsumptionReport"/>
+    <messageFlow id="MF10" sourceRef="Throw_ServiceConsumptionReport" targetRef="Catch_ServiceConsumptionReport" messageRef="Message_ServiceConsumptionReport"/>
+    <messageFlow id="MF11" sourceRef="Throw_FinalBilling" targetRef="Catch_FinalBilling_OS" messageRef="Message_FinalBilling"/>
+    <messageFlow id="MF12" sourceRef="Throw_FinalBillingToCustomer" targetRef="Catch_FinalBilling" messageRef="Message_FinalBilling"/>
+
+  </process>
+
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+  <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="SwitchOverProcess">
+
+    <!-- Pools (Participant Bands) -->
+    <bpmndi:BPMNShape id="Participant_Customer" bpmnElement="Lane_Customer" isHorizontal="true">
+      <dc:Bounds x="100" y="100" width="2600" height="140"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="Participant_CustomerService" bpmnElement="Lane_CustomerService" isHorizontal="true">
+      <dc:Bounds x="100" y="250" width="2600" height="120"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="Participant_Sales" bpmnElement="Lane_Sales" isHorizontal="true">
+      <dc:Bounds x="100" y="370" width="2600" height="120"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="Participant_Distribution" bpmnElement="Lane_Distribution" isHorizontal="true">
+      <dc:Bounds x="100" y="490" width="2600" height="120"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="Participant_GridOperator" bpmnElement="Lane_GridOperator" isHorizontal="true">
+      <dc:Bounds x="100" y="610" width="2600" height="120"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="Participant_OldSupplier" bpmnElement="Lane_OldSupplier" isHorizontal="true">
+      <dc:Bounds x="100" y="730" width="2600" height="120"/>
+    </bpmndi:BPMNShape>
+
+    <!-- Customer Lane Elements -->
+    <bpmndi:BPMNShape id="Shape_StartEvent_Customer" bpmnElement="StartEvent_Customer">
+      <dc:Bounds x="150" y="157" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="Shape_Task_SendCustomerData" bpmnElement="Task_SendCustomerData">
+      <dc:Bounds x="230" y="147" width="100" height="56"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="Shape_Catch_ContractConfirmation" bpmnElement="Catch_ContractConfirmation">
+      <dc:Bounds x="360" y="157" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="Shape_Catch_ContractDetails" bpmnElement="Catch_ContractDetails">
+      <dc:Bounds x="470" y="157" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="Shape_Gateway_ReviewContract" bpmnElement="Gateway_ReviewContract" isMarkerVisible="true">
+      <dc:Bounds x="550" y="152" width="40" height="40"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="Shape_Throw_Withdraw" bpmnElement="Throw_Withdraw">
+      <dc:Bounds x="630" y="117" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="Shape_Throw_Confirm" bpmnElement="Throw_Confirm">
+      <dc:Bounds x="630" y="157" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="Shape_Timer_7Days" bpmnElement="Timer_7Days">
+      <dc:Bounds x="630" y="197" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="Shape_EndEvent_Customer" bpmnElement="EndEvent_Customer">
+      <dc:Bounds x="720" y="157" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="Shape_Catch_FinalBilling" bpmnElement="Catch_FinalBilling">
+      <dc:Bounds x="820" y="117" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="Shape_Catch_ServiceConsumptionReport" bpmnElement="Catch_ServiceConsumptionReport">
+      <dc:Bounds x="820" y="197" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+    
+    <!-- Customer Service Lane Elements -->
+    <bpmndi:BPMNShape id="Shape_StartEvent_CS" bpmnElement="StartEvent_CS">
+      <dc:Bounds x="150" y="287" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="Shape_Task_EnterCustomerData" bpmnElement="Task_EnterCustomerData">
+      <dc:Bounds x="230" y="272" width="100" height="56"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="Shape_Task_CompareCustomerData" bpmnElement="Task_CompareCustomerData">
+      <dc:Bounds x="350" y="272" width="100" height="56"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="Shape_Gateway_DataCheck" bpmnElement="Gateway_DataCheck" isMarkerVisible="true">
+      <dc:Bounds x="480" y="277" width="40" height="40"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="Shape_Task_CorrectErrors" bpmnElement="Task_CorrectErrors">
+      <dc:Bounds x="550" y="232" width="100" height="56"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="Shape_Task_CreateCustomerObject" bpmnElement="Task_CreateCustomerObject">
+      <dc:Bounds x="550" y="312" width="100" height="56"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="Shape_Task_PrepareContractDocs" bpmnElement="Task_PrepareContractDocs">
+      <dc:Bounds x="670" y="312" width="100" height="56"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="Shape_Call_CheckContractDocs" bpmnElement="Call_CheckContractDocs">
+      <dc:Bounds x="800" y="312" width="100" height="56"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="Shape_Gateway_ContractDocsOK" bpmnElement="Gateway_ContractDocsOK" isMarkerVisible="true">
+      <dc:Bounds x="920" y="317" width="40" height="40"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="Shape_Task_AnalyzeResolveIssues" bpmnElement="Task_AnalyzeResolveIssues">
+      <dc:Bounds x="980" y="257" width="100" height="56"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="Shape_Task_RegenerateContractDocs" bpmnElement="Task_RegenerateContractDocs">
+      <dc:Bounds x="1100" y="257" width="100" height="56"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="Shape_Task_SendConfirmationDoc" bpmnElement="Task_SendConfirmationDoc">
+      <dc:Bounds x="980" y="357" width="100" height="56"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="Shape_Throw_ConfirmationDoc" bpmnElement="Throw_ConfirmationDoc">
+      <dc:Bounds x="1110" y="367" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="Shape_Throw_ContractDetails" bpmnElement="Throw_ContractDetails">
+      <dc:Bounds x="1200" y="367" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="Shape_Catch_Withdraw" bpmnElement="Catch_Withdraw">
+      <dc:Bounds x="1280" y="322" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="Shape_Catch_Confirm" bpmnElement="Catch_Confirm">
+      <dc:Bounds x="1280" y="382" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="Shape_Timer_7Days_CS" bpmnElement="Timer_7Days_CS">
+      <dc:Bounds x="1280" y="442" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="Shape_Gateway_WithdrawOrConfirm" bpmnElement="Gateway_WithdrawOrConfirm" isMarkerVisible="true">
+      <dc:Bounds x="1375" y="367" width="40" height="40"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="Shape_Task_CreateCISContract" bpmnElement="Task_CreateCISContract">
+      <dc:Bounds x="1460" y="367" width="100" height="56"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="Shape_Throw_SwitchRequest" bpmnElement="Throw_SwitchRequest">
+      <dc:Bounds x="1570" y="377" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="Shape_Catch_GridOperatorResponse" bpmnElement="Catch_GridOperatorResponse">
+      <dc:Bounds x="1650" y="377" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="Shape_Gateway_SupplierConcurrence" bpmnElement="Gateway_SupplierConcurrence" isMarkerVisible="true">
+      <dc:Bounds x="1730" y="372" width="40" height="40"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="Shape_EndEvent_CS" bpmnElement="EndEvent_CS">
+      <dc:Bounds x="1810" y="377" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="Shape_Catch_MeterData" bpmnElement="Catch_MeterData">
+      <dc:Bounds x="1930" y="287" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="Shape_Task_ImportMeterData" bpmnElement="Task_ImportMeterData">
+      <dc:Bounds x="2010" y="272" width="100" height="56"/>
+    </bpmndi:BPMNShape>
+
+    <!-- Grid Operator Lane Elements -->
+    <bpmndi:BPMNShape id="Shape_StartEvent_GridOperator" bpmnElement="StartEvent_GridOperator">
+      <dc:Bounds x="150" y="647" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="Shape_Task_CheckSupplierConcurrence" bpmnElement="Task_CheckSupplierConcurrence">
+      <dc:Bounds x="230" y="632" width="100" height="56"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="Shape_Throw_GridOperatorResponse" bpmnElement="Throw_GridOperatorResponse">
+      <dc:Bounds x="350" y="647" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="Shape_Gateway_Concurrence" bpmnElement="Gateway_Concurrence" isMarkerVisible="true">
+      <dc:Bounds x="410" y="642" width="40" height="40"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="Shape_Task_InformSuppliers" bpmnElement="Task_InformSuppliers">
+      <dc:Bounds x="480" y="617" width="100" height="56"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="Shape_Task_ResolveConflict" bpmnElement="Task_ResolveConflict">
+      <dc:Bounds x="600" y="617" width="100" height="56"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="Shape_Task_TerminateOldContract" bpmnElement="Task_TerminateOldContract">
+      <dc:Bounds x="480" y="692" width="100" height="56"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="Shape_Throw_MeterData" bpmnElement="Throw_MeterData">
+      <dc:Bounds x="600" y="702" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="Shape_Throw_ServiceConsumptionReport" bpmnElement="Throw_ServiceConsumptionReport">
+      <dc:Bounds x="670" y="702" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="Shape_Task_ComputeFinalBilling" bpmnElement="Task_ComputeFinalBilling">
+      <dc:Bounds x="740" y="687" width="100" height="56"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="Shape_Throw_FinalBilling" bpmnElement="Throw_FinalBilling">
+      <dc:Bounds x="860" y="702" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="Shape_EndEvent_GridOperator" bpmnElement="EndEvent_GridOperator">
+      <dc:Bounds x="930" y="702" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="Shape_Timer_10Days" bpmnElement="Timer_10Days">
+      <dc:Bounds x="740" y="762" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+    
+    <!-- Old Supplier Lane Elements -->
+    <bpmndi:BPMNShape id="Shape_StartEvent_OldSupplier" bpmnElement="StartEvent_OldSupplier">
+      <dc:Bounds x="150" y="767" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="Shape_Catch_FinalBilling_OS" bpmnElement="Catch_FinalBilling_OS">
+      <dc:Bounds x="230" y="767" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="Shape_Catch_ServiceConsumptionReport_OS" bpmnElement="Catch_ServiceConsumptionReport_OS">
+      <dc:Bounds x="300" y="767" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="Shape_Task_CreateFinalBilling" bpmnElement="Task_CreateFinalBilling">
+      <dc:Bounds x="380" y="757" width="100" height="56"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="Shape_Throw_FinalBillingToCustomer" bpmnElement="Throw_FinalBillingToCustomer">
+      <dc:Bounds x="500" y="767" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="Shape_EndEvent_OldSupplier" bpmnElement="EndEvent_OldSupplier">
+      <dc:Bounds x="570" y="767" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+
+    <!-- Data Stores/Objects -->
+    <bpmndi:BPMNShape id="DS_CustomerData" bpmnElement="CustomerData" isExpanded="true">
+      <dc:Bounds x="120" y="60" width="40" height="40"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="DS_CRMSystem" bpmnElement="CRMSystem" isExpanded="true">
+      <dc:Bounds x="260" y="60" width="40" height="40"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="DS_CustomerDB" bpmnElement="CustomerDB" isExpanded="true">
+      <dc:Bounds x="380" y="60" width="40" height="40"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="DS_ErrorList" bpmnElement="ErrorList" isExpanded="true">
+      <dc:Bounds x="510" y="60" width="40" height="40"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="DS_CustomerObject" bpmnElement="CustomerObject" isExpanded="true">
+      <dc:Bounds x="640" y="60" width="40" height="40"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="DS_ContractDocuments" bpmnElement="ContractDocuments" isExpanded="true">
+      <dc:Bounds x="770" y="60" width="40" height="40"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="DS_CISSystem" bpmnElement="CISSystem" isExpanded="true">
+      <dc:Bounds x="900" y="60" width="40" height="40"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="DS_ConfirmationDoc" bpmnElement="ConfirmationDoc" isExpanded="true">
+      <dc:Bounds x="1030" y="60" width="40" height="40"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="DS_MeterData" bpmnElement="MeterData" isExpanded="true">
+      <dc:Bounds x="1160" y="60" width="40" height="40"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="DS_FinalBilling" bpmnElement="FinalBilling" isExpanded="true">
+      <dc:Bounds x="1290" y="60" width="40" height="40"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="DS_ServiceConsumptionReport" bpmnElement="ServiceConsumptionReport" isExpanded="true">
+      <dc:Bounds x="1420" y="60" width="40" height="40"/>
+    </bpmndi:BPMNShape>
+    
+    <!-- Sequence Flows: Customer -->
+    <bpmndi:BPMNEdge id="Edge_SF_C1" bpmnElement="SF_C1">
+      <di:waypoint x="186" y="175"/>
+      <di:waypoint x="230" y="175"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="Edge_SF_C2" bpmnElement="SF_C2">
+      <di:waypoint x="330" y="175"/>
+      <di:waypoint x="720" y="175"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="Edge_SF_C3" bpmnElement="SF_C3">
+      <di:waypoint x="506" y="175"/>
+      <di:waypoint x="550" y="172"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="Edge_SF_C4" bpmnElement="SF_C4">
+      <di:waypoint x="570" y="152"/>
+      <di:waypoint x="630" y="135"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="Edge_SF_C5" bpmnElement="SF_C5">
+      <di:waypoint x="590" y="172"/>
+      <di:waypoint x="630" y="175"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="Edge_SF_C6" bpmnElement="SF_C6">
+      <di:waypoint x="570" y="192"/>
+      <di:waypoint x="630" y="215"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="Edge_SF_C7" bpmnElement="SF_C7">
+      <di:waypoint x="666" y="135"/>
+      <di:waypoint x="720" y="175"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="Edge_SF_C8" bpmnElement="SF_C8">
+      <di:waypoint x="666" y="175"/>
+      <di:waypoint x="720" y="175"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="Edge_SF_C9" bpmnElement="SF_C9">
+      <di:waypoint x="666" y="215"/>
+      <di:waypoint x="720" y="175"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="Edge_SF_C10" bpmnElement="SF_C10">
+      <di:waypoint x="396" y="175"/>
+      <di:waypoint x="720" y="175"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="Edge_SF_C11" bpmnElement="SF_C11">
+      <di:waypoint x="856" y="135"/>
+      <di:waypoint x="720" y="175"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="Edge_SF_C12" bpmnElement="SF_C12">
+      <di:waypoint x="856" y="215"/>
+      <di:waypoint x="720" y="175"/>
+    </bpmndi:BPMNEdge>
+
+    <!-- Sequence Flows: Customer Service (Sample, full connections can be expanded similarly) -->
+    <bpmndi:BPMNEdge id="Edge_SF_CS1" bpmnElement="SF_CS1">
+      <di:waypoint x="186" y="305"/>
+      <di:waypoint x="230" y="300"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="Edge_SF_CS2" bpmnElement="SF_CS2">
+      <di:waypoint x="330" y="300"/>
+      <di:waypoint x="350" y="300"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="Edge_SF_CS3" bpmnElement="SF_CS3">
+      <di:waypoint x="450" y="300"/>
+      <di:waypoint x="480" y="297"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="Edge_SF_CS4" bpmnElement="SF_CS4">
+      <di:waypoint x="500" y="277"/>
+      <di:waypoint x="550" y="260"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="Edge_SF_CS5" bpmnElement="SF_CS5">
+      <di:waypoint x="520" y="317"/>
+      <di:waypoint x="550" y="340"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="Edge_SF_CS6" bpmnElement="SF_CS6">
+      <di:waypoint x="650" y="260"/>
+      <di:waypoint x="350" y="285"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="Edge_SF_CS7" bpmnElement="SF_CS7">
+      <di:waypoint x="650" y="340"/>
+      <di:waypoint x="670" y="340"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="Edge_SF_CS8" bpmnElement="SF_CS8">
+      <di:waypoint x="770" y="340"/>
+      <di:waypoint x="800" y="340"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="Edge_SF_CS9" bpmnElement="SF_CS9">
+      <di:waypoint x="900" y="340"/>
+      <di:waypoint x="920" y="337"/>
+    </bpmndi:BPMNEdge>
+
+    <!-- (The rest of the sequence flows would be continued here using similar patterns) -->
+
+    <!-- Sequence Flows: Grid Operator -->
+    <bpmndi:BPMNEdge id="Edge_SF_GO1" bpmnElement="SF_GO1">
+      <di:waypoint x="186" y="665"/>
+      <di:waypoint x="230" y="660"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="Edge_SF_GO2" bpmnElement="SF_GO2">
+      <di:waypoint x="330" y="660"/>
+      <di:waypoint x="350" y="665"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="Edge_SF_GO3" bpmnElement="SF_GO3">
+      <di:waypoint x="386" y="665"/>
+      <di:waypoint x="410" y="662"/>
+    </bpmndi:BPMNEdge>
+
+    <!-- Sequence Flows: Old Supplier -->
+    <bpmndi:BPMNEdge id="Edge_SF_OS1" bpmnElement="SF_OS1">
+      <di:waypoint x="186" y="785"/>
+      <di:waypoint x="230" y="785"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="Edge_SF_OS2" bpmnElement="SF_OS2">
+      <di:waypoint x="266" y="785"/>
+      <di:waypoint x="300" y="785"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="Edge_SF_OS3" bpmnElement="SF_OS3">
+      <di:waypoint x="336" y="785"/>
+      <di:waypoint x="380" y="785"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="Edge_SF_OS4" bpmnElement="SF_OS4">
+      <di:waypoint x="480" y="785"/>
+      <di:waypoint x="500" y="785"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="Edge_SF_OS5" bpmnElement="SF_OS5">
+      <di:waypoint x="536" y="785"/>
+      <di:waypoint x="570" y="785"/>
+    </bpmndi:BPMNEdge>
+    
+    <!-- Message Flows (arcs between pools) -->
+    <bpmndi:BPMNEdge id="Edge_MF1" bpmnElement="MF1">
+      <di:waypoint x="330" y="175"/>
+      <di:waypoint x="150" y="305"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="Edge_MF2" bpmnElement="MF2">
+      <di:waypoint x="1128" y="385"/>
+      <di:waypoint x="360" y="175"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="Edge_MF3" bpmnElement="MF3">
+      <di:waypoint x="1236" y="385"/>
+      <di:waypoint x="470" y="175"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="Edge_MF4" bpmnElement="MF4">
+      <di:waypoint x="666" y="135"/>
+      <di:waypoint x="1280" y="340"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="Edge_MF5" bpmnElement="MF5">
+      <di:waypoint x="666" y="175"/>
+      <di:waypoint x="1280" y="402"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="Edge_MF6" bpmnElement="MF6">
+      <di:waypoint x="1606" y="395"/>
+      <di:waypoint x="150" y="665"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="Edge_MF7" bpmnElement="MF7">
+      <di:waypoint x="386" y="665"/>
+      <di:waypoint x="1650" y="395"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="Edge_MF8" bpmnElement="MF8">
+      <di:waypoint x="636" y="720"/>
+      <di:waypoint x="1930" y="305"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="Edge_MF9" bpmnElement="MF9">
+      <di:waypoint x="636" y="720"/>
+      <di:waypoint x="300" y="785"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="Edge_MF10" bpmnElement="MF10">
+      <di:waypoint x="706" y="720"/>
+      <di:waypoint x="820" y="215"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="Edge_MF11" bpmnElement="MF11">
+      <di:waypoint x="896" y="720"/>
+      <di:waypoint x="230" y="785"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="Edge_MF12" bpmnElement="MF12">
+      <di:waypoint x="536" y="785"/>
+      <di:waypoint x="820" y="135"/>
+    </bpmndi:BPMNEdge>
+
+    <!-- Data Associations (sample, full for all references can be expanded as needed) -->
+    <bpmndi:BPMNEdge id="DA_CS1_Draw" bpmnElement="DA_CS1">
+      <di:waypoint x="230" y="272"/>
+      <di:waypoint x="140" y="100"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="DA_CS2_Draw" bpmnElement="DA_CS2">
+      <di:waypoint x="140" y="100"/>
+      <di:waypoint x="280" y="100"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="DA_CS3_Draw" bpmnElement="DA_CS3">
+      <di:waypoint x="350" y="272"/>
+      <di:waypoint x="400" y="100"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="DA_CS4_Draw" bpmnElement="DA_CS4">
+      <di:waypoint x="550" y="232"/>
+      <di:waypoint x="530" y="100"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="DA_CS5_Draw" bpmnElement="DA_CS5">
+      <di:waypoint x="600" y="312"/>
+      <di:waypoint x="660" y="100"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="DA_CS6_Draw" bpmnElement="DA_CS6">
+      <di:waypoint x="670" y="340"/>
+      <di:waypoint x="660" y="100"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="DA_CS7_Draw" bpmnElement="DA_CS7">
+      <di:waypoint x="770" y="340"/>
+      <di:waypoint x="790" y="100"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="DA_CS8_Draw" bpmnElement="DA_CS8">
+      <di:waypoint x="800" y="312"/>
+      <di:waypoint x="790" y="100"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="DA_CS9_Draw" bpmnElement="DA_CS9">
+      <di:waypoint x="1030" y="357"/>
+      <di:waypoint x="1050" y="100"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="DA_CS10_Draw" bpmnElement="DA_CS10">
+      <di:waypoint x="2010" y="272"/>
+      <di:waypoint x="1180" y="100"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="DA_GO1_Draw" bpmnElement="DA_GO1">
+      <di:waypoint x="760" y="687"/>
+      <di:waypoint x="1180" y="100"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="DA_GO2_Draw" bpmnElement="DA_GO2">
+      <di:waypoint x="760" y="687"/>
+      <di:waypoint x="1310" y="100"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="DA_GO3_Draw" bpmnElement="DA_GO3">
+      <di:waypoint x="706" y="720"/>
+      <di:waypoint x="1440" y="100"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="DA_OS1_Draw" bpmnElement="DA_OS1">
+      <di:waypoint x="380" y="757"/>
+      <di:waypoint x="1440" y="100"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="DA_OS2_Draw" bpmnElement="DA_OS2">
+      <di:waypoint x="380" y="757"/>
+      <di:waypoint x="1310" y="100"/>
+    </bpmndi:BPMNEdge>
+    
+  </bpmndi:BPMNPlane>
+</bpmndi:BPMNDiagram>
+</definitions>

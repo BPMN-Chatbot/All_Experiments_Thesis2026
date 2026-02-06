@@ -1,0 +1,799 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_1" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.34.0">
+  <collaboration id="Collaboration_1">
+    <participant id="Participant_Applicant" name="Applicant" processRef="Process_Applicant" />
+    <participant id="Participant_SportsInstitute" name="Sports Institute" processRef="Process_SportsInstitute" />
+  </collaboration>
+  <process id="Process_Applicant" isExecutable="true">
+    <laneSet>
+      <lane id="Lane_Applicant_Twitter" name="Twitter">
+        <flowNodeRef>MessageThrow_RequestActivation</flowNodeRef>
+        <flowNodeRef>MessageCatch_ActivationResponse</flowNodeRef>
+        <flowNodeRef>Task_ShareTwitter</flowNodeRef>
+        <flowNodeRef>EndEvent_Twitter</flowNodeRef>
+      </lane>
+      <lane id="Lane_Applicant_User" name="User">
+        <flowNodeRef>StartEvent_Applicant</flowNodeRef>
+        <flowNodeRef>Task_SelectCourse</flowNodeRef>
+        <flowNodeRef>MessageThrow_RequestCourses</flowNodeRef>
+        <flowNodeRef>MessageCatch_CourseList</flowNodeRef>
+        <flowNodeRef>Task_SelectOneCourse</flowNodeRef>
+        <flowNodeRef>Task_CheckAccount</flowNodeRef>
+        <flowNodeRef>Gateway_HasAccount</flowNodeRef>
+        <flowNodeRef>Task_LoginToAccount</flowNodeRef>
+        <flowNodeRef>Task_CheckUniversity</flowNodeRef>
+        <flowNodeRef>Gateway_EligibleUniversity</flowNodeRef>
+        <flowNodeRef>Task_RegisterAccount</flowNodeRef>
+        <flowNodeRef>Task_RegisterAccountAfterActivation</flowNodeRef>
+        <flowNodeRef>Parallel_Login_Tweet</flowNodeRef>
+        <flowNodeRef>Task_RegisterForCourse</flowNodeRef>
+        <flowNodeRef>MessageThrow_RegisterRequest</flowNodeRef>
+        <flowNodeRef>MessageCatch_CourseTicket</flowNodeRef>
+        <flowNodeRef>EndEvent_Applicant</flowNodeRef>
+      </lane>
+    </laneSet>
+    <dataObjectReference id="DataObjectReference_UniversityStatus" name="University Eligibility" dataObjectRef="DataObject_UniversityStatus" />
+    <dataObject id="DataObject_UniversityStatus" name="University Eligibility" />
+    <dataObjectReference id="DataObjectReference_PaymentInfo" name="Payment Information" dataObjectRef="DataObject_PaymentInfo" />
+    <dataObject id="DataObject_PaymentInfo" name="Payment Information" />
+    <dataObjectReference id="DataObjectReference_CourseTicket" name="Course Ticket" dataObjectRef="DataObject_CourseTicket" />
+    <dataObject id="DataObject_CourseTicket" name="Course Ticket" />
+    <startEvent id="StartEvent_Applicant" name="Start Registration">
+      <outgoing>Flow_Start_SelectCourse</outgoing>
+    </startEvent>
+    <task id="Task_SelectCourse" name="Select Course">
+      <incoming>Flow_Start_SelectCourse</incoming>
+      <outgoing>Flow_Throw_RequestCourses</outgoing>
+    </task>
+    <intermediateThrowEvent id="MessageThrow_RequestCourses" name="Request Available Courses">
+      <incoming>Flow_Throw_RequestCourses</incoming>
+      <outgoing>Flow_Catch_CourseList</outgoing>
+      <messageEventDefinition messageRef="Message_RequestCourses" />
+    </intermediateThrowEvent>
+    <intermediateCatchEvent id="MessageCatch_CourseList" name="Receive Available Courses">
+      <incoming>Flow_Catch_CourseList</incoming>
+      <outgoing>Flow_Select_One_Course</outgoing>
+      <messageEventDefinition messageRef="Message_CoursesList" />
+    </intermediateCatchEvent>
+    <task id="Task_SelectOneCourse" name="Select Course and Date">
+      <incoming>Flow_Select_One_Course</incoming>
+      <outgoing>Flow_Check_Account</outgoing>
+    </task>
+    <task id="Task_CheckAccount" name="Check for Existing Account">
+      <incoming>Flow_Check_Account</incoming>
+      <outgoing>Flow_Gateway_HasAccount</outgoing>
+    </task>
+    <exclusiveGateway id="Gateway_HasAccount" name="Account Exists?">
+      <incoming>Flow_Gateway_HasAccount</incoming>
+      <outgoing>Flow_Account_Exists</outgoing>
+      <outgoing>Flow_No_Account</outgoing>
+    </exclusiveGateway>
+    <task id="Task_LoginToAccount" name="Log Into Account">
+      <incoming>Flow_Account_Exists</incoming>
+      <outgoing>Flow_Parallel_Login_Tweet</outgoing>
+    </task>
+    <task id="Task_CheckUniversity" name="Check University Eligibility">
+      <incoming>Flow_No_Account</incoming>
+      <outgoing>Flow_Gateway_EligibleUniversity</outgoing>
+      <dataOutputAssociation id="dataOutputAssociation1">
+        <targetRef>DataObjectReference_UniversityStatus</targetRef>
+      </dataOutputAssociation>
+    </task>
+    <exclusiveGateway id="Gateway_EligibleUniversity" name="Eligible University?">
+      <incoming>Flow_Gateway_EligibleUniversity</incoming>
+      <outgoing>Flow_Eligible_Yes</outgoing>
+      <outgoing>Flow_Eligible_No</outgoing>
+    </exclusiveGateway>
+    <task id="Task_RegisterAccount" name="Register Account">
+      <incoming>Flow_Eligible_Yes</incoming>
+      <outgoing>Flow_ReturnToLogin</outgoing>
+      <dataInputAssociation id="dataInputAssociation1">
+        <sourceRef>DataObjectReference_UniversityStatus</sourceRef>
+      </dataInputAssociation>
+      <dataOutputAssociation id="dataOutputAssociation2">
+        <targetRef>DataObjectReference_AccountInfo</targetRef>
+      </dataOutputAssociation>
+    </task>
+    <intermediateThrowEvent id="MessageThrow_RequestActivation" name="Request Activation">
+      <incoming>Flow_Eligible_No</incoming>
+      <outgoing>Flow_WaitForActivation</outgoing>
+      <messageEventDefinition messageRef="Message_RequestActivation" />
+    </intermediateThrowEvent>
+    <intermediateCatchEvent id="MessageCatch_ActivationResponse" name="Receive Activation">
+      <incoming>Flow_WaitForActivation</incoming>
+      <outgoing>Flow_CreateAccountAfterActivation</outgoing>
+      <messageEventDefinition messageRef="Message_ActivationResponse" />
+    </intermediateCatchEvent>
+    <task id="Task_RegisterAccountAfterActivation" name="Register Account">
+      <incoming>Flow_CreateAccountAfterActivation</incoming>
+      <outgoing>Flow_ReturnToLogin_Activation</outgoing>
+      <dataOutputAssociation id="dataOutputAssociation3">
+        <targetRef>DataObjectReference_AccountInfo</targetRef>
+      </dataOutputAssociation>
+    </task>
+    <parallelGateway id="Parallel_Login_Tweet" name="Continue Registration and Social Sharing">
+      <incoming>Flow_Parallel_Login_Tweet</incoming>
+      <outgoing>Flow_RegisterCourse</outgoing>
+      <outgoing>Flow_ShareToTwitter</outgoing>
+    </parallelGateway>
+    <task id="Task_ShareTwitter" name="Tweet to Friends">
+      <incoming>Flow_ShareToTwitter</incoming>
+      <outgoing>Flow_End_Twitter</outgoing>
+    </task>
+    <endEvent id="EndEvent_Twitter" name="Done Tweeting">
+      <incoming>Flow_End_Twitter</incoming>
+    </endEvent>
+    <task id="Task_RegisterForCourse" name="Register for Course  Provide Payment Info">
+      <incoming>Flow_RegisterCourse</incoming>
+      <outgoing>Flow_Throw_RegistrationRequest</outgoing>
+    
+      <dataInputAssociation id="dataInputAssociation2">
+        <sourceRef>DataObjectReference_AccountInfo</sourceRef>
+      </dataInputAssociation>
+      <dataOutputAssociation id="dataOutputAssociation4">
+        <targetRef>DataObjectReference_PaymentInfo</targetRef>
+      </dataOutputAssociation>
+    </task>
+    <intermediateThrowEvent id="MessageThrow_RegisterRequest" name="Send Registration Request">
+      <incoming>Flow_Throw_RegistrationRequest</incoming>
+      <outgoing>Flow_Catch_CourseTicket</outgoing>
+      <messageEventDefinition messageRef="Message_RegistrationRequest" />
+    </intermediateThrowEvent>
+    <intermediateCatchEvent id="MessageCatch_CourseTicket" name="Receive Course Ticket">
+      <incoming>Flow_Catch_CourseTicket</incoming>
+      <outgoing>Flow_End_ApplicantProcess</outgoing>
+      <dataOutputAssociation id="dataOutputAssociation5">
+        <targetRef>DataObjectReference_CourseTicket</targetRef>
+      </dataOutputAssociation>
+      <messageEventDefinition messageRef="Message_CourseTicket" />
+    </intermediateCatchEvent>
+    <endEvent id="EndEvent_Applicant" name="Registration Complete">
+      <incoming>Flow_End_ApplicantProcess</incoming>
+    </endEvent>
+    <dataObjectReference id="DataObjectReference_AccountInfo" name="Account Info" dataObjectRef="DataObject_AccountInfo" />
+    <dataObject id="DataObject_AccountInfo" name="Account Info" />
+    <sequenceFlow id="Flow_Start_SelectCourse" sourceRef="StartEvent_Applicant" targetRef="Task_SelectCourse" />
+    <sequenceFlow id="Flow_Throw_RequestCourses" sourceRef="Task_SelectCourse" targetRef="MessageThrow_RequestCourses" />
+    <sequenceFlow id="Flow_Catch_CourseList" sourceRef="MessageThrow_RequestCourses" targetRef="MessageCatch_CourseList" />
+    <sequenceFlow id="Flow_Select_One_Course" sourceRef="MessageCatch_CourseList" targetRef="Task_SelectOneCourse" />
+    <sequenceFlow id="Flow_Check_Account" sourceRef="Task_SelectOneCourse" targetRef="Task_CheckAccount" />
+    <sequenceFlow id="Flow_Gateway_HasAccount" sourceRef="Task_CheckAccount" targetRef="Gateway_HasAccount" />
+    <sequenceFlow id="Flow_Account_Exists" sourceRef="Gateway_HasAccount" targetRef="Task_LoginToAccount">
+      <conditionExpression xsi:type="tFormalExpression">hasAccount</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="Flow_No_Account" sourceRef="Gateway_HasAccount" targetRef="Task_CheckUniversity">
+      <conditionExpression xsi:type="tFormalExpression">!hasAccount</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="Flow_ReturnToLogin" sourceRef="Task_RegisterAccount" targetRef="Task_LoginToAccount" />
+    <sequenceFlow id="Flow_ReturnToLogin_Activation" sourceRef="Task_RegisterAccountAfterActivation" targetRef="Task_LoginToAccount" />
+    <sequenceFlow id="Flow_Parallel_Login_Tweet" sourceRef="Task_LoginToAccount" targetRef="Parallel_Login_Tweet" />
+    <sequenceFlow id="Flow_Gateway_EligibleUniversity" sourceRef="Task_CheckUniversity" targetRef="Gateway_EligibleUniversity" />
+    <sequenceFlow id="Flow_Eligible_Yes" sourceRef="Gateway_EligibleUniversity" targetRef="Task_RegisterAccount">
+      <conditionExpression xsi:type="tFormalExpression">eligibleUniversity</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="Flow_Eligible_No" sourceRef="Gateway_EligibleUniversity" targetRef="MessageThrow_RequestActivation">
+      <conditionExpression xsi:type="tFormalExpression">!eligibleUniversity</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="Flow_WaitForActivation" sourceRef="MessageThrow_RequestActivation" targetRef="MessageCatch_ActivationResponse" />
+    <sequenceFlow id="Flow_CreateAccountAfterActivation" sourceRef="MessageCatch_ActivationResponse" targetRef="Task_RegisterAccountAfterActivation" />
+    <sequenceFlow id="Flow_ShareToTwitter" sourceRef="Parallel_Login_Tweet" targetRef="Task_ShareTwitter" />
+    <sequenceFlow id="Flow_RegisterCourse" sourceRef="Parallel_Login_Tweet" targetRef="Task_RegisterForCourse" />
+    <sequenceFlow id="Flow_End_Twitter" sourceRef="Task_ShareTwitter" targetRef="EndEvent_Twitter" />
+    <sequenceFlow id="Flow_Throw_RegistrationRequest" sourceRef="Task_RegisterForCourse" targetRef="MessageThrow_RegisterRequest" />
+    <sequenceFlow id="Flow_Catch_CourseTicket" sourceRef="MessageThrow_RegisterRequest" targetRef="MessageCatch_CourseTicket" />
+    <sequenceFlow id="Flow_End_ApplicantProcess" sourceRef="MessageCatch_CourseTicket" targetRef="EndEvent_Applicant" />
+  </process>
+  <process id="Process_SportsInstitute" isExecutable="true">
+    <laneSet>
+      <lane id="Lane_SportsInstitute_Admin" name="Administration">
+        <flowNodeRef>MessageCatch_ActivationRequest</flowNodeRef>
+        <flowNodeRef>Task_AdminReviewActivation</flowNodeRef>
+        <flowNodeRef>MessageThrow_ActivationResponse</flowNodeRef>
+      </lane>
+      <lane id="Lane_SportsInstitute_System" name="Registration System">
+        <flowNodeRef>StartEvent_SI</flowNodeRef>
+        <flowNodeRef>MessageCatch_RequestCourses</flowNodeRef>
+        <flowNodeRef>Task_CheckSlots</flowNodeRef>
+        <flowNodeRef>MessageThrow_CoursesList</flowNodeRef>
+        <flowNodeRef>EventBasedGateway_WaitForNext</flowNodeRef>
+        <flowNodeRef>MessageCatch_RegisterRequest</flowNodeRef>
+        <flowNodeRef>Task_ProcessRegistration</flowNodeRef>
+        <flowNodeRef>Task_SaveToDB</flowNodeRef>
+        <flowNodeRef>Task_GenerateCourseTicket</flowNodeRef>
+        <flowNodeRef>MessageThrow_CourseTicket</flowNodeRef>
+        <flowNodeRef>EndEvent_SI</flowNodeRef>
+      </lane>
+    </laneSet>
+    <dataObjectReference id="DataObjectReference_ScheduleList" name="Courses  Dates" dataObjectRef="DataObject_ScheduleList" />
+    <dataObject id="DataObject_ScheduleList" name="Courses  Dates" />
+    <dataObjectReference id="DataObjectReference_ActivationRequest" name="Activation Request" dataObjectRef="DataObject_ActivationRequest" />
+    <dataObject id="DataObject_ActivationRequest" name="Activation Request" />
+    <dataStoreReference id="DataStore_AvailableSlots" name="Course Slots Database" />
+    <dataStoreReference id="DataStore_Accounts" name="Account Database" />
+    <startEvent id="StartEvent_SI" name="Wait for Applicant Message" />
+    <intermediateCatchEvent id="MessageCatch_RequestCourses" name="Receive Request for Courses">
+      <incoming>Flow_StartCourses</incoming>
+      <outgoing>Flow_CheckSlots</outgoing>
+      <messageEventDefinition messageRef="Message_RequestCourses" />
+    </intermediateCatchEvent>
+    <task id="Task_CheckSlots" name="Check Available Course Slots">
+      <incoming>Flow_CheckSlots</incoming>
+      <outgoing>Flow_PrepareCourseList</outgoing>
+      <dataInputAssociation id="dataInputAssociation3">
+        <sourceRef>DataStore_AvailableSlots</sourceRef>
+      </dataInputAssociation>
+      <dataOutputAssociation id="dataOutputAssociation6">
+        <targetRef>DataObjectReference_ScheduleList</targetRef>
+      </dataOutputAssociation>
+    </task>
+    <intermediateThrowEvent id="MessageThrow_CoursesList" name="Send Courses  Dates">
+      <incoming>Flow_PrepareCourseList</incoming>
+      <outgoing>Flow_WaitForRegistrationOrActivation</outgoing>
+      <messageEventDefinition messageRef="Message_CoursesList" />
+    </intermediateThrowEvent>
+    <eventBasedGateway id="EventBasedGateway_WaitForNext" name="Wait for Registration or Activation">
+      <incoming>Flow_WaitForRegistrationOrActivation</incoming>
+      <outgoing>Flow_RegistrationRequest</outgoing>
+      <outgoing>Flow_ActivationRequest</outgoing>
+    </eventBasedGateway>
+    <intermediateCatchEvent id="MessageCatch_RegisterRequest" name="Receive Registration Request">
+      <incoming>Flow_RegistrationRequest</incoming>
+      <outgoing>Flow_ProcessRegistration</outgoing>
+      <messageEventDefinition messageRef="Message_RegistrationRequest" />
+    </intermediateCatchEvent>
+    <task id="Task_ProcessRegistration" name="Process Registration Request">
+      <incoming>Flow_ProcessRegistration</incoming>
+      <outgoing>Flow_SaveToDB</outgoing>
+      <dataInputAssociation id="dataInputAssociation4">
+        <sourceRef>DataObjectReference_ScheduleList</sourceRef>
+      </dataInputAssociation>
+      <dataInputAssociation id="dataInputAssociation5">
+        <sourceRef>DataStore_AvailableSlots</sourceRef>
+      </dataInputAssociation>
+      <dataInputAssociation id="dataInputAssociation6">
+        <sourceRef>DataStore_Accounts</sourceRef>
+      </dataInputAssociation>
+      <dataOutputAssociation id="dataOutputAssociation7">
+        <targetRef>DataObjectReference_RegistrationRequest</targetRef>
+      </dataOutputAssociation>
+    </task>
+    <task id="Task_SaveToDB" name="Save Registration">
+      <incoming>Flow_SaveToDB</incoming>
+      <outgoing>Flow_SendCourseTicket</outgoing>
+      <dataInputAssociation id="dataInputAssociation7">
+        <sourceRef>DataObjectReference_RegistrationRequest</sourceRef>
+      </dataInputAssociation>
+      <dataOutputAssociation id="dataOutputAssociation8">
+        <targetRef>DataStore_Accounts</targetRef>
+      </dataOutputAssociation>
+    </task>
+    <task id="Task_GenerateCourseTicket" name="Generate Course Ticket">
+      <incoming>Flow_SendCourseTicket</incoming>
+      <outgoing>Flow_Throw_CourseTicket</outgoing>
+      <dataInputAssociation id="dataInputAssociation8">
+        <sourceRef>DataStore_Accounts</sourceRef>
+      </dataInputAssociation>
+      <dataOutputAssociation id="dataOutputAssociation9">
+        <targetRef>DataObjectReference_CourseTicket</targetRef>
+      </dataOutputAssociation>
+    </task>
+    <intermediateThrowEvent id="MessageThrow_CourseTicket" name="Send Course Ticket">
+      <incoming>Flow_Throw_CourseTicket</incoming>
+      <outgoing>Flow_End_Process</outgoing>
+      <dataInputAssociation id="dataInputAssociation9">
+        <sourceRef>DataObjectReference_CourseTicket</sourceRef>
+      </dataInputAssociation>
+      <messageEventDefinition messageRef="Message_CourseTicket" />
+    </intermediateThrowEvent>
+    <endEvent id="EndEvent_SI" name="End">
+      <incoming>Flow_End_Process</incoming>
+    </endEvent>
+    <intermediateCatchEvent id="MessageCatch_ActivationRequest" name="Receive Activation Request">
+      <incoming>Flow_ActivationRequest</incoming>
+      <outgoing>Flow_AdminReviewActivation</outgoing>
+      <messageEventDefinition messageRef="Message_RequestActivation" />
+    </intermediateCatchEvent>
+    <task id="Task_AdminReviewActivation" name="Admin Reviews Activation Request">
+      <incoming>Flow_AdminReviewActivation</incoming>
+      <outgoing>Flow_Throw_ActivationResponse</outgoing>
+      <dataInputAssociation id="dataInputAssociation10">
+        <sourceRef>DataObjectReference_ActivationRequest</sourceRef>
+      </dataInputAssociation>
+      <dataOutputAssociation id="dataOutputAssociation10">
+        <targetRef>DataStore_Accounts</targetRef>
+      </dataOutputAssociation>
+    </task>
+    <intermediateThrowEvent id="MessageThrow_ActivationResponse" name="Send Activation Response">
+      <incoming>Flow_Throw_ActivationResponse</incoming>
+      <outgoing>Flow_BackToWaiting</outgoing>
+      <messageEventDefinition messageRef="Message_ActivationResponse" />
+    </intermediateThrowEvent>
+    <dataObjectReference id="DataObjectReference_RegistrationRequest" name="Registration Request" dataObjectRef="DataObject_RegistrationRequest" />
+    <dataObject id="DataObject_RegistrationRequest" name="Registration Request" />
+    <sequenceFlow id="Flow_StartCourses" sourceRef="StartEvent_SI" targetRef="MessageCatch_RequestCourses" />
+    <sequenceFlow id="Flow_CheckSlots" sourceRef="MessageCatch_RequestCourses" targetRef="Task_CheckSlots" />
+    <sequenceFlow id="Flow_PrepareCourseList" sourceRef="Task_CheckSlots" targetRef="MessageThrow_CoursesList" />
+    <sequenceFlow id="Flow_WaitForRegistrationOrActivation" sourceRef="MessageThrow_CoursesList" targetRef="EventBasedGateway_WaitForNext" />
+    <sequenceFlow id="Flow_BackToWaiting" sourceRef="MessageThrow_ActivationResponse" targetRef="EventBasedGateway_WaitForNext" />
+    <sequenceFlow id="Flow_RegistrationRequest" sourceRef="EventBasedGateway_WaitForNext" targetRef="MessageCatch_RegisterRequest" />
+    <sequenceFlow id="Flow_ActivationRequest" sourceRef="EventBasedGateway_WaitForNext" targetRef="MessageCatch_ActivationRequest" />
+    <sequenceFlow id="Flow_ProcessRegistration" sourceRef="MessageCatch_RegisterRequest" targetRef="Task_ProcessRegistration" />
+    <sequenceFlow id="Flow_SaveToDB" sourceRef="Task_ProcessRegistration" targetRef="Task_SaveToDB" />
+    <sequenceFlow id="Flow_SendCourseTicket" sourceRef="Task_SaveToDB" targetRef="Task_GenerateCourseTicket" />
+    <sequenceFlow id="Flow_Throw_CourseTicket" sourceRef="Task_GenerateCourseTicket" targetRef="MessageThrow_CourseTicket" />
+    <sequenceFlow id="Flow_End_Process" sourceRef="MessageThrow_CourseTicket" targetRef="EndEvent_SI" />
+    <sequenceFlow id="Flow_AdminReviewActivation" sourceRef="MessageCatch_ActivationRequest" targetRef="Task_AdminReviewActivation" />
+    <sequenceFlow id="Flow_Throw_ActivationResponse" sourceRef="Task_AdminReviewActivation" targetRef="MessageThrow_ActivationResponse" />
+  </process>
+  <message id="Message_RequestCourses" name="Request Available Courses" />
+  <message id="Message_CoursesList" name="Courses List" />
+  <message id="Message_RequestActivation" name="Activation Request" />
+  <message id="Message_ActivationResponse" name="Activation Response" />
+  <message id="Message_RegistrationRequest" name="Registration Request" />
+  <message id="Message_CourseTicket" name="Course Ticket" />
+  
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_1">
+      <bpmndi:BPMNShape id="Participant_Applicant_di" bpmnElement="Participant_Applicant" isHorizontal="true">
+        <dc:Bounds x="160" y="80" width="3950" height="680" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Applicant_Twitter_di" bpmnElement="Lane_Applicant_Twitter" isHorizontal="true">
+        <dc:Bounds x="190" y="600" width="3900" height="160" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Applicant_User_di" bpmnElement="Lane_Applicant_User" isHorizontal="true">
+        <dc:Bounds x="190" y="120" width="3900" height="480" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataObjectReference_CourseTicket_di" bpmnElement="DataObjectReference_CourseTicket" isExpanded="true">
+        <dc:Bounds x="2110" y="505" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2094" y="541" width="68" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="StartEvent_Applicant_di" bpmnElement="StartEvent_Applicant">
+        <dc:Bounds x="230" y="435" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="206" y="471" width="85" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_SelectCourse_di" bpmnElement="Task_SelectCourse">
+        <dc:Bounds x="310" y="418" width="100" height="70" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="MessageThrow_RequestCourses_di" bpmnElement="MessageThrow_RequestCourses">
+        <dc:Bounds x="450" y="438" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="424" y="474" width="89" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="MessageCatch_CourseList_di" bpmnElement="MessageCatch_CourseList">
+        <dc:Bounds x="540" y="438" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="514" y="474" width="88" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_SelectOneCourse_di" bpmnElement="Task_SelectOneCourse">
+        <dc:Bounds x="640" y="418" width="100" height="70" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_CheckAccount_di" bpmnElement="Task_CheckAccount">
+        <dc:Bounds x="780" y="418" width="100" height="70" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_HasAccount_di" bpmnElement="Gateway_HasAccount" isMarkerVisible="true">
+        <dc:Bounds x="930" y="433" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="916" y="483" width="78" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_ShareTwitter_di" bpmnElement="Task_ShareTwitter">
+        <dc:Bounds x="1710" y="630" width="110" height="64" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_Twitter_di" bpmnElement="EndEvent_Twitter">
+        <dc:Bounds x="1850" y="648" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1831" y="684" width="74" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="MessageThrow_RegisterRequest_di" bpmnElement="MessageThrow_RegisterRequest">
+        <dc:Bounds x="1930" y="438" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1904" y="474" width="88" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="MessageCatch_CourseTicket_di" bpmnElement="MessageCatch_CourseTicket">
+        <dc:Bounds x="2050" y="438" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2029" y="474" width="79" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_Applicant_di" bpmnElement="EndEvent_Applicant">
+        <dc:Bounds x="2165" y="450" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2154" y="486" width="59" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_LoginToAccount_di" bpmnElement="Task_LoginToAccount">
+        <dc:Bounds x="1055" y="275" width="100" height="70" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Parallel_Login_Tweet_di" bpmnElement="Parallel_Login_Tweet" isMarkerVisible="true">
+        <dc:Bounds x="1610" y="286" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1679" y="350" width="81" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_CheckUniversity_di" bpmnElement="Task_CheckUniversity">
+        <dc:Bounds x="1075" y="445" width="130" height="70" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataObjectReference_UniversityStatus_di" bpmnElement="DataObjectReference_UniversityStatus" isExpanded="true">
+        <dc:Bounds x="1212" y="372" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1206" y="408" width="49" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_RegisterAccount_di" bpmnElement="Task_RegisterAccount">
+        <dc:Bounds x="1385" y="375" width="110" height="70" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_RegisterForCourse_di" bpmnElement="Task_RegisterForCourse">
+        <dc:Bounds x="1785" y="268" width="130" height="70" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataObjectReference_PaymentInfo_di" bpmnElement="DataObjectReference_PaymentInfo" isExpanded="true">
+        <dc:Bounds x="1982" y="292" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1972" y="328" width="56" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataObjectReference_AccountInfo_di" bpmnElement="DataObjectReference_AccountInfo" isExpanded="true">
+        <dc:Bounds x="1522" y="152" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1509" y="188" width="62" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_EligibleUniversity_di" bpmnElement="Gateway_EligibleUniversity" isMarkerVisible="true">
+        <dc:Bounds x="1305" y="444" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1302" y="406.5" width="55" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="MessageThrow_RequestActivation_di" bpmnElement="MessageThrow_RequestActivation">
+        <dc:Bounds x="1430" y="528" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1424" y="490.5" width="48" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="MessageCatch_ActivationResponse_di" bpmnElement="MessageCatch_ActivationResponse">
+        <dc:Bounds x="1522" y="528" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1495" y="564" width="90" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_RegisterAccountAfterActivation_di" bpmnElement="Task_RegisterAccountAfterActivation">
+        <dc:Bounds x="1730" y="477" width="120" height="46" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_Start_SelectCourse_di" bpmnElement="Flow_Start_SelectCourse">
+        <di:waypoint x="266" y="453" />
+        <di:waypoint x="310" y="453" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Throw_RequestCourses_di" bpmnElement="Flow_Throw_RequestCourses">
+        <di:waypoint x="410" y="453" />
+        <di:waypoint x="450" y="456" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Catch_CourseList_di" bpmnElement="Flow_Catch_CourseList">
+        <di:waypoint x="486" y="456" />
+        <di:waypoint x="540" y="456" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Select_One_Course_di" bpmnElement="Flow_Select_One_Course">
+        <di:waypoint x="576" y="456" />
+        <di:waypoint x="640" y="453" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Check_Account_di" bpmnElement="Flow_Check_Account">
+        <di:waypoint x="740" y="453" />
+        <di:waypoint x="780" y="453" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Gateway_HasAccount_di" bpmnElement="Flow_Gateway_HasAccount">
+        <di:waypoint x="880" y="453" />
+        <di:waypoint x="930" y="458" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Account_Exists_di" bpmnElement="Flow_Account_Exists">
+        <di:waypoint x="955" y="433" />
+        <di:waypoint x="955" y="306" />
+        <di:waypoint x="1055" y="306" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_No_Account_di" bpmnElement="Flow_No_Account">
+        <di:waypoint x="980" y="458" />
+        <di:waypoint x="1028" y="458" />
+        <di:waypoint x="1028" y="490" />
+        <di:waypoint x="1075" y="490" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_ShareToTwitter_di" bpmnElement="Flow_ShareToTwitter">
+        <di:waypoint x="1635" y="336" />
+        <di:waypoint x="1635" y="662" />
+        <di:waypoint x="1710" y="662" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_End_Twitter_di" bpmnElement="Flow_End_Twitter">
+        <di:waypoint x="1820" y="662" />
+        <di:waypoint x="1850" y="662" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Throw_RegistrationRequest_di" bpmnElement="Flow_Throw_RegistrationRequest">
+        <di:waypoint x="1850" y="338" />
+        <di:waypoint x="1850" y="382" />
+        <di:waypoint x="1948" y="382" />
+        <di:waypoint x="1948" y="438" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Catch_CourseTicket_di" bpmnElement="Flow_Catch_CourseTicket">
+        <di:waypoint x="1966" y="456" />
+        <di:waypoint x="2050" y="456" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_End_ApplicantProcess_di" bpmnElement="Flow_End_ApplicantProcess">
+        <di:waypoint x="2086" y="465" />
+        <di:waypoint x="2165" y="468" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_ReturnToLogin_di" bpmnElement="Flow_ReturnToLogin">
+        <di:waypoint x="1440" y="375" />
+        <di:waypoint x="1440" y="311" />
+        <di:waypoint x="1155" y="310" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Parallel_Login_Tweet_di" bpmnElement="Flow_Parallel_Login_Tweet">
+        <di:waypoint x="1155" y="311" />
+        <di:waypoint x="1610" y="311" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_ReturnToLogin_Activation_di" bpmnElement="Flow_ReturnToLogin_Activation">
+        <di:waypoint x="1730" y="500" />
+        <di:waypoint x="1650" y="500" />
+        <di:waypoint x="1650" y="321" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_RegisterCourse_di" bpmnElement="Flow_RegisterCourse">
+        <di:waypoint x="1658" y="309" />
+        <di:waypoint x="1785" y="309" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Gateway_EligibleUniversity_di" bpmnElement="Flow_Gateway_EligibleUniversity">
+        <di:waypoint x="1205" y="472" />
+        <di:waypoint x="1308" y="472" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Eligible_Yes_di" bpmnElement="Flow_Eligible_Yes">
+        <di:waypoint x="1355" y="469" />
+        <di:waypoint x="1440" y="469" />
+        <di:waypoint x="1440" y="445" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Eligible_No_di" bpmnElement="Flow_Eligible_No">
+        <di:waypoint x="1330" y="494" />
+        <di:waypoint x="1330" y="557" />
+        <di:waypoint x="1434" y="557" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_WaitForActivation_di" bpmnElement="Flow_WaitForActivation">
+        <di:waypoint x="1466" y="546" />
+        <di:waypoint x="1522" y="546" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_CreateAccountAfterActivation_di" bpmnElement="Flow_CreateAccountAfterActivation">
+        <di:waypoint x="1558" y="546" />
+        <di:waypoint x="1790" y="546" />
+        <di:waypoint x="1790" y="523" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Participant_SportsInstitute_di" bpmnElement="Participant_SportsInstitute" isHorizontal="true">
+        <dc:Bounds x="180" y="800" width="3950" height="490" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_SportsInstitute_Admin_di" bpmnElement="Lane_SportsInstitute_Admin" isHorizontal="true">
+        <dc:Bounds x="210" y="1140" width="3900" height="140" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_SportsInstitute_System_di" bpmnElement="Lane_SportsInstitute_System" isHorizontal="true">
+        <dc:Bounds x="210" y="810" width="3900" height="330" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="StartEvent_SI_di" bpmnElement="StartEvent_SI">
+        <dc:Bounds x="580" y="965" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="575" y="1001" width="46" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="MessageCatch_RequestCourses_di" bpmnElement="MessageCatch_RequestCourses">
+        <dc:Bounds x="730" y="965" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="706" y="1001" width="85" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_CheckSlots_di" bpmnElement="Task_CheckSlots">
+        <dc:Bounds x="850" y="945" width="110" height="64" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="MessageThrow_CoursesList_di" bpmnElement="MessageThrow_CoursesList">
+        <dc:Bounds x="1010" y="965" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="993" y="1001" width="71" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EventBasedGateway_WaitForNext_di" bpmnElement="EventBasedGateway_WaitForNext">
+        <dc:Bounds x="1180" y="980" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1169" y="1030" width="73" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="MessageCatch_RegisterRequest_di" bpmnElement="MessageCatch_RegisterRequest">
+        <dc:Bounds x="1330" y="945" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1319" y="981" width="59" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_ProcessRegistration_di" bpmnElement="Task_ProcessRegistration">
+        <dc:Bounds x="1450" y="925" width="110" height="64" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_SaveToDB_di" bpmnElement="Task_SaveToDB">
+        <dc:Bounds x="1630" y="925" width="100" height="64" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_GenerateCourseTicket_di" bpmnElement="Task_GenerateCourseTicket">
+        <dc:Bounds x="1770" y="925" width="100" height="64" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="MessageThrow_CourseTicket_di" bpmnElement="MessageThrow_CourseTicket">
+        <dc:Bounds x="1910" y="945" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1896" y="981" width="65" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_SI_di" bpmnElement="EndEvent_SI">
+        <dc:Bounds x="2030" y="962" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2038" y="998" width="20" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="MessageCatch_ActivationRequest_di" bpmnElement="MessageCatch_ActivationRequest">
+        <dc:Bounds x="1310" y="1200" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1304" y="1236" width="48" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_AdminReviewActivation_di" bpmnElement="Task_AdminReviewActivation">
+        <dc:Bounds x="1430" y="1190" width="110" height="56" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataObjectReference_RegistrationRequest_di" bpmnElement="DataObjectReference_RegistrationRequest" isExpanded="true">
+        <dc:Bounds x="1580" y="1010" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1569" y="1046" width="59" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataStore_AvailableSlots_di" bpmnElement="DataStore_AvailableSlots" isExpanded="true">
+        <dc:Bounds x="1282" y="880" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1268" y="916" width="64" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataObjectReference_ScheduleList_di" bpmnElement="DataObjectReference_ScheduleList" isExpanded="true">
+        <dc:Bounds x="1022" y="852" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1003" y="888" width="74" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataObjectReference_ActivationRequest_di" bpmnElement="DataObjectReference_ActivationRequest" isExpanded="true">
+        <dc:Bounds x="1782" y="1182" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1776" y="1218" width="48" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="MessageThrow_ActivationResponse_di" bpmnElement="MessageThrow_ActivationResponse">
+        <dc:Bounds x="1652" y="1152" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1632" y="1188" width="76" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_StartCourses_di" bpmnElement="Flow_StartCourses">
+        <di:waypoint x="616" y="983" />
+        <di:waypoint x="730" y="983" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_CheckSlots_di" bpmnElement="Flow_CheckSlots">
+        <di:waypoint x="766" y="983" />
+        <di:waypoint x="850" y="977" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_PrepareCourseList_di" bpmnElement="Flow_PrepareCourseList">
+        <di:waypoint x="960" y="977" />
+        <di:waypoint x="1010" y="983" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_WaitForRegistrationOrActivation_di" bpmnElement="Flow_WaitForRegistrationOrActivation">
+        <di:waypoint x="1046" y="983" />
+        <di:waypoint x="1205" y="1005" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_BackToWaiting_di" bpmnElement="Flow_BackToWaiting">
+        <di:waypoint x="1670" y="1152" />
+        <di:waypoint x="1670" y="1110" />
+        <di:waypoint x="1229" y="1004" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_RegistrationRequest_di" bpmnElement="Flow_RegistrationRequest">
+        <di:waypoint x="1230" y="1005" />
+        <di:waypoint x="1330" y="963" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_ActivationRequest_di" bpmnElement="Flow_ActivationRequest">
+        <di:waypoint x="1206" y="1029" />
+        <di:waypoint x="1210" y="1160" />
+        <di:waypoint x="1328" y="1160" />
+        <di:waypoint x="1328" y="1200" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_ProcessRegistration_di" bpmnElement="Flow_ProcessRegistration">
+        <di:waypoint x="1366" y="963" />
+        <di:waypoint x="1450" y="957" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_SaveToDB_di" bpmnElement="Flow_SaveToDB">
+        <di:waypoint x="1560" y="957" />
+        <di:waypoint x="1630" y="957" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_SendCourseTicket_di" bpmnElement="Flow_SendCourseTicket">
+        <di:waypoint x="1730" y="957" />
+        <di:waypoint x="1770" y="957" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Throw_CourseTicket_di" bpmnElement="Flow_Throw_CourseTicket">
+        <di:waypoint x="1870" y="957" />
+        <di:waypoint x="1910" y="963" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_End_Process_di" bpmnElement="Flow_End_Process">
+        <di:waypoint x="1946" y="963" />
+        <di:waypoint x="2030" y="980" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_AdminReviewActivation_di" bpmnElement="Flow_AdminReviewActivation">
+        <di:waypoint x="1346" y="1218" />
+        <di:waypoint x="1430" y="1216" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Throw_ActivationResponse_di" bpmnElement="Flow_Throw_ActivationResponse">
+        <di:waypoint x="1540" y="1212" />
+        <di:waypoint x="1596" y="1210" />
+        <di:waypoint x="1610" y="1171" />
+        <di:waypoint x="1652" y="1171" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="da7" bpmnElement="dataOutputAssociation5">
+        <di:waypoint x="2086" y="465" />
+        <di:waypoint x="2128" y="523" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="da1" bpmnElement="dataOutputAssociation1">
+        <di:waypoint x="1178" y="445" />
+        <di:waypoint x="1213" y="408" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="da2" bpmnElement="dataInputAssociation1">
+        <di:waypoint x="1248" y="391" />
+        <di:waypoint x="1385" y="399" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="da3" bpmnElement="dataOutputAssociation2">
+        <di:waypoint x="1454" y="375" />
+        <di:waypoint x="1532" y="188" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="da5" bpmnElement="dataInputAssociation2">
+        <di:waypoint x="1558" y="179" />
+        <di:waypoint x="1784" y="303" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="da6" bpmnElement="dataOutputAssociation4">
+        <di:waypoint x="1915" y="303" />
+        <di:waypoint x="1982" y="309" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="da4" bpmnElement="dataOutputAssociation3">
+        <di:waypoint x="1829" y="477" />
+        <di:waypoint x="1558" y="187" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="da8" bpmnElement="dataInputAssociation3">
+        <di:waypoint x="1282" y="901" />
+        <di:waypoint x="960" y="963" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="da9" bpmnElement="dataOutputAssociation6">
+        <di:waypoint x="960" y="977" />
+        <di:waypoint x="1027" y="888" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="da10" bpmnElement="dataInputAssociation4">
+        <di:waypoint x="1058" y="870" />
+        <di:waypoint x="1505" y="870" />
+        <di:waypoint x="1505" y="925" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="da11" bpmnElement="dataInputAssociation5">
+        <di:waypoint x="1318" y="898" />
+        <di:waypoint x="1380" y="898" />
+        <di:waypoint x="1453" y="929" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="da13" bpmnElement="dataOutputAssociation7">
+        <di:waypoint x="1560" y="957" />
+        <di:waypoint x="1598" y="1028" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="da14" bpmnElement="dataInputAssociation7">
+        <di:waypoint x="1598" y="1028" />
+        <di:waypoint x="1630" y="989" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="da17" bpmnElement="dataOutputAssociation9">
+        <di:waypoint x="1853" y="925" />
+        <di:waypoint x="2110" y="538" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="da18" bpmnElement="dataInputAssociation9">
+        <di:waypoint x="2120" y="541" />
+        <di:waypoint x="1940" y="950" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="da19" bpmnElement="dataInputAssociation10">
+        <di:waypoint x="1782" y="1214" />
+        <di:waypoint x="1540" y="1228" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

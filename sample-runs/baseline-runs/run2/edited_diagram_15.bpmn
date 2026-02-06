@@ -1,0 +1,846 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+             xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+             xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+             id="Definitions_1"
+             targetNamespace="http://example.com/bpmn">
+
+    <bpmn:collaboration id="Collaboration_1">
+  </bpmn:collaboration>
+  <!-- Customer Pool -->
+  <process id="CustomerProcess" isExecutable="true">
+    <laneSet>
+      <lane id="CustomerLane" name="Customer"/>
+    </laneSet>
+    <startEvent id="CustomerStart" name="Service Degradation Perceived"/>
+    <task id="PrepareProblemParameterList" name="Prepare Problem Parameter List"/>
+    <endEvent id="CustomerEnd" name="Receive Service Performance/Resolution Report"/>
+    <sequenceFlow id="flow1" sourceRef="CustomerStart" targetRef="PrepareProblemParameterList"/>
+    <intermediateThrowEvent id="SendProblemParameters" name="Send Problem Parameters">
+      <messageEventDefinition id="SendProblemParametersDef"/>
+    </intermediateThrowEvent>
+    <sequenceFlow id="flow2" sourceRef="PrepareProblemParameterList" targetRef="SendProblemParameters"/>
+    <intermediateCatchEvent id="ReceiveServiceReport" name="Receive Service Performance/Resolution Report">
+      <messageEventDefinition id="ReceiveServiceReportDef"/>
+    </intermediateCatchEvent>
+    <sequenceFlow id="flow3" sourceRef="SendProblemParameters" targetRef="ReceiveServiceReport"/>
+    <sequenceFlow id="flow4" sourceRef="ReceiveServiceReport" targetRef="CustomerEnd"/>
+  </process>
+
+  <!-- TELECO Pool -->
+  <process id="TelecoProcess" isExecutable="true">
+    <laneSet>
+      <lane id="CustomerServiceLane" name="Customer Service"/>
+      <lane id="ServiceManagementLane" name="Service Management"/>
+      <lane id="ResourceProvisioningLane" name="Resource Provisioning"/>
+      <lane id="BillingLane" name="Billing & Collections"/>
+    </laneSet>
+    <!-- Customer Service Lane -->
+    <startEvent id="TelecoStart" name="Start"/>
+    <intermediateCatchEvent id="ReceiveProblemParameters" name="Receive Problem Parameters">
+      <messageEventDefinition id="ReceiveProblemParametersDef"/>
+    </intermediateCatchEvent>
+    <task id="EnterProblemReport" name="Enter Problem Report into System T"/>
+    <dataObjectReference id="ProblemReportData" dataObjectRef="ProblemReport"/>
+    <task id="CompareToSLA" name="Compare to Customer SLA"/>
+    <dataObjectReference id="SLAData" dataObjectRef="SLA"/>
+    <task id="DetermineCounterMeasures" name="Determine Counter Measures and Priorities"/>
+    <dataObjectReference id="CounterMeasuresData" dataObjectRef="CounterMeasures"/>
+    <callActivity id="DetermineCustomerSignificance" name="Determine Customer Significance"/>
+    <exclusiveGateway id="IsPremiumCustomer" name="Premium Customer?"/>
+    <callActivity id="ExtraProblemFixProcess" name="Extra Problem Fix Process"/>
+    <exclusiveGateway id="IsSignificanceAffecting" name="Significance Affects Counter Measures?"/>
+    <task id="ReprioritizeCounterMeasures" name="Re-prioritize Counter Measures"/>
+    <task id="CreateDetailedProblemReport" name="Create Detailed Problem Report"/>
+    <dataObjectReference id="DetailedProblemReportData" dataObjectRef="DetailedProblemReport"/>
+    <intermediateThrowEvent id="SendDetailedProblemReportToSM" name="Send Detailed Problem Report to Service Management">
+      <messageEventDefinition id="SendDetailedProblemReportToSMDef"/>
+    </intermediateThrowEvent>
+    <!-- End of Customer Service Lane -->
+    <!-- Service Management Lane -->
+    <intermediateCatchEvent id="ReceiveDetailedProblemReport" name="Receive Detailed Problem Report">
+      <messageEventDefinition id="ReceiveDetailedProblemReportDef"/>
+    </intermediateCatchEvent>
+    <exclusiveGateway id="SMAnalyzable" name="Analyzable by Service Management?"/>
+    <task id="SMAnalyzeProblem" name="Analyze Problem"/>
+    <task id="SMCreateTroubleReport" name="Create Trouble Report"/>
+    <dataObjectReference id="TroubleReportData" dataObjectRef="TroubleReport"/>
+    <intermediateThrowEvent id="SendDetailedProblemReportToRP" name="Send Detailed Problem Report to Resource Provisioning">
+      <messageEventDefinition id="SendDetailedProblemReportToRPDef"/>
+    </intermediateThrowEvent>
+    <intermediateCatchEvent id="ReceiveStatusReportFromRP" name="Receive Status Report from Resource Provisioning">
+      <messageEventDefinition id="ReceiveStatusReportFromRPDef"/>
+    </intermediateCatchEvent>
+    <task id="PrepareFinalStatusReport" name="Prepare Final Status Report"/>
+    <exclusiveGateway id="DetermineCounterMeasure" name="Determine Counter Measure"/>
+    <task id="SendActualServicePerformance" name="Send Actual Service Performance to Customer Service"/>
+    <intermediateThrowEvent id="SendActualServicePerformanceEvent" name="Send Actual Service Performance">
+      <messageEventDefinition id="SendActualServicePerformanceDef"/>
+    </intermediateThrowEvent>
+    <task id="UndertakeCorrectiveActions" name="Undertake Corrective Actions"/>
+    <task id="CreateProblemResolutionReport" name="Create Problem Resolution Report"/>
+    <dataObjectReference id="ProblemResolutionReportData" dataObjectRef="ProblemResolutionReport"/>
+    <intermediateThrowEvent id="SendProblemResolutionReport" name="Send Problem Resolution Report to Customer Service">
+      <messageEventDefinition id="SendProblemResolutionReportDef"/>
+    </intermediateThrowEvent>
+    <task id="CreateRestorationRequest" name="Create Request for Automatic Resource Restoration"/>
+    <intermediateThrowEvent id="SendRestorationRequestToRP" name="Send Restoration Request to Resource Provisioning">
+      <messageEventDefinition id="SendRestorationRequestToRPDef"/>
+    </intermediateThrowEvent>
+    <intermediateCatchEvent id="ReceiveTroubleshootingReport" name="Receive Trouble-shooting Report from Resource Provisioning">
+      <messageEventDefinition id="ReceiveTroubleshootingReportDef"/>
+    </intermediateCatchEvent>
+    <endEvent id="ServiceManagementEnd" name="End"/>
+    <!-- End of Service Management Lane -->
+    <!-- Resource Provisioning Lane -->
+    <intermediateCatchEvent id="ReceiveDetailedProblemReportFromSM" name="Receive Detailed Problem Report from Service Management">
+      <messageEventDefinition id="ReceiveDetailedProblemReportFromSMDef"/>
+    </intermediateCatchEvent>
+    <exclusiveGateway id="RPProblemDetected" name="Problem Detected?"/>
+    <task id="CreateNormalExecutionNotification" name="Create Normal Service Execution Notification"/>
+    <task id="RPAnalyzeProblem" name="Analyze Problem"/>
+    <task id="RPCreateTroubleReport" name="Create Trouble Report"/>
+    <task id="RPCreateStatusReport" name="Create Status Report"/>
+    <intermediateThrowEvent id="SendStatusReportToSM" name="Send Status Report to Service Management">
+      <messageEventDefinition id="SendStatusReportToSMDef"/>
+    </intermediateThrowEvent>
+    <intermediateCatchEvent id="ReceiveRestorationRequest" name="Receive Restoration Request">
+      <messageEventDefinition id="ReceiveRestorationRequestDef"/>
+    </intermediateCatchEvent>
+    <intermediateCatchEvent id="RestorationTimeout" name="Restoration Request Timeout">
+      <timerEventDefinition>
+        <timeDuration>PT48H</timeDuration>
+      </timerEventDefinition>
+    </intermediateCatchEvent>
+    <exclusiveGateway id="RestorationRequestArrived" name="Restoration Request Arrived?"/>
+    <task id="TrackErrors" name="Track Errors"/>
+    <task id="RPCorrectiveActions" name="Undertake Corrective Actions"/>
+    <task id="RPCreateTroubleshootingReport" name="Create Trouble-shooting Report"/>
+    <intermediateThrowEvent id="SendTroubleshootingReportToSM" name="Send Trouble-shooting Report to Service Management">
+      <messageEventDefinition id="SendTroubleshootingReportToSMDef"/>
+    </intermediateThrowEvent>
+    <endEvent id="ResourceProvisioningEnd" name="End"/>
+    <!-- End of Resource Provisioning Lane -->
+    <!-- Billing & Collections Lane -->
+    <intermediateCatchEvent id="ReceiveSLAViolationRebate" name="Receive SLA Violation Rebate"/>
+    <task id="AdjustBilling" name="Adjust Billing"/>
+    <endEvent id="BillingEnd" name="End"/>
+    <!-- End of Billing & Collections Lane -->
+    <!-- Data Objects -->
+    <dataObject id="ProblemReport" name="Problem Report"/>
+    <dataObject id="SLA" name="Customer SLA"/>
+    <dataObject id="CounterMeasures" name="Counter Measures"/>
+    <dataObject id="DetailedProblemReport" name="Detailed Problem Report"/>
+    <dataObject id="TroubleReport" name="Trouble Report"/>
+    <dataObject id="ProblemResolutionReport" name="Problem Resolution Report"/>
+    <!-- Sequence Flows: Customer Service Lane -->
+    <sequenceFlow id="t1" sourceRef="TelecoStart" targetRef="ReceiveProblemParameters"/>
+    <sequenceFlow id="t2" sourceRef="ReceiveProblemParameters" targetRef="EnterProblemReport"/>
+    <sequenceFlow id="t3" sourceRef="EnterProblemReport" targetRef="CompareToSLA"/>
+    <dataInputAssociation id="d1">
+      <sourceRef>EnterProblemReport</sourceRef>
+      <targetRef>ProblemReportData</targetRef>
+    </dataInputAssociation>
+    <sequenceFlow id="t4" sourceRef="CompareToSLA" targetRef="DetermineCounterMeasures"/>
+    <dataInputAssociation id="d2">
+      <sourceRef>CompareToSLA</sourceRef>
+      <targetRef>SLAData</targetRef>
+    </dataInputAssociation>
+    <sequenceFlow id="t5" sourceRef="DetermineCounterMeasures" targetRef="DetermineCustomerSignificance"/>
+    <dataInputAssociation id="d3">
+      <sourceRef>DetermineCounterMeasures</sourceRef>
+      <targetRef>CounterMeasuresData</targetRef>
+    </dataInputAssociation>
+    <sequenceFlow id="t6" sourceRef="DetermineCustomerSignificance" targetRef="IsPremiumCustomer"/>
+    <sequenceFlow id="t7" sourceRef="IsPremiumCustomer" targetRef="ExtraProblemFixProcess">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[isPremium]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="t8" sourceRef="IsPremiumCustomer" targetRef="IsSignificanceAffecting">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[!isPremium]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="t9" sourceRef="ExtraProblemFixProcess" targetRef="CreateDetailedProblemReport"/>
+    <sequenceFlow id="t10" sourceRef="IsSignificanceAffecting" targetRef="ReprioritizeCounterMeasures">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[significanceAffects]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="t11" sourceRef="IsSignificanceAffecting" targetRef="CreateDetailedProblemReport">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[!significanceAffects]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="t12" sourceRef="ReprioritizeCounterMeasures" targetRef="CreateDetailedProblemReport"/>
+    <sequenceFlow id="t13" sourceRef="CreateDetailedProblemReport" targetRef="SendDetailedProblemReportToSM"/>
+    <dataInputAssociation id="d4">
+      <sourceRef>CreateDetailedProblemReport</sourceRef>
+      <targetRef>DetailedProblemReportData</targetRef>
+    </dataInputAssociation>
+    <!-- Sequence Flows: Service Management Lane -->
+    <sequenceFlow id="t14" sourceRef="SendDetailedProblemReportToSM" targetRef="ReceiveDetailedProblemReport"/>
+    <sequenceFlow id="t15" sourceRef="ReceiveDetailedProblemReport" targetRef="SMAnalyzable"/>
+    <sequenceFlow id="t16" sourceRef="SMAnalyzable" targetRef="SMAnalyzeProblem">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[analyzable]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="t17" sourceRef="SMAnalyzable" targetRef="SendDetailedProblemReportToRP">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[!analyzable]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="t18" sourceRef="SMAnalyzeProblem" targetRef="SMCreateTroubleReport"/>
+    <sequenceFlow id="t19" sourceRef="SMCreateTroubleReport" targetRef="PrepareFinalStatusReport"/>
+    <dataInputAssociation id="d5">
+      <sourceRef>SMCreateTroubleReport</sourceRef>
+      <targetRef>TroubleReportData</targetRef>
+    </dataInputAssociation>
+    <sequenceFlow id="t20" sourceRef="SendDetailedProblemReportToRP" targetRef="ReceiveStatusReportFromRP"/>
+    <sequenceFlow id="t21" sourceRef="ReceiveStatusReportFromRP" targetRef="PrepareFinalStatusReport"/>
+    <sequenceFlow id="t22" sourceRef="PrepareFinalStatusReport" targetRef="DetermineCounterMeasure"/>
+    <sequenceFlow id="t23" sourceRef="DetermineCounterMeasure" targetRef="SendActualServicePerformance">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[noProblem]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="t24" sourceRef="DetermineCounterMeasure" targetRef="UndertakeCorrectiveActions">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[minorCorrective]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="t25" sourceRef="DetermineCounterMeasure" targetRef="CreateRestorationRequest">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[autoRestoration]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="t26" sourceRef="SendActualServicePerformance" targetRef="SendActualServicePerformanceEvent"/>
+    <sequenceFlow id="t27" sourceRef="SendActualServicePerformanceEvent" targetRef="ServiceManagementEnd"/>
+    <sequenceFlow id="t28" sourceRef="UndertakeCorrectiveActions" targetRef="CreateProblemResolutionReport"/>
+    <sequenceFlow id="t29" sourceRef="CreateProblemResolutionReport" targetRef="SendProblemResolutionReport"/>
+    <dataInputAssociation id="d6">
+      <sourceRef>CreateProblemResolutionReport</sourceRef>
+      <targetRef>ProblemResolutionReportData</targetRef>
+    </dataInputAssociation>
+    <sequenceFlow id="t30" sourceRef="SendProblemResolutionReport" targetRef="ServiceManagementEnd"/>
+    <sequenceFlow id="t31" sourceRef="CreateRestorationRequest" targetRef="SendRestorationRequestToRP"/>
+    <sequenceFlow id="t32" sourceRef="SendRestorationRequestToRP" targetRef="ReceiveTroubleshootingReport"/>
+    <sequenceFlow id="t33" sourceRef="ReceiveTroubleshootingReport" targetRef="CreateProblemResolutionReport"/>
+    <!-- Sequence Flows: Resource Provisioning Lane -->
+    <sequenceFlow id="t34" sourceRef="SendDetailedProblemReportToRP" targetRef="ReceiveDetailedProblemReportFromSM"/>
+    <sequenceFlow id="t35" sourceRef="ReceiveDetailedProblemReportFromSM" targetRef="RPProblemDetected"/>
+    <sequenceFlow id="t36" sourceRef="RPProblemDetected" targetRef="CreateNormalExecutionNotification">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[!problemDetected]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="t37" sourceRef="RPProblemDetected" targetRef="RPAnalyzeProblem">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[problemDetected]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="t38" sourceRef="CreateNormalExecutionNotification" targetRef="RPCreateStatusReport"/>
+    <sequenceFlow id="t39" sourceRef="RPAnalyzeProblem" targetRef="RPCreateTroubleReport"/>
+    <sequenceFlow id="t40" sourceRef="RPCreateTroubleReport" targetRef="RPCreateStatusReport"/>
+    <sequenceFlow id="t41" sourceRef="RPCreateStatusReport" targetRef="SendStatusReportToSM"/>
+    <sequenceFlow id="t42" sourceRef="SendStatusReportToSM" targetRef="RestorationRequestArrived"/>
+    <sequenceFlow id="t43" sourceRef="RestorationRequestArrived" targetRef="ReceiveRestorationRequest">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[restorationRequest]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="t44" sourceRef="RestorationRequestArrived" targetRef="RestorationTimeout">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[!restorationRequest]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="t45" sourceRef="ReceiveRestorationRequest" targetRef="TrackErrors"/>
+    <sequenceFlow id="t46" sourceRef="TrackErrors" targetRef="RPCorrectiveActions"/>
+    <sequenceFlow id="t47" sourceRef="RPCorrectiveActions" targetRef="RPCreateTroubleshootingReport"/>
+    <sequenceFlow id="t48" sourceRef="RPCreateTroubleshootingReport" targetRef="SendTroubleshootingReportToSM"/>
+    <sequenceFlow id="t49" sourceRef="SendTroubleshootingReportToSM" targetRef="ResourceProvisioningEnd"/>
+    <sequenceFlow id="t50" sourceRef="RestorationTimeout" targetRef="ResourceProvisioningEnd"/>
+    <!-- Sequence Flows: Billing & Collections Lane -->
+    <sequenceFlow id="t51" sourceRef="ReceiveSLAViolationRebate" targetRef="AdjustBilling"/>
+    <sequenceFlow id="t52" sourceRef="AdjustBilling" targetRef="BillingEnd"/>
+    <!-- Data Flows between Lanes (Data Associations) -->
+    <!-- Customer Service: After receiving actual service performance or problem resolution report, parallel activities -->
+    <parallelGateway id="CSParallelGatewayStart" name="Start Parallel Activities"/>
+    <parallelGateway id="CSParallelGatewayEnd" name="End Parallel Activities"/>
+    <intermediateCatchEvent id="ReceiveActualServicePerformance" name="Receive Actual Service Performance">
+      <messageEventDefinition id="ReceiveActualServicePerformanceDef"/>
+    </intermediateCatchEvent>
+    <intermediateCatchEvent id="ReceiveProblemResolutionReport" name="Receive Problem Resolution Report">
+      <messageEventDefinition id="ReceiveProblemResolutionReportDef"/>
+    </intermediateCatchEvent>
+    <task id="CreateCustomerReport" name="Create Report for Customer"/>
+    <task id="ReportSLAViolationRebate" name="Report SLA Violation Rebate"/>
+    <intermediateThrowEvent id="SendCustomerReport" name="Send Report to Customer">
+      <messageEventDefinition id="SendCustomerReportDef"/>
+    </intermediateThrowEvent>
+    <sequenceFlow id="t53" sourceRef="ReceiveActualServicePerformance" targetRef="CSParallelGatewayStart"/>
+    <sequenceFlow id="t54" sourceRef="ReceiveProblemResolutionReport" targetRef="CSParallelGatewayStart"/>
+    <sequenceFlow id="t55" sourceRef="CSParallelGatewayStart" targetRef="CreateCustomerReport"/>
+    <sequenceFlow id="t56" sourceRef="CSParallelGatewayStart" targetRef="ReportSLAViolationRebate"/>
+    <sequenceFlow id="t57" sourceRef="CreateCustomerReport" targetRef="SendCustomerReport"/>
+    <sequenceFlow id="t58" sourceRef="SendCustomerReport" targetRef="CSParallelGatewayEnd"/>
+    <sequenceFlow id="t59" sourceRef="ReportSLAViolationRebate" targetRef="ReceiveSLAViolationRebate"/>
+    <sequenceFlow id="t60" sourceRef="CSParallelGatewayEnd" targetRef="BillingEnd"/>
+    <endEvent id="CustomerServiceEnd" name="End"/>
+    <sequenceFlow id="t61" sourceRef="CSParallelGatewayEnd" targetRef="CustomerServiceEnd"/>
+  </process>
+
+  <!-- Message Flows between Pools -->
+  <messageFlow id="mf1" sourceRef="SendProblemParameters" targetRef="ReceiveProblemParameters"/>
+  <messageFlow id="mf2" sourceRef="SendDetailedProblemReportToSM" targetRef="ReceiveDetailedProblemReport"/>
+  <messageFlow id="mf3" sourceRef="SendDetailedProblemReportToRP" targetRef="ReceiveDetailedProblemReportFromSM"/>
+  <messageFlow id="mf4" sourceRef="SendStatusReportToSM" targetRef="ReceiveStatusReportFromRP"/>
+  <messageFlow id="mf5" sourceRef="SendActualServicePerformanceEvent" targetRef="ReceiveActualServicePerformance"/>
+  <messageFlow id="mf6" sourceRef="SendProblemResolutionReport" targetRef="ReceiveProblemResolutionReport"/>
+  <messageFlow id="mf7" sourceRef="SendRestorationRequestToRP" targetRef="ReceiveRestorationRequest"/>
+  <messageFlow id="mf8" sourceRef="SendTroubleshootingReportToSM" targetRef="ReceiveTroubleshootingReport"/>
+  <messageFlow id="mf9" sourceRef="SendCustomerReport" targetRef="ReceiveServiceReport"/>
+
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+  <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_1">
+
+    <!-- Customer Pool -->
+    <bpmndi:BPMNShape id="CustomerPool_di" bpmnElement="CustomerProcess" isHorizontal="true">
+      <dc:Bounds x="60" y="60" width="1920" height="240"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="CustomerLane_di" bpmnElement="CustomerLane">
+      <dc:Bounds x="60" y="60" width="1920" height="240"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="CustomerStart_di" bpmnElement="CustomerStart">
+      <dc:Bounds x="100" y="150" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="PrepareProblemParameterList_di" bpmnElement="PrepareProblemParameterList">
+      <dc:Bounds x="220" y="140" width="100" height="56"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="SendProblemParameters_di" bpmnElement="SendProblemParameters">
+      <dc:Bounds x="370" y="150" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="ReceiveServiceReport_di" bpmnElement="ReceiveServiceReport">
+      <dc:Bounds x="600" y="150" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="CustomerEnd_di" bpmnElement="CustomerEnd">
+      <dc:Bounds x="720" y="150" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+
+    <bpmndi:BPMNEdge id="flow1_di" bpmnElement="flow1">
+      <di:waypoint x="136" y="168"/>
+      <di:waypoint x="220" y="168"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="flow2_di" bpmnElement="flow2">
+      <di:waypoint x="320" y="168"/>
+      <di:waypoint x="370" y="168"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="flow3_di" bpmnElement="flow3">
+      <di:waypoint x="406" y="168"/>
+      <di:waypoint x="600" y="168"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="flow4_di" bpmnElement="flow4">
+      <di:waypoint x="636" y="168"/>
+      <di:waypoint x="720" y="168"/>
+    </bpmndi:BPMNEdge>
+
+    <!-- Teleco Pool -->
+    <bpmndi:BPMNShape id="TelecoPool_di" bpmnElement="TelecoProcess" isHorizontal="true">
+      <dc:Bounds x="60" y="340" width="2600" height="620"/>
+    </bpmndi:BPMNShape>
+    <!-- Lanes -->
+    <bpmndi:BPMNShape id="CustomerServiceLane_di" bpmnElement="CustomerServiceLane">
+      <dc:Bounds x="60" y="340" width="2600" height="155"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="ServiceManagementLane_di" bpmnElement="ServiceManagementLane">
+      <dc:Bounds x="60" y="495" width="2600" height="155"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="ResourceProvisioningLane_di" bpmnElement="ResourceProvisioningLane">
+      <dc:Bounds x="60" y="650" width="2600" height="155"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="BillingLane_di" bpmnElement="BillingLane">
+      <dc:Bounds x="60" y="805" width="2600" height="155"/>
+    </bpmndi:BPMNShape>
+
+    <!-- --- Customer Service Lane --- -->
+    <bpmndi:BPMNShape id="TelecoStart_di" bpmnElement="TelecoStart">
+      <dc:Bounds x="100" y="390" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="ReceiveProblemParameters_di" bpmnElement="ReceiveProblemParameters">
+      <dc:Bounds x="180" y="390" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="EnterProblemReport_di" bpmnElement="EnterProblemReport">
+      <dc:Bounds x="260" y="380" width="100" height="56"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="ProblemReportData_di" bpmnElement="ProblemReportData">
+      <dc:Bounds x="265" y="441" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="CompareToSLA_di" bpmnElement="CompareToSLA">
+      <dc:Bounds x="390" y="380" width="120" height="56"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="SLAData_di" bpmnElement="SLAData">
+      <dc:Bounds x="440" y="441" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="DetermineCounterMeasures_di" bpmnElement="DetermineCounterMeasures">
+      <dc:Bounds x="550" y="380" width="130" height="56"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="CounterMeasuresData_di" bpmnElement="CounterMeasuresData">
+      <dc:Bounds x="600" y="441" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="DetermineCustomerSignificance_di" bpmnElement="DetermineCustomerSignificance">
+      <dc:Bounds x="715" y="380" width="110" height="56"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="IsPremiumCustomer_di" bpmnElement="IsPremiumCustomer">
+      <dc:Bounds x="850" y="394" width="40" height="40"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="ExtraProblemFixProcess_di" bpmnElement="ExtraProblemFixProcess">
+      <dc:Bounds x="940" y="350" width="120" height="56"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="IsSignificanceAffecting_di" bpmnElement="IsSignificanceAffecting">
+      <dc:Bounds x="940" y="430" width="40" height="40"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="ReprioritizeCounterMeasures_di" bpmnElement="ReprioritizeCounterMeasures">
+      <dc:Bounds x="1040" y="425" width="130" height="56"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="CreateDetailedProblemReport_di" bpmnElement="CreateDetailedProblemReport">
+      <dc:Bounds x="1200" y="390" width="120" height="56"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="DetailedProblemReportData_di" bpmnElement="DetailedProblemReportData">
+      <dc:Bounds x="1210" y="451" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="SendDetailedProblemReportToSM_di" bpmnElement="SendDetailedProblemReportToSM">
+      <dc:Bounds x="1345" y="405" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="CSParallelGatewayStart_di" bpmnElement="CSParallelGatewayStart">
+      <dc:Bounds x="1720" y="415" width="40" height="40"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="CSParallelGatewayEnd_di" bpmnElement="CSParallelGatewayEnd">
+      <dc:Bounds x="2010" y="415" width="40" height="40"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="ReceiveActualServicePerformance_di" bpmnElement="ReceiveActualServicePerformance">
+      <dc:Bounds x="1650" y="370" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="ReceiveProblemResolutionReport_di" bpmnElement="ReceiveProblemResolutionReport">
+      <dc:Bounds x="1650" y="470" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="CreateCustomerReport_di" bpmnElement="CreateCustomerReport">
+      <dc:Bounds x="1810" y="370" width="120" height="56"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="ReportSLAViolationRebate_di" bpmnElement="ReportSLAViolationRebate">
+      <dc:Bounds x="1810" y="470" width="120" height="56"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="SendCustomerReport_di" bpmnElement="SendCustomerReport">
+      <dc:Bounds x="1960" y="385" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="CustomerServiceEnd_di" bpmnElement="CustomerServiceEnd">
+      <dc:Bounds x="2080" y="415" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+
+    <!-- --- Service Management Lane --- -->
+    <bpmndi:BPMNShape id="ReceiveDetailedProblemReport_di" bpmnElement="ReceiveDetailedProblemReport">
+      <dc:Bounds x="1400" y="530" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="SMAnalyzable_di" bpmnElement="SMAnalyzable">
+      <dc:Bounds x="1460" y="544" width="40" height="40"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="SMAnalyzeProblem_di" bpmnElement="SMAnalyzeProblem">
+      <dc:Bounds x="1560" y="523" width="110" height="56"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="SMCreateTroubleReport_di" bpmnElement="SMCreateTroubleReport">
+      <dc:Bounds x="1690" y="523" width="110" height="56"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="TroubleReportData_di" bpmnElement="TroubleReportData">
+      <dc:Bounds x="1689" y="580" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="PrepareFinalStatusReport_di" bpmnElement="PrepareFinalStatusReport">
+      <dc:Bounds x="1850" y="523" width="140" height="56"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="DetermineCounterMeasure_di" bpmnElement="DetermineCounterMeasure">
+      <dc:Bounds x="2020" y="537" width="40" height="40"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="SendActualServicePerformance_di" bpmnElement="SendActualServicePerformance">
+      <dc:Bounds x="2120" y="510" width="120" height="56"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="SendActualServicePerformanceEvent_di" bpmnElement="SendActualServicePerformanceEvent">
+      <dc:Bounds x="2260" y="524" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="UndertakeCorrectiveActions_di" bpmnElement="UndertakeCorrectiveActions">
+      <dc:Bounds x="2120" y="583" width="120" height="56"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="CreateProblemResolutionReport_di" bpmnElement="CreateProblemResolutionReport">
+      <dc:Bounds x="2260" y="583" width="110" height="56"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="ProblemResolutionReportData_di" bpmnElement="ProblemResolutionReportData">
+      <dc:Bounds x="2330" y="647" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="SendProblemResolutionReport_di" bpmnElement="SendProblemResolutionReport">
+      <dc:Bounds x="2400" y="597" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="CreateRestorationRequest_di" bpmnElement="CreateRestorationRequest">
+      <dc:Bounds x="2120" y="646" width="130" height="56"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="SendRestorationRequestToRP_di" bpmnElement="SendRestorationRequestToRP">
+      <dc:Bounds x="2260" y="665" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="ReceiveStatusReportFromRP_di" bpmnElement="ReceiveStatusReportFromRP">
+      <dc:Bounds x="1470" y="646" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="SendDetailedProblemReportToRP_di" bpmnElement="SendDetailedProblemReportToRP">
+      <dc:Bounds x="1560" y="646" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="ReceiveTroubleshootingReport_di" bpmnElement="ReceiveTroubleshootingReport">
+      <dc:Bounds x="2400" y="665" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="ServiceManagementEnd_di" bpmnElement="ServiceManagementEnd">
+      <dc:Bounds x="2460" y="597" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+
+    <!-- --- Resource Provisioning Lane --- -->
+    <bpmndi:BPMNShape id="ReceiveDetailedProblemReportFromSM_di" bpmnElement="ReceiveDetailedProblemReportFromSM">
+      <dc:Bounds x="1620" y="790" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="RPProblemDetected_di" bpmnElement="RPProblemDetected">
+      <dc:Bounds x="1700" y="804" width="40" height="40"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="CreateNormalExecutionNotification_di" bpmnElement="CreateNormalExecutionNotification">
+      <dc:Bounds x="1800" y="780" width="100" height="56"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="RPAnalyzeProblem_di" bpmnElement="RPAnalyzeProblem">
+      <dc:Bounds x="1800" y="871" width="110" height="56"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="RPCreateTroubleReport_di" bpmnElement="RPCreateTroubleReport">
+      <dc:Bounds x="1930" y="871" width="110" height="56"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="RPCreateStatusReport_di" bpmnElement="RPCreateStatusReport">
+      <dc:Bounds x="2060" y="780" width="110" height="56"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="SendStatusReportToSM_di" bpmnElement="SendStatusReportToSM">
+      <dc:Bounds x="2200" y="794" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="RestorationRequestArrived_di" bpmnElement="RestorationRequestArrived">
+      <dc:Bounds x="2260" y="808" width="40" height="40"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="ReceiveRestorationRequest_di" bpmnElement="ReceiveRestorationRequest">
+      <dc:Bounds x="2330" y="823" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="RestorationTimeout_di" bpmnElement="RestorationTimeout">
+      <dc:Bounds x="2330" y="873" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="TrackErrors_di" bpmnElement="TrackErrors">
+      <dc:Bounds x="2400" y="808" width="90" height="56"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="RPCorrectiveActions_di" bpmnElement="RPCorrectiveActions">
+      <dc:Bounds x="2500" y="808" width="110" height="56"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="RPCreateTroubleshootingReport_di" bpmnElement="RPCreateTroubleshootingReport">
+      <dc:Bounds x="2620" y="808" width="120" height="56"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="SendTroubleshootingReportToSM_di" bpmnElement="SendTroubleshootingReportToSM">
+      <dc:Bounds x="2750" y="823" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="ResourceProvisioningEnd_di" bpmnElement="ResourceProvisioningEnd">
+      <dc:Bounds x="2810" y="823" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+
+    <!-- --- Billing & Collections Lane --- -->
+    <bpmndi:BPMNShape id="ReceiveSLAViolationRebate_di" bpmnElement="ReceiveSLAViolationRebate">
+      <dc:Bounds x="2120" y="880" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="AdjustBilling_di" bpmnElement="AdjustBilling">
+      <dc:Bounds x="2230" y="885" width="110" height="56"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="BillingEnd_di" bpmnElement="BillingEnd">
+      <dc:Bounds x="2355" y="900" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+
+    <!-- Sequence Flows: Teleco -->
+    <bpmndi:BPMNEdge id="t1_di" bpmnElement="t1">
+      <di:waypoint x="136" y="408"/>
+      <di:waypoint x="180" y="408"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="t2_di" bpmnElement="t2">
+      <di:waypoint x="216" y="408"/>
+      <di:waypoint x="260" y="408"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="t3_di" bpmnElement="t3">
+      <di:waypoint x="360" y="408"/>
+      <di:waypoint x="390" y="408"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="t4_di" bpmnElement="t4">
+      <di:waypoint x="510" y="408"/>
+      <di:waypoint x="550" y="408"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="t5_di" bpmnElement="t5">
+      <di:waypoint x="680" y="408"/>
+      <di:waypoint x="715" y="408"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="t6_di" bpmnElement="t6">
+      <di:waypoint x="825" y="408"/>
+      <di:waypoint x="850" y="414"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="t7_di" bpmnElement="t7">
+      <di:waypoint x="890" y="414"/>
+      <di:waypoint x="940" y="378"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="t8_di" bpmnElement="t8">
+      <di:waypoint x="870" y="434"/>
+      <di:waypoint x="940" y="450"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="t9_di" bpmnElement="t9">
+      <di:waypoint x="1060" y="378"/>
+      <di:waypoint x="1200" y="418"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="t10_di" bpmnElement="t10">
+      <di:waypoint x="980" y="450"/>
+      <di:waypoint x="1040" y="453"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="t11_di" bpmnElement="t11">
+      <di:waypoint x="960" y="470"/>
+      <di:waypoint x="1200" y="418"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="t12_di" bpmnElement="t12">
+      <di:waypoint x="1170" y="453"/>
+      <di:waypoint x="1200" y="418"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="t13_di" bpmnElement="t13">
+      <di:waypoint x="1320" y="418"/>
+      <di:waypoint x="1345" y="423"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="t14_di" bpmnElement="t14">
+      <di:waypoint x="1381" y="423"/>
+      <di:waypoint x="1400" y="548"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="t15_di" bpmnElement="t15">
+      <di:waypoint x="1436" y="548"/>
+      <di:waypoint x="1460" y="564"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="t16_di" bpmnElement="t16">
+      <di:waypoint x="1500" y="564"/>
+      <di:waypoint x="1560" y="551"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="t17_di" bpmnElement="t17">
+      <di:waypoint x="1500" y="584"/>
+      <di:waypoint x="1560" y="664"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="t18_di" bpmnElement="t18">
+      <di:waypoint x="1670" y="551"/>
+      <di:waypoint x="1690" y="551"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="t19_di" bpmnElement="t19">
+      <di:waypoint x="1800" y="551"/>
+      <di:waypoint x="1850" y="551"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="t20_di" bpmnElement="t20">
+      <di:waypoint x="1596" y="664"/>
+      <di:waypoint x="1470" y="664"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="t21_di" bpmnElement="t21">
+      <di:waypoint x="1506" y="664"/>
+      <di:waypoint x="1850" y="551"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="t22_di" bpmnElement="t22">
+      <di:waypoint x="1990" y="551"/>
+      <di:waypoint x="2020" y="557"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="t23_di" bpmnElement="t23">
+      <di:waypoint x="2060" y="557"/>
+      <di:waypoint x="2120" y="538"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="t24_di" bpmnElement="t24">
+      <di:waypoint x="2060" y="577"/>
+      <di:waypoint x="2120" y="611"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="t25_di" bpmnElement="t25">
+      <di:waypoint x="2040" y="577"/>
+      <di:waypoint x="2120" y="674"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="t26_di" bpmnElement="t26">
+      <di:waypoint x="2240" y="538"/>
+      <di:waypoint x="2260" y="542"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="t27_di" bpmnElement="t27">
+      <di:waypoint x="2296" y="542"/>
+      <di:waypoint x="2460" y="615"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="t28_di" bpmnElement="t28">
+      <di:waypoint x="2240" y="611"/>
+      <di:waypoint x="2260" y="611"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="t29_di" bpmnElement="t29">
+      <di:waypoint x="2370" y="611"/>
+      <di:waypoint x="2400" y="615"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="t30_di" bpmnElement="t30">
+      <di:waypoint x="2436" y="615"/>
+      <di:waypoint x="2460" y="615"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="t31_di" bpmnElement="t31">
+      <di:waypoint x="2250" y="674"/>
+      <di:waypoint x="2260" y="683"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="t32_di" bpmnElement="t32">
+      <di:waypoint x="2296" y="683"/>
+      <di:waypoint x="2400" y="683"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="t33_di" bpmnElement="t33">
+      <di:waypoint x="2436" y="683"/>
+      <di:waypoint x="2260" y="611"/>
+    </bpmndi:BPMNEdge>
+
+    <bpmndi:BPMNEdge id="t34_di" bpmnElement="t34">
+      <di:waypoint x="1596" y="664"/>
+      <di:waypoint x="1620" y="808"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="t35_di" bpmnElement="t35">
+      <di:waypoint x="1656" y="808"/>
+      <di:waypoint x="1700" y="824"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="t36_di" bpmnElement="t36">
+      <di:waypoint x="1740" y="824"/>
+      <di:waypoint x="1800" y="808"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="t37_di" bpmnElement="t37">
+      <di:waypoint x="1740" y="844"/>
+      <di:waypoint x="1800" y="899"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="t38_di" bpmnElement="t38">
+      <di:waypoint x="1900" y="808"/>
+      <di:waypoint x="2060" y="808"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="t39_di" bpmnElement="t39">
+      <di:waypoint x="1910" y="899"/>
+      <di:waypoint x="1930" y="899"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="t40_di" bpmnElement="t40">
+      <di:waypoint x="2040" y="899"/>
+      <di:waypoint x="2060" y="808"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="t41_di" bpmnElement="t41">
+      <di:waypoint x="2170" y="808"/>
+      <di:waypoint x="2200" y="812"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="t42_di" bpmnElement="t42">
+      <di:waypoint x="2236" y="812"/>
+      <di:waypoint x="2260" y="828"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="t43_di" bpmnElement="t43">
+      <di:waypoint x="2300" y="828"/>
+      <di:waypoint x="2330" y="841"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="t44_di" bpmnElement="t44">
+      <di:waypoint x="2300" y="848"/>
+      <di:waypoint x="2330" y="891"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="t45_di" bpmnElement="t45">
+      <di:waypoint x="2366" y="841"/>
+      <di:waypoint x="2400" y="836"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="t46_di" bpmnElement="t46">
+      <di:waypoint x="2490" y="836"/>
+      <di:waypoint x="2500" y="836"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="t47_di" bpmnElement="t47">
+      <di:waypoint x="2610" y="836"/>
+      <di:waypoint x="2620" y="836"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="t48_di" bpmnElement="t48">
+      <di:waypoint x="2740" y="836"/>
+      <di:waypoint x="2750" y="841"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="t49_di" bpmnElement="t49">
+      <di:waypoint x="2786" y="841"/>
+      <di:waypoint x="2810" y="841"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="t50_di" bpmnElement="t50">
+      <di:waypoint x="2366" y="891"/>
+      <di:waypoint x="2810" y="841"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="t51_di" bpmnElement="t51">
+      <di:waypoint x="2156" y="898"/>
+      <di:waypoint x="2230" y="913"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="t52_di" bpmnElement="t52">
+      <di:waypoint x="2340" y="913"/>
+      <di:waypoint x="2355" y="918"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="t53_di" bpmnElement="t53">
+      <di:waypoint x="1686" y="388"/>
+      <di:waypoint x="1720" y="435"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="t54_di" bpmnElement="t54">
+      <di:waypoint x="1686" y="488"/>
+      <di:waypoint x="1720" y="435"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="t55_di" bpmnElement="t55">
+      <di:waypoint x="1760" y="435"/>
+      <di:waypoint x="1810" y="398"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="t56_di" bpmnElement="t56">
+      <di:waypoint x="1760" y="435"/>
+      <di:waypoint x="1810" y="498"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="t57_di" bpmnElement="t57">
+      <di:waypoint x="1930" y="398"/>
+      <di:waypoint x="1960" y="403"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="t58_di" bpmnElement="t58">
+      <di:waypoint x="1996" y="403"/>
+      <di:waypoint x="2010" y="435"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="t59_di" bpmnElement="t59">
+      <di:waypoint x="1930" y="498"/>
+      <di:waypoint x="2120" y="898"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="t60_di" bpmnElement="t60">
+      <di:waypoint x="2050" y="435"/>
+      <di:waypoint x="2355" y="918"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="t61_di" bpmnElement="t61">
+      <di:waypoint x="2050" y="435"/>
+      <di:waypoint x="2080" y="433"/>
+    </bpmndi:BPMNEdge>
+
+    <!-- Data Associations -->
+    <bpmndi:BPMNEdge id="d1_di" bpmnElement="d1">
+      <di:waypoint x="310" y="436"/>
+      <di:waypoint x="265" y="441"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="d2_di" bpmnElement="d2">
+      <di:waypoint x="440" y="436"/>
+      <di:waypoint x="440" y="441"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="d3_di" bpmnElement="d3">
+      <di:waypoint x="600" y="436"/>
+      <di:waypoint x="600" y="441"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="d4_di" bpmnElement="d4">
+      <di:waypoint x="1210" y="446"/>
+      <di:waypoint x="1210" y="451"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="d5_di" bpmnElement="d5">
+      <di:waypoint x="1745" y="579"/>
+      <di:waypoint x="1689" y="580"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="d6_di" bpmnElement="d6">
+      <di:waypoint x="2330" y="639"/>
+      <di:waypoint x="2330" y="647"/>
+    </bpmndi:BPMNEdge>
+
+    <!-- Message Flows between Pools -->
+    <bpmndi:BPMNEdge id="mf1_di" bpmnElement="mf1">
+      <di:waypoint x="406" y="168"/>
+      <di:waypoint x="198" y="390"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="mf2_di" bpmnElement="mf2">
+      <di:waypoint x="1363" y="423"/>
+      <di:waypoint x="1418" y="548"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="mf3_di" bpmnElement="mf3">
+      <di:waypoint x="1578" y="664"/>
+      <di:waypoint x="1638" y="790"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="mf4_di" bpmnElement="mf4">
+      <di:waypoint x="2218" y="812"/>
+      <di:waypoint x="1488" y="664"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="mf5_di" bpmnElement="mf5">
+      <di:waypoint x="2296" y="542"/>
+      <di:waypoint x="1668" y="388"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="mf6_di" bpmnElement="mf6">
+      <di:waypoint x="2436" y="615"/>
+      <di:waypoint x="1688" y="488"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="mf7_di" bpmnElement="mf7">
+      <di:waypoint x="2296" y="683"/>
+      <di:waypoint x="2348" y="841"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="mf8_di" bpmnElement="mf8">
+      <di:waypoint x="2786" y="841"/>
+      <di:waypoint x="2418" y="683"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="mf9_di" bpmnElement="mf9">
+      <di:waypoint x="1996" y="403"/>
+      <di:waypoint x="618" y="168"/>
+    </bpmndi:BPMNEdge>
+  </bpmndi:BPMNPlane>
+</bpmndi:BPMNDiagram>
+</definitions>

@@ -1,0 +1,36 @@
+{
+  "id": "chatcmpl-BSURrXgod9jbYgUz70UrSAP9Yr1Rc",
+  "object": "chat.completion",
+  "created": 1746129927,
+  "model": "gpt-4.1-2025-04-14",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<bpmn:definitions xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n                  xmlns:bpmn=\"http://www.omg.org/spec/BPMN/20100524/MODEL\"\n                  id=\"Definitions_1\"\n                  targetNamespace=\"http://example.com/bpmn\">\n  <bpmn:collaboration id=\"Collaboration_1\">\n    <bpmn:participant id=\"Pool_Management\" name=\"Management\" processRef=\"Process_Management\"/>\n    <bpmn:participant id=\"Pool_Company\" name=\"Company\" processRef=\"Process_Company\"/>\n    <bpmn:messageFlow id=\"MessageFlow_ManagementToCompany\" sourceRef=\"Management_SendOrderEvent\" targetRef=\"Company_ReceiveOrderEvent\"/>\n    <bpmn:messageFlow id=\"MessageFlow_CompanyToManagement\" sourceRef=\"Company_SendReportMessage\" targetRef=\"Management_ReceiveReportEvent\"/>\n  </bpmn:collaboration>\n  <bpmn:process id=\"Process_Management\" isExecutable=\"true\">\n    <bpmn:laneSet id=\"LaneSet_Management\">\n      <bpmn:lane id=\"Lane_Management\" name=\"Management\"/>\n    </bpmn:laneSet>\n    <bpmn:startEvent id=\"Management_Start\" name=\"Start\"/>\n    <bpmn:task id=\"Management_ProvideParams\" name=\"Set Year and Month for Cash-Out Report\"/>\n    <bpmn:intermediateThrowEvent id=\"Management_SendOrderEvent\" name=\"Send Cash-Out Order\">\n      <bpmn:messageEventDefinition id=\"MessageEventDefinition_SendOrder\"/>\n    </bpmn:intermediateThrowEvent>\n    <bpmn:intermediateCatchEvent id=\"Management_ReceiveReportEvent\" name=\"Receive Report\">\n      <bpmn:messageEventDefinition id=\"MessageEventDefinition_ReceiveReport\"/>\n    </bpmn:intermediateCatchEvent>\n    <bpmn:endEvent id=\"Management_End\" name=\"End\"/>\n    <bpmn:sequenceFlow id=\"Flow_M1\" sourceRef=\"Management_Start\" targetRef=\"Management_ProvideParams\"/>\n    <bpmn:sequenceFlow id=\"Flow_M2\" sourceRef=\"Management_ProvideParams\" targetRef=\"Management_SendOrderEvent\"/>\n    <bpmn:sequenceFlow id=\"Flow_M3\" sourceRef=\"Management_SendOrderEvent\" targetRef=\"Management_ReceiveReportEvent\"/>\n    <bpmn:sequenceFlow id=\"Flow_M4\" sourceRef=\"Management_ReceiveReportEvent\" targetRef=\"Management_End\"/>\n  </bpmn:process>\n  <bpmn:process id=\"Process_Company\" isExecutable=\"true\">\n    <bpmn:laneSet id=\"LaneSet_Company\">\n      <bpmn:lane id=\"Lane_Accounting\" name=\"Accountant\"/>\n    </bpmn:laneSet>\n    <bpmn:startEvent id=\"Company_Start\" name=\"Start\"/>\n    <bpmn:intermediateCatchEvent id=\"Company_ReceiveOrderEvent\" name=\"Receive Cash-Out Order\">\n      <bpmn:messageEventDefinition id=\"MessageEventDefinition_ReceiveOrder\"/>\n    </bpmn:intermediateCatchEvent>\n    <bpmn:task id=\"Company_FilterCashTransactions\" name=\"Filter Cash Transactions\">\n      <bpmn:dataInputAssociation id=\"DataInputAssociation_FilterQuery\">\n        <bpmn:sourceRef>Data_CashOutParams</bpmn:sourceRef>\n      </bpmn:dataInputAssociation>\n      <bpmn:dataInputAssociation id=\"DataInputAssociation_FilterCashDB\">\n        <bpmn:sourceRef>DataStore_CashDatabase</bpmn:sourceRef>\n      </bpmn:dataInputAssociation>\n      <bpmn:dataOutputAssociation id=\"DataOutputAssociation_FilterResult\">\n        <bpmn:targetRef>Data_CashTransactionResult</bpmn:targetRef>\n      </bpmn:dataOutputAssociation>\n    </bpmn:task>\n    <bpmn:exclusiveGateway id=\"Company_IsQueryEmpty\" name=\"Cash Transactions Found?\"/>\n    <bpmn:task id=\"Company_PrintReport\" name=\"Print Cash-Out Report\">\n      <bpmn:dataInputAssociation id=\"DataInputAssociation_PrintReport\">\n        <bpmn:sourceRef>Data_CashTransactionResult</bpmn:sourceRef>\n      </bpmn:dataInputAssociation>\n      <bpmn:dataOutputAssociation id=\"DataOutputAssociation_Report\">\n        <bpmn:targetRef>Data_CashOutReportPrinted</bpmn:targetRef>\n      </bpmn:dataOutputAssociation>\n    </bpmn:task>\n    <bpmn:intermediateThrowEvent id=\"Company_SendReportMessage\" name=\"Send Report\">\n      <bpmn:messageEventDefinition id=\"MessageEventDefinition_SendReport\"/>\n      <bpmn:dataInputAssociation id=\"DataInputAssociation_SendReport\">\n        <bpmn:sourceRef>Data_CashOutReportPrinted</bpmn:sourceRef>\n      </bpmn:dataInputAssociation>\n    </bpmn:intermediateThrowEvent>\n    <bpmn:endEvent id=\"Company_End_NoReport\" name=\"No Cash-Out\"/>\n    <bpmn:endEvent id=\"Company_End_ReportDone\" name=\"Report Delivered\"/>\n    <bpmn:dataObject id=\"Data_CashOutParams\" name=\"Cash-Out Parameters\"/>\n    <bpmn:dataStoreReference id=\"DataStore_CashDatabase\" name=\"Cash Database\"/>\n    <bpmn:dataObject id=\"Data_CashTransactionResult\" name=\"Cash Transactions\"/>\n    <bpmn:dataObject id=\"Data_CashOutReportPrinted\" name=\"Cash-Out Report\"/>\n    <bpmn:sequenceFlow id=\"Flow_C1\" sourceRef=\"Company_Start\" targetRef=\"Company_ReceiveOrderEvent\"/>\n    <bpmn:sequenceFlow id=\"Flow_C2\" sourceRef=\"Company_ReceiveOrderEvent\" targetRef=\"Company_FilterCashTransactions\"/>\n    <bpmn:sequenceFlow id=\"Flow_C3\" sourceRef=\"Company_FilterCashTransactions\" targetRef=\"Company_IsQueryEmpty\"/>\n    <bpmn:sequenceFlow id=\"Flow_C4\" sourceRef=\"Company_IsQueryEmpty\" targetRef=\"Company_PrintReport\">\n      <bpmn:conditionExpression xsi:type=\"bpmn:tFormalExpression\"><![CDATA[not empty]]></bpmn:conditionExpression>\n    </bpmn:sequenceFlow>\n    <bpmn:sequenceFlow id=\"Flow_C5\" sourceRef=\"Company_IsQueryEmpty\" targetRef=\"Company_End_NoReport\">\n      <bpmn:conditionExpression xsi:type=\"bpmn:tFormalExpression\"><![CDATA[empty]]></bpmn:conditionExpression>\n    </bpmn:sequenceFlow>\n    <bpmn:sequenceFlow id=\"Flow_C6\" sourceRef=\"Company_PrintReport\" targetRef=\"Company_SendReportMessage\"/>\n    <bpmn:sequenceFlow id=\"Flow_C7\" sourceRef=\"Company_SendReportMessage\" targetRef=\"Company_End_ReportDone\"/>\n  </bpmn:process>\n</bpmn:definitions>\n",
+        "refusal": null,
+        "annotations": []
+      },
+      "logprobs": null,
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 558,
+    "completion_tokens": 1444,
+    "total_tokens": 2002,
+    "prompt_tokens_details": {
+      "cached_tokens": 0,
+      "audio_tokens": 0
+    },
+    "completion_tokens_details": {
+      "reasoning_tokens": 0,
+      "audio_tokens": 0,
+      "accepted_prediction_tokens": 0,
+      "rejected_prediction_tokens": 0
+    }
+  },
+  "service_tier": "default",
+  "system_fingerprint": "fp_a1102cf978"
+}

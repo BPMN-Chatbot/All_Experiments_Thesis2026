@@ -1,0 +1,36 @@
+{
+  "id": "chatcmpl-BTe6xhENTy9YUr6b4i5OfXkf9NU8M",
+  "object": "chat.completion",
+  "created": 1746405399,
+  "model": "gpt-4.1-2025-04-14",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "```xml\n<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<definitions xmlns=\"http://www.omg.org/spec/BPMN/20100524/MODEL\"\n             xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n             xmlns:bpmndi=\"http://www.omg.org/spec/BPMN/20100524/DI\"\n             xmlns:dc=\"http://www.omg.org/spec/DD/20100524/DC\"\n             xmlns:di=\"http://www.omg.org/spec/DD/20100524/DI\"\n             id=\"Definitions_1\"\n             targetNamespace=\"http://bpmn.io/schema/bpmn\">\n\n  <process id=\"TribunalCompensationAssessment\" name=\"Tribunal Compensation Assessment\" isExecutable=\"true\">\n\n    <laneSet>\n      <lane id=\"Lane_Cashier\" name=\"Cashier\"/>\n      <lane id=\"Lane_Owner\" name=\"Owner\"/>\n    </laneSet>\n\n    <!-- Tribunal Pool -->\n    <participant id=\"Pool_Tribunal\" name=\"Tribunal\" processRef=\"TribunalCompensationAssessment\"/>\n    <!-- Owner Pool -->\n    <participant id=\"Pool_Owner\" name=\"Owner\"/>\n    \n    <!-- Tribunal Lane: Cashier -->\n    <startEvent id=\"StartEvent_RequestReceived\" name=\"Request Received\">\n      <messageEventDefinition/>\n    </startEvent>\n    <task id=\"Task_RetrieveFile\" name=\"Retrieve File\"/>\n    <task id=\"Task_CheckRequest\" name=\"Check Request Acceptability and Compliance\"/>\n    <exclusiveGateway id=\"Gateway_FeesPaidDecision\" name=\"Fees Paid?\"/>\n    <task id=\"Task_AllocateHearingDate\" name=\"Allocate Hearing Date\"/>\n    <endEvent id=\"EndEvent_ProcessComplete\" name=\"Process Complete\"/>\n\n    <task id=\"Task_ProduceFeesNotice\" name=\"Produce Fees Notice\"/>\n    <intermediateThrowEvent id=\"ThrowEvent_SendFeesNotice\" name=\"Send Fees Notice\">\n      <messageEventDefinition/>\n    </intermediateThrowEvent>\n    <intermediateCatchEvent id=\"CatchEvent_FeesPaid\" name=\"Wait for Fees Payment\">\n      <messageEventDefinition/>\n    </intermediateCatchEvent>\n\n    <!-- Data artifacts -->\n    <dataObject id=\"DataObject_Request\" name=\"Request Document\"/>\n    <dataObject id=\"DataObject_File\" name=\"Premises File\"/>\n    <dataObject id=\"DataObject_FeesNotice\" name=\"Fees Notice\"/>\n\n    <!-- Sequence flows for Tribunal process -->\n    <sequenceFlow id=\"flow1\" sourceRef=\"StartEvent_RequestReceived\" targetRef=\"Task_RetrieveFile\"/>\n    <sequenceFlow id=\"flow2\" sourceRef=\"Task_RetrieveFile\" targetRef=\"Task_CheckRequest\"/>\n    <sequenceFlow id=\"flow3\" sourceRef=\"Task_CheckRequest\" targetRef=\"Gateway_FeesPaidDecision\"/>\n\n    <sequenceFlow id=\"flow4\" sourceRef=\"Gateway_FeesPaidDecision\" targetRef=\"Task_AllocateHearingDate\">\n      <conditionExpression xsi:type=\"tFormalExpression\">feesPaid</conditionExpression>\n    </sequenceFlow>\n    <sequenceFlow id=\"flow5\" sourceRef=\"Task_AllocateHearingDate\" targetRef=\"EndEvent_ProcessComplete\"/>\n\n    <sequenceFlow id=\"flow6\" sourceRef=\"Gateway_FeesPaidDecision\" targetRef=\"Task_ProduceFeesNotice\">\n      <conditionExpression xsi:type=\"tFormalExpression\">!feesPaid</conditionExpression>\n    </sequenceFlow>\n    <sequenceFlow id=\"flow7\" sourceRef=\"Task_ProduceFeesNotice\" targetRef=\"ThrowEvent_SendFeesNotice\"/>\n    <sequenceFlow id=\"flow8\" sourceRef=\"ThrowEvent_SendFeesNotice\" targetRef=\"CatchEvent_FeesPaid\"/>\n    <sequenceFlow id=\"flow9\" sourceRef=\"CatchEvent_FeesPaid\" targetRef=\"Task_CheckRequest\"/>\n\n    <!-- Data Associations (Tribunal Lane) -->\n    <dataInputAssociation id=\"dia1\">\n      <sourceRef>DataObject_Request</sourceRef>\n      <targetRef>Task_CheckRequest</targetRef>\n    </dataInputAssociation>\n    <dataInputAssociation id=\"dia2\">\n      <sourceRef>DataObject_File</sourceRef>\n      <targetRef>Task_CheckRequest</targetRef>\n    </dataInputAssociation>\n    <dataOutputAssociation id=\"doa1\">\n      <sourceRef>Task_ProduceFeesNotice</sourceRef>\n      <targetRef>DataObject_FeesNotice</targetRef>\n    </dataOutputAssociation>\n    <dataInputAssociation id=\"dia3\">\n      <sourceRef>DataObject_FeesNotice</sourceRef>\n      <targetRef>ThrowEvent_SendFeesNotice</targetRef>\n    </dataInputAssociation>\n\n    <!-- Owner Pool: External participant, not modeled in detail -->\n    <startEvent id=\"StartEvent_OwnerBegin\" name=\"Submit Compensation Request\" isInterrupting=\"true\">\n      <messageEventDefinition/>\n    </startEvent>\n    <intermediateCatchEvent id=\"CatchEvent_ReceiveFeesNotice\" name=\"Receive Fees Notice\">\n      <messageEventDefinition/>\n    </intermediateCatchEvent>\n    <intermediateThrowEvent id=\"ThrowEvent_PayFees\" name=\"Pay Fees\">\n      <messageEventDefinition/>\n    </intermediateThrowEvent>\n\n    <!-- Message Flows (Pool-to-Pool Communication) -->\n    <messageFlow id=\"mf1\" sourceRef=\"StartEvent_OwnerBegin\" targetRef=\"StartEvent_RequestReceived\"/>\n    <messageFlow id=\"mf2\" sourceRef=\"ThrowEvent_SendFeesNotice\" targetRef=\"CatchEvent_ReceiveFeesNotice\"/>\n    <messageFlow id=\"mf3\" sourceRef=\"ThrowEvent_PayFees\" targetRef=\"CatchEvent_FeesPaid\"/>\n\n    <!-- Owner sequence (for completeness) -->\n    <sequenceFlow id=\"of1\" sourceRef=\"StartEvent_OwnerBegin\" targetRef=\"CatchEvent_ReceiveFeesNotice\"/>\n    <sequenceFlow id=\"of2\" sourceRef=\"CatchEvent_ReceiveFeesNotice\" targetRef=\"ThrowEvent_PayFees\"/>\n\n  </process>\n</definitions>\n```",
+        "refusal": null,
+        "annotations": []
+      },
+      "logprobs": null,
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 686,
+    "completion_tokens": 1257,
+    "total_tokens": 1943,
+    "prompt_tokens_details": {
+      "cached_tokens": 0,
+      "audio_tokens": 0
+    },
+    "completion_tokens_details": {
+      "reasoning_tokens": 0,
+      "audio_tokens": 0,
+      "accepted_prediction_tokens": 0,
+      "rejected_prediction_tokens": 0
+    }
+  },
+  "service_tier": "default",
+  "system_fingerprint": "fp_cf18407276"
+}

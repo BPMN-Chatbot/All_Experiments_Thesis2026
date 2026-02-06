@@ -1,0 +1,1 @@
+When the bank receives a new online application for opening a bank account, the application is evaluated. If the application is rejected, the customer is notified by email and the process ends. If the application is approved, a new bank account is created. Before the process ends, the bank sends a welcome pack, a bank card, and a PIN number in separate letters to the customer.

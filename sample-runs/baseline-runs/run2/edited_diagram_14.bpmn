@@ -1,0 +1,376 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_1" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.34.0">
+  <collaboration id="Collaboration_1">
+    <participant id="ApplicantPool" name="Applicant" processRef="ApplicantProcess" />
+    <participant id="AustrianRepresentationPool" name="Austrian Representation Office" processRef="RepresentationProcess" />
+    <messageFlow id="MessageFlow_ApplicationSubmission" sourceRef="Event_SubmitApplication" targetRef="Event_ReceiveApplication" />
+    <messageFlow id="MessageFlow_RequestAdditionalDocs" sourceRef="Event_RequestAdditionalDocs" targetRef="Event_ReceiveAdditionalDocs" />
+    <messageFlow id="MessageFlow_NotifyDecision" sourceRef="Event_NotifyDecision" targetRef="Event_ReceiveDecision" />
+    <messageFlow id="Flow_0de4pgt" sourceRef="Task_ReviewAdditionalDocs" targetRef="Task_CheckRequirements" />
+    <messageFlow id="Flow_1icoq3l" sourceRef="Event_RequestAdditionalDocs" targetRef="Event_ReceiveAdditionalDocs" />
+  </collaboration>
+  <process id="ApplicantProcess" isExecutable="true">
+    <laneSet>
+      <lane id="Lane_PersonalPreparation" name="Personal Preparation">
+        <flowNodeRef>StartEvent_Applicant</flowNodeRef>
+        <flowNodeRef>Task_CheckRequirements</flowNodeRef>
+        <flowNodeRef>Task_OrganizeAccommodation</flowNodeRef>
+        <flowNodeRef>Task_OrganizeBankAccount</flowNodeRef>
+      </lane>
+      <lane id="Lane_AccommodationBank" name="Accommodation &#38; Bank" />
+      <lane id="Lane_VisaApplication" name="Visa Application">
+        <flowNodeRef>Task_PrepareDocuments</flowNodeRef>
+        <flowNodeRef>Event_SubmitApplication</flowNodeRef>
+        <flowNodeRef>Event_ReceiveAdditionalDocs</flowNodeRef>
+        <flowNodeRef>Task_ProvideAdditionalDocs</flowNodeRef>
+        <flowNodeRef>Event_SubmitAdditionalDocs</flowNodeRef>
+        <flowNodeRef>Event_ReceiveDecision</flowNodeRef>
+        <flowNodeRef>Gateway_Decision</flowNodeRef>
+        <flowNodeRef>EndEvent_Approved</flowNodeRef>
+        <flowNodeRef>EndEvent_Rejected</flowNodeRef>
+      </lane>
+    </laneSet>
+    <startEvent id="StartEvent_Applicant" name="Start Preparation" />
+    <task id="Task_CheckRequirements" name="Check Visa &#38; Living Requirements" />
+    <task id="Task_OrganizeAccommodation" name="Organize Accommodation" />
+    <task id="Task_OrganizeBankAccount" name="Organize Bank Account" />
+    <dataObjectReference id="Data_AccommodationProof" name="AccommodationProof" dataObjectRef="DataObject_AccommodationProof" />
+    <dataObject id="DataObject_AccommodationProof" name="Accommodation Proof" />
+    <dataObjectReference id="Data_BankProof" name="BankProof" dataObjectRef="DataObject_BankProof" />
+    <dataObject id="DataObject_BankProof" name="Bank Account Proof" />
+    <task id="Task_PrepareDocuments" name="Prepare Required Documents" />
+    <intermediateThrowEvent id="Event_SubmitApplication" name="Submit Visa Application">
+      <messageEventDefinition id="MessageEventDefinition_SubmitApplication" />
+    </intermediateThrowEvent>
+    <intermediateCatchEvent id="Event_ReceiveAdditionalDocs" name="Receive Request for Additional Documents">
+      <messageEventDefinition id="MessageEventDefinition_ReceiveAdditionalDocs" />
+    </intermediateCatchEvent>
+    <task id="Task_ProvideAdditionalDocs" name="Provide Additional Documents" />
+    <intermediateThrowEvent id="Event_SubmitAdditionalDocs" name="Submit Additional Documents">
+      <messageEventDefinition id="MessageEventDefinition_SubmitAdditionalDocs" />
+    </intermediateThrowEvent>
+    <intermediateCatchEvent id="Event_ReceiveDecision" name="Receive Visa Decision">
+      <messageEventDefinition id="MessageEventDefinition_ReceiveDecision" />
+    </intermediateCatchEvent>
+    <exclusiveGateway id="Gateway_Decision" name="Visa Approved?" />
+    <endEvent id="EndEvent_Approved" name="Visa Approved" />
+    <endEvent id="EndEvent_Rejected" name="Visa Rejected" />
+    <dataObjectReference id="Data_ApplicationDocuments" name="DataObject_ApplicationDocuments" dataObjectRef="DataObject_ApplicationDocuments" />
+    <dataObject id="DataObject_ApplicationDocuments" name="Visa Application Documents" />
+    <sequenceFlow id="Flow1" sourceRef="StartEvent_Applicant" targetRef="Task_CheckRequirements" />
+    <sequenceFlow id="Flow2" sourceRef="Task_CheckRequirements" targetRef="Task_OrganizeAccommodation" />
+    <sequenceFlow id="Flow3" sourceRef="Task_OrganizeAccommodation" targetRef="Task_OrganizeBankAccount" />
+    <sequenceFlow id="Flow4" sourceRef="Task_OrganizeBankAccount" targetRef="Task_PrepareDocuments" />
+    <sequenceFlow id="Flow5" sourceRef="Task_PrepareDocuments" targetRef="Event_SubmitApplication" />
+    <sequenceFlow id="Flow8" sourceRef="Event_SubmitApplication" targetRef="Event_ReceiveDecision" />
+    <sequenceFlow id="Flow6" sourceRef="Event_ReceiveAdditionalDocs" targetRef="Task_ProvideAdditionalDocs" />
+    <sequenceFlow id="Flow7" sourceRef="Task_ProvideAdditionalDocs" targetRef="Event_SubmitAdditionalDocs" />
+    <sequenceFlow id="Flow9" sourceRef="Event_SubmitAdditionalDocs" targetRef="Event_ReceiveDecision" />
+    <sequenceFlow id="Flow10" sourceRef="Event_ReceiveDecision" targetRef="Gateway_Decision" />
+    <sequenceFlow id="Flow11" sourceRef="Gateway_Decision" targetRef="EndEvent_Approved">
+      <conditionExpression xsi:type="tFormalExpression">approved</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="Flow12" sourceRef="Gateway_Decision" targetRef="EndEvent_Rejected">
+      <conditionExpression xsi:type="tFormalExpression">not approved</conditionExpression>
+    </sequenceFlow>
+  </process>
+  <process id="RepresentationProcess" isExecutable="true">
+    <laneSet>
+      <lane id="Lane_VisaOfficer" name="Visa Officer">
+        <flowNodeRef>Event_RequestAdditionalDocs</flowNodeRef>
+        <flowNodeRef>Task_ReviewAdditionalDocs</flowNodeRef>
+      </lane>
+      <lane id="Lane_ConsularSection" name="Consular Section">
+        <flowNodeRef>StartEvent_Representation</flowNodeRef>
+        <flowNodeRef>Event_ReceiveApplication</flowNodeRef>
+        <flowNodeRef>Task_ReviewApplication</flowNodeRef>
+        <flowNodeRef>Gateway_CompleteDocs</flowNodeRef>
+        <flowNodeRef>Gateway_Eligibility</flowNodeRef>
+        <flowNodeRef>Task_IssueDecision</flowNodeRef>
+        <flowNodeRef>Event_NotifyDecision</flowNodeRef>
+        <flowNodeRef>EndEvent_Representation</flowNodeRef>
+      </lane>
+    </laneSet>
+    <sequenceFlow id="RFlow13" sourceRef="Event_NotifyDecision" targetRef="EndEvent_Representation" />
+    <sequenceFlow id="RFlow12" sourceRef="Task_IssueDecision" targetRef="Event_NotifyDecision" />
+    <sequenceFlow id="RFlow11" sourceRef="Gateway_Eligibility" targetRef="Task_IssueDecision">
+      <conditionExpression xsi:type="tFormalExpression">not eligible</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="RFlow10" sourceRef="Gateway_Eligibility" targetRef="Task_IssueDecision">
+      <conditionExpression xsi:type="tFormalExpression">eligible</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="RFlow5" sourceRef="Gateway_CompleteDocs" targetRef="Event_RequestAdditionalDocs">
+      <conditionExpression xsi:type="tFormalExpression">incomplete</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="RFlow3" sourceRef="Task_ReviewApplication" targetRef="Gateway_CompleteDocs" />
+    <sequenceFlow id="RFlow2" sourceRef="Event_ReceiveApplication" targetRef="Task_ReviewApplication" />
+    <sequenceFlow id="RFlow1" sourceRef="StartEvent_Representation" targetRef="Event_ReceiveApplication" />
+    <endEvent id="EndEvent_Representation" name="End" />
+    <intermediateThrowEvent id="Event_NotifyDecision" name="Notify Applicant of Decision">
+      <messageEventDefinition id="MessageEventDefinition_NotifyDecision" />
+    </intermediateThrowEvent>
+    <task id="Task_IssueDecision" name="Issue Visa Decision" />
+    <exclusiveGateway id="Gateway_Eligibility" name="Eligible?" />
+    <task id="Task_ReviewAdditionalDocs" name="Review Additional Documents" />
+    <intermediateThrowEvent id="Event_RequestAdditionalDocs" name="Request Additional Documents">
+      <messageEventDefinition id="MessageEventDefinition_RequestAdditionalDocs" />
+    </intermediateThrowEvent>
+    <exclusiveGateway id="Gateway_CompleteDocs" name="Documents Complete?" />
+    <task id="Task_ReviewApplication" name="Review Application" />
+    <intermediateCatchEvent id="Event_ReceiveApplication" name="Receive Visa Application">
+      <messageEventDefinition id="MessageEventDefinition_ReceiveApplication" />
+    </intermediateCatchEvent>
+    <startEvent id="StartEvent_Representation" name="Start" />
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_1">
+      <bpmndi:BPMNShape id="Shape_ApplicantPool" bpmnElement="ApplicantPool" isHorizontal="true">
+        <dc:Bounds x="160" y="100" width="1880" height="520" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_PersonalPreparation" bpmnElement="Lane_PersonalPreparation" isHorizontal="true">
+        <dc:Bounds x="180" y="120" width="1840" height="120" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_AccommodationBank" bpmnElement="Lane_AccommodationBank" isHorizontal="true">
+        <dc:Bounds x="180" y="240" width="1840" height="120" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_VisaApplication" bpmnElement="Lane_VisaApplication" isHorizontal="true">
+        <dc:Bounds x="180" y="360" width="1840" height="240" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_StartEvent_Applicant" bpmnElement="StartEvent_Applicant">
+        <dc:Bounds x="210" y="170" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="186" y="206" width="84" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Task_CheckRequirements" bpmnElement="Task_CheckRequirements">
+        <dc:Bounds x="310" y="150" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Task_OrganizeAccommodation" bpmnElement="Task_OrganizeAccommodation">
+        <dc:Bounds x="440" y="150" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Task_OrganizeBankAccount" bpmnElement="Task_OrganizeBankAccount">
+        <dc:Bounds x="610" y="150" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Data_AccommodationProof" bpmnElement="Data_AccommodationProof" isExpanded="true">
+        <dc:Bounds x="500" y="255" width="40" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="477" y="305" width="86" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Data_BankProof" bpmnElement="Data_BankProof" isExpanded="true">
+        <dc:Bounds x="670" y="255" width="40" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="664" y="305" width="53" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Task_PrepareDocuments" bpmnElement="Task_PrepareDocuments">
+        <dc:Bounds x="780" y="390" width="160" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Event_SubmitApplication" bpmnElement="Event_SubmitApplication">
+        <dc:Bounds x="990" y="410" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="978" y="446" width="60" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Event_ReceiveAdditionalDocs" bpmnElement="Event_ReceiveAdditionalDocs">
+        <dc:Bounds x="1110" y="430" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1086" y="466" width="85" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Task_ProvideAdditionalDocs" bpmnElement="Task_ProvideAdditionalDocs">
+        <dc:Bounds x="1210" y="430" width="140" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Event_SubmitAdditionalDocs" bpmnElement="Event_SubmitAdditionalDocs">
+        <dc:Bounds x="1380" y="440" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1370" y="476" width="57" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Event_ReceiveDecision" bpmnElement="Event_ReceiveDecision">
+        <dc:Bounds x="1490" y="430" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1476" y="466" width="65" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Gateway_Decision" bpmnElement="Gateway_Decision" isMarkerVisible="true">
+        <dc:Bounds x="1610" y="430" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1597" y="480" width="77" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_EndEvent_Approved" bpmnElement="EndEvent_Approved">
+        <dc:Bounds x="1740" y="440" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1723" y="476" width="71" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_EndEvent_Rejected" bpmnElement="EndEvent_Rejected">
+        <dc:Bounds x="1740" y="490" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1724" y="526" width="68" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Data_ApplicationDocuments" bpmnElement="Data_ApplicationDocuments" isExpanded="true">
+        <dc:Bounds x="860" y="500" width="46" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="839" y="550" width="88" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Edge_Flow1" bpmnElement="Flow1">
+        <di:waypoint x="246" y="188" />
+        <di:waypoint x="310" y="190" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow2" bpmnElement="Flow2">
+        <di:waypoint x="410" y="190" />
+        <di:waypoint x="440" y="190" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow3" bpmnElement="Flow3">
+        <di:waypoint x="580" y="190" />
+        <di:waypoint x="610" y="190" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow4" bpmnElement="Flow4">
+        <di:waypoint x="750" y="190" />
+        <di:waypoint x="780" y="430" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow5" bpmnElement="Flow5">
+        <di:waypoint x="940" y="430" />
+        <di:waypoint x="990" y="428" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow8" bpmnElement="Flow8">
+        <di:waypoint x="1026" y="428" />
+        <di:waypoint x="1490" y="448" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow6" bpmnElement="Flow6">
+        <di:waypoint x="1146" y="448" />
+        <di:waypoint x="1210" y="460" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow7" bpmnElement="Flow7">
+        <di:waypoint x="1350" y="460" />
+        <di:waypoint x="1380" y="458" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow9" bpmnElement="Flow9">
+        <di:waypoint x="1416" y="458" />
+        <di:waypoint x="1490" y="448" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow10" bpmnElement="Flow10">
+        <di:waypoint x="1526" y="448" />
+        <di:waypoint x="1610" y="455" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow11" bpmnElement="Flow11">
+        <di:waypoint x="1660" y="455" />
+        <di:waypoint x="1740" y="458" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow12" bpmnElement="Flow12">
+        <di:waypoint x="1660" y="480" />
+        <di:waypoint x="1740" y="508" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Shape_AustrianRepresentationPool" bpmnElement="AustrianRepresentationPool" isHorizontal="true">
+        <dc:Bounds x="160" y="650" width="1880" height="320" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_ConsularSection" bpmnElement="Lane_ConsularSection" isHorizontal="true">
+        <dc:Bounds x="180" y="670" width="1840" height="120" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_VisaOfficer" bpmnElement="Lane_VisaOfficer" isHorizontal="true">
+        <dc:Bounds x="180" y="790" width="1840" height="160" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_StartEvent_Representation" bpmnElement="StartEvent_Representation">
+        <dc:Bounds x="210" y="720" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="216" y="756" width="24" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Event_ReceiveApplication" bpmnElement="Event_ReceiveApplication">
+        <dc:Bounds x="350" y="730" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="336" y="766" width="65" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Task_ReviewApplication" bpmnElement="Task_ReviewApplication">
+        <dc:Bounds x="430" y="700" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Gateway_CompleteDocs" bpmnElement="Gateway_CompleteDocs" isMarkerVisible="true">
+        <dc:Bounds x="600" y="740" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="597" y="790" width="57" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Event_RequestAdditionalDocs" bpmnElement="Event_RequestAdditionalDocs">
+        <dc:Bounds x="690" y="840" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="680" y="876" width="57" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Task_ReviewAdditionalDocs" bpmnElement="Task_ReviewAdditionalDocs">
+        <dc:Bounds x="910" y="850" width="140" height="60" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Gateway_Eligibility" bpmnElement="Gateway_Eligibility" isMarkerVisible="true">
+        <dc:Bounds x="940" y="740" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="944" y="790" width="42" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Task_IssueDecision" bpmnElement="Task_IssueDecision">
+        <dc:Bounds x="1050" y="730" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Event_NotifyDecision" bpmnElement="Event_NotifyDecision">
+        <dc:Bounds x="1260" y="750" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1240" y="786" width="77" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_EndEvent_Representation" bpmnElement="EndEvent_Representation">
+        <dc:Bounds x="1370" y="760" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1378" y="796" width="20" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Edge_RFlow1" bpmnElement="RFlow1">
+        <di:waypoint x="246" y="738" />
+        <di:waypoint x="350" y="748" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_RFlow2" bpmnElement="RFlow2">
+        <di:waypoint x="386" y="748" />
+        <di:waypoint x="430" y="740" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_RFlow3" bpmnElement="RFlow3">
+        <di:waypoint x="570" y="740" />
+        <di:waypoint x="600" y="765" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_RFlow5" bpmnElement="RFlow5">
+        <di:waypoint x="625" y="790" />
+        <di:waypoint x="690" y="858" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_RFlow10" bpmnElement="RFlow10">
+        <di:waypoint x="990" y="765" />
+        <di:waypoint x="1050" y="770" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_RFlow11" bpmnElement="RFlow11">
+        <di:waypoint x="990" y="790" />
+        <di:waypoint x="1050" y="800" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_RFlow12" bpmnElement="RFlow12">
+        <di:waypoint x="1190" y="770" />
+        <di:waypoint x="1260" y="768" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_RFlow13" bpmnElement="RFlow13">
+        <di:waypoint x="1296" y="768" />
+        <di:waypoint x="1370" y="778" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="MessageEdge_ApplicationSubmission" bpmnElement="MessageFlow_ApplicationSubmission">
+        <di:waypoint x="1008" y="428" />
+        <di:waypoint x="368" y="748" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="MessageEdge_RequestAdditionalDocs" bpmnElement="MessageFlow_RequestAdditionalDocs">
+        <di:waypoint x="726" y="858" />
+        <di:waypoint x="1128" y="448" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="MessageEdge_NotifyDecision" bpmnElement="MessageFlow_NotifyDecision">
+        <di:waypoint x="1296" y="768" />
+        <di:waypoint x="1508" y="448" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

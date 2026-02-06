@@ -1,0 +1,463 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_StorageManagement" targetNamespace="http://example.com/bpmn/storage-management" exporter="Camunda Modeler" exporterVersion="5.34.0">
+  <process id="StorageManagementProcess" isExecutable="true">
+    <laneSet>
+      <lane id="Lane_Storage" name="Storage Management" />
+      <lane id="Lane_Logistics" name="Logistics" />
+    </laneSet>
+    <dataObjectReference id="OrderData" name="Order" dataObjectRef="OrderDO" />
+    <dataObject id="OrderDO" />
+    <dataObjectReference id="ProductData" name="Product" dataObjectRef="ProductDO" />
+    <dataObject id="ProductDO" />
+    <dataStoreReference id="StockDB" name="Stock Management System" dataStoreRef="StockDS" />
+    <dataObject id="StockDS" />
+    <startEvent id="StartEvent_ReadOrder" name="Read Order" />
+    <sequenceFlow id="flow1" sourceRef="StartEvent_ReadOrder" targetRef="Task_ReadOrder" />
+    <task id="Task_ReadOrder" name="Read Order from Automatic System">
+      <dataOutputAssociation id="asso1">
+        <targetRef>OrderData</targetRef>
+      </dataOutputAssociation>
+    </task>
+    <sequenceFlow id="flow2" sourceRef="Task_ReadOrder" targetRef="Task_SelectFirstProduct" />
+    <task id="Task_SelectFirstProduct" name="Select First/Next Product from Order">
+      <dataInputAssociation id="asso4">
+        <sourceRef>OrderData</sourceRef>
+      </dataInputAssociation>
+      <dataOutputAssociation id="asso2">
+        <targetRef>ProductData</targetRef>
+      </dataOutputAssociation>
+    </task>
+    <sequenceFlow id="flow3" sourceRef="Task_SelectFirstProduct" targetRef="Task_CheckInStock" />
+    <task id="Task_CheckInStock" name="Check Product in Stock">
+      <dataInputAssociation id="asso5">
+        <sourceRef>ProductData</sourceRef>
+      </dataInputAssociation>
+      <dataInputAssociation id="asso6">
+        <sourceRef>StockDB</sourceRef>
+      </dataInputAssociation>
+    </task>
+    <exclusiveGateway id="Gateway_InStock" name="Product in Stock?" />
+    <sequenceFlow id="flow4" sourceRef="Task_CheckInStock" targetRef="Gateway_InStock" />
+    <sequenceFlow id="flow5" name="Yes" sourceRef="Gateway_InStock" targetRef="Task_WithdrawProduct">
+      <conditionExpression xsi:type="tFormalExpression">productInStock</conditionExpression>
+    </sequenceFlow>
+    <task id="Task_WithdrawProduct" name="Withdraw Product from Warehouse">
+      <dataInputAssociation id="asso7">
+        <sourceRef>ProductData</sourceRef>
+      </dataInputAssociation>
+      <dataInputAssociation id="asso8">
+        <sourceRef>StockDB</sourceRef>
+      </dataInputAssociation>
+    </task>
+    <sequenceFlow id="flow6" sourceRef="Task_WithdrawProduct" targetRef="Gateway_OrderReady" />
+    <sequenceFlow id="flow7" name="No" sourceRef="Gateway_InStock" targetRef="Task_ReorderWholesaler">
+      <conditionExpression xsi:type="tFormalExpression">!productInStock</conditionExpression>
+    </sequenceFlow>
+    <intermediateThrowEvent id="MsgEvent_ReorderRequest" name="Reorder from Wholesaler">
+      <messageEventDefinition messageRef="Message_Reorder" />
+    </intermediateThrowEvent>
+    <sequenceFlow id="flow8" sourceRef="Task_ReorderWholesaler" targetRef="MsgEvent_ReorderRequest" />
+    <task id="Task_ReorderWholesaler" name="Reorder Product from Wholesaler">
+      <dataInputAssociation id="asso9">
+        <sourceRef>ProductData</sourceRef>
+      </dataInputAssociation>
+    </task>
+    <sequenceFlow id="flow9" sourceRef="MsgEvent_ReorderRequest" targetRef="Catch_ReorderDeliveryEvent" />
+    <eventBasedGateway id="Gateway_WaitDeliveryOrTimeout" name="Wait for Product Arrival or 10d Timeout" />
+    <sequenceFlow id="flow10" sourceRef="MsgEvent_ReorderRequest" targetRef="Gateway_WaitDeliveryOrTimeout" />
+    <intermediateCatchEvent id="Catch_ReorderDeliveryEvent" name="Product Arrived from Wholesaler">
+      <messageEventDefinition messageRef="Message_ProductArrived" />
+    </intermediateCatchEvent>
+    <sequenceFlow id="flow11" sourceRef="Gateway_WaitDeliveryOrTimeout" targetRef="Catch_ReorderDeliveryEvent" />
+    <intermediateCatchEvent id="Catch_Timeout10d" name="Waited more than 10 days">
+      <timerEventDefinition>
+        <timeDuration>PT240H</timeDuration>
+      </timerEventDefinition>
+    </intermediateCatchEvent>
+    <sequenceFlow id="flow12" sourceRef="Gateway_WaitDeliveryOrTimeout" targetRef="Catch_Timeout10d" />
+    <intermediateThrowEvent id="MsgEvent_DemandPenalty" name="Demand Penalty to Wholesaler">
+      <messageEventDefinition messageRef="Message_Penalty" />
+    </intermediateThrowEvent>
+    <sequenceFlow id="flow13" sourceRef="Catch_Timeout10d" targetRef="MsgEvent_DemandPenalty" />
+    <sequenceFlow id="flow14" sourceRef="MsgEvent_DemandPenalty" targetRef="Catch_ReorderDeliveryEvent" />
+    <task id="Task_RegisterProduct" name="Register Received Product in Stock Management">
+      <dataInputAssociation id="asso10">
+        <sourceRef>ProductData</sourceRef>
+      </dataInputAssociation>
+      <dataOutputAssociation id="ass03">
+        <targetRef>StockDB</targetRef>
+      </dataOutputAssociation>
+    </task>
+    <sequenceFlow id="flow15" sourceRef="Catch_ReorderDeliveryEvent" targetRef="Task_RegisterProduct" />
+    <sequenceFlow id="flow16" sourceRef="Task_RegisterProduct" targetRef="Gateway_OrderReady" />
+    <exclusiveGateway id="Gateway_OrderReady" name="Is Whole Order Ready for Shipment?" />
+    <sequenceFlow id="flow17" name="Yes" sourceRef="Gateway_OrderReady" targetRef="ParallelGateway_PackAndCourier">
+      <conditionExpression xsi:type="tFormalExpression">orderReadyForShipment</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow18" name="No" sourceRef="Gateway_OrderReady" targetRef="Task_SelectFirstProduct">
+      <conditionExpression xsi:type="tFormalExpression">!orderReadyForShipment</conditionExpression>
+    </sequenceFlow>
+    <parallelGateway id="ParallelGateway_PackAndCourier" />
+    <task id="Task_PackProducts" name="Pack Products" />
+    <intermediateThrowEvent id="MsgEvent_RequestCourier" name="Request Courier">
+      <messageEventDefinition messageRef="Message_RequestCourier" />
+    </intermediateThrowEvent>
+    <sequenceFlow id="flow19" sourceRef="ParallelGateway_PackAndCourier" targetRef="Task_PackProducts" />
+    <sequenceFlow id="flow20" sourceRef="ParallelGateway_PackAndCourier" targetRef="MsgEvent_RequestCourier" />
+    <sequenceFlow id="flow21" sourceRef="Task_PackProducts" targetRef="Task_ShipOrder" />
+    <intermediateCatchEvent id="Catch_CourierAccept" name="Courier Accepts Request">
+      <messageEventDefinition messageRef="Message_CourierAccept" />
+    </intermediateCatchEvent>
+    <sequenceFlow id="flow22" sourceRef="MsgEvent_RequestCourier" targetRef="Catch_CourierAccept" />
+    <sequenceFlow id="flow23" sourceRef="Catch_CourierAccept" targetRef="Task_ShipOrder" />
+    <task id="Task_ShipOrder" name="Ship Order" />
+    <endEvent id="EndEvent_ProcessComplete" name="Order Shipped" />
+    <sequenceFlow id="flow24" sourceRef="Task_ShipOrder" targetRef="EndEvent_ProcessComplete" />
+  </process>
+  <collaboration id="Collab_StorageManagement">
+    <participant id="Participant_Company" name="Company" processRef="StorageManagementProcess" />
+    <participant id="Participant_Wholesaler" name="Wholesaler" />
+    <participant id="Participant_Courier" name="Courier" />
+    <messageFlow id="msgflow1" name="Reorder Product" sourceRef="MsgEvent_ReorderRequest" targetRef="Participant_Wholesaler" />
+    <messageFlow id="msgflow2" name="Product Arrived" sourceRef="Participant_Wholesaler" targetRef="Catch_ReorderDeliveryEvent" />
+    <messageFlow id="msgflow3" name="Penalty Demand" sourceRef="MsgEvent_DemandPenalty" targetRef="Participant_Wholesaler" />
+    <messageFlow id="msgflow4" name="Request Courier" sourceRef="MsgEvent_RequestCourier" targetRef="Participant_Courier" />
+    <messageFlow id="msgflow5" name="Courier Accept" sourceRef="Participant_Courier" targetRef="Catch_CourierAccept" />
+  </collaboration>
+  <message id="Message_Reorder" name="Reorder Request" />
+  <message id="Message_ProductArrived" name="Product Arrived" />
+  <message id="Message_Penalty" name="Penalty Demand" />
+  <message id="Message_RequestCourier" name="Request Courier" />
+  <message id="Message_CourierAccept" name="Courier Accept" />
+  <bpmndi:BPMNDiagram id="BPMNDiagram_StorageManagement">
+    <bpmndi:BPMNPlane id="BPMNPlane_StorageManagement" bpmnElement="Collab_StorageManagement">
+      <bpmndi:BPMNShape id="Participant_Company_di" bpmnElement="Participant_Company" isHorizontal="true">
+        <dc:Bounds x="160" y="80" width="1920" height="680" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Logistics_di" bpmnElement="Lane_Logistics" isHorizontal="true">
+        <dc:Bounds x="190" y="610" width="1890" height="150" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Storage_di" bpmnElement="Lane_Storage" isHorizontal="true">
+        <dc:Bounds x="190" y="80" width="1890" height="530" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="OrderData_di" bpmnElement="OrderData" isExpanded="true">
+        <dc:Bounds x="353" y="235" width="34" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="355" y="285" width="30" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ProductData_di" bpmnElement="ProductData" isExpanded="true">
+        <dc:Bounds x="583" y="215" width="34" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="StockDB_di" bpmnElement="StockDB" isExpanded="true">
+        <dc:Bounds x="955" y="217" width="50" height="45" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="948" y="262" width="65" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="StartEvent_ReadOrder_di" bpmnElement="StartEvent_ReadOrder">
+        <dc:Bounds x="230" y="345" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="219" y="381" width="59" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_ReadOrder_di" bpmnElement="Task_ReadOrder">
+        <dc:Bounds x="340" y="335" width="100" height="56" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_SelectFirstProduct_di" bpmnElement="Task_SelectFirstProduct">
+        <dc:Bounds x="480" y="335" width="100" height="56" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_CheckInStock_di" bpmnElement="Task_CheckInStock">
+        <dc:Bounds x="620" y="335" width="110" height="56" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_InStock_di" bpmnElement="Gateway_InStock" isMarkerVisible="true">
+        <dc:Bounds x="770" y="342" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="751" y="318" width="87" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_WithdrawProduct_di" bpmnElement="Task_WithdrawProduct">
+        <dc:Bounds x="870" y="335" width="110" height="56" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="MsgEvent_ReorderRequest_di" bpmnElement="MsgEvent_ReorderRequest">
+        <dc:Bounds x="985" y="497" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="909.5" y="501.5" width="65" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_ReorderWholesaler_di" bpmnElement="Task_ReorderWholesaler">
+        <dc:Bounds x="725" y="512" width="140" height="56" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_WaitDeliveryOrTimeout_di" bpmnElement="Gateway_WaitDeliveryOrTimeout">
+        <dc:Bounds x="1072" y="490" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1058" y="540" width="79" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Catch_ReorderDeliveryEvent_di" bpmnElement="Catch_ReorderDeliveryEvent">
+        <dc:Bounds x="1130" y="405" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1107" y="367.5" width="81" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Catch_Timeout10d_di" bpmnElement="Catch_Timeout10d">
+        <dc:Bounds x="1192" y="497" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1167" y="533" width="86" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="MsgEvent_DemandPenalty_di" bpmnElement="MsgEvent_DemandPenalty">
+        <dc:Bounds x="1292" y="491" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1338" y="495.5" width="82" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_RegisterProduct_di" bpmnElement="Task_RegisterProduct">
+        <dc:Bounds x="1220" y="395" width="160" height="56" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_OrderReady_di" bpmnElement="Gateway_OrderReady" isMarkerVisible="true">
+        <dc:Bounds x="1420" y="332" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1334.5" y="337" width="75" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ParallelGateway_PackAndCourier_di" bpmnElement="ParallelGateway_PackAndCourier">
+        <dc:Bounds x="1530" y="352" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_PackProducts_di" bpmnElement="Task_PackProducts">
+        <dc:Bounds x="1620" y="395" width="110" height="56" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="MsgEvent_RequestCourier_di" bpmnElement="MsgEvent_RequestCourier">
+        <dc:Bounds x="1620" y="305" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1597" y="281" width="82" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Catch_CourierAccept_di" bpmnElement="Catch_CourierAccept">
+        <dc:Bounds x="1720" y="305" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1698" y="267.5" width="79" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_ShipOrder_di" bpmnElement="Task_ShipOrder">
+        <dc:Bounds x="1840" y="349" width="100" height="56" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_ProcessComplete_di" bpmnElement="EndEvent_ProcessComplete">
+        <dc:Bounds x="1992" y="349" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1974" y="385" width="72" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="flow1_di" bpmnElement="flow1">
+        <di:waypoint x="266" y="363" />
+        <di:waypoint x="340" y="363" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow2_di" bpmnElement="flow2">
+        <di:waypoint x="440" y="363" />
+        <di:waypoint x="480" y="363" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow3_di" bpmnElement="flow3">
+        <di:waypoint x="580" y="363" />
+        <di:waypoint x="620" y="363" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow4_di" bpmnElement="flow4">
+        <di:waypoint x="730" y="363" />
+        <di:waypoint x="770" y="367" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow5_di" bpmnElement="flow5">
+        <di:waypoint x="820" y="367" />
+        <di:waypoint x="870" y="363" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="836" y="340" width="18" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow6_di" bpmnElement="flow6">
+        <di:waypoint x="980" y="363" />
+        <di:waypoint x="1420" y="357" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow7_di" bpmnElement="flow7">
+        <di:waypoint x="795" y="392" />
+        <di:waypoint x="795" y="512" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="802" y="433" width="15" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow8_di" bpmnElement="flow8">
+        <di:waypoint x="795" y="568" />
+        <di:waypoint x="795" y="590" />
+        <di:waypoint x="1003" y="590" />
+        <di:waypoint x="1003" y="533" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow9_di" bpmnElement="flow9">
+        <di:waypoint x="1003" y="497" />
+        <di:waypoint x="1003" y="423" />
+        <di:waypoint x="1130" y="423" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow10_di" bpmnElement="flow10">
+        <di:waypoint x="1021" y="515" />
+        <di:waypoint x="1072" y="515" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow11_di" bpmnElement="flow11">
+        <di:waypoint x="1097" y="490" />
+        <di:waypoint x="1097" y="423" />
+        <di:waypoint x="1130" y="423" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow12_di" bpmnElement="flow12">
+        <di:waypoint x="1122" y="515" />
+        <di:waypoint x="1192" y="515" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow13_di" bpmnElement="flow13">
+        <di:waypoint x="1228" y="512" />
+        <di:waypoint x="1292" y="512" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow14_di" bpmnElement="flow14">
+        <di:waypoint x="1310" y="491" />
+        <di:waypoint x="1310" y="451" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow15_di" bpmnElement="flow15">
+        <di:waypoint x="1166" y="423" />
+        <di:waypoint x="1220" y="423" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow16_di" bpmnElement="flow16">
+        <di:waypoint x="1380" y="415" />
+        <di:waypoint x="1445" y="415" />
+        <di:waypoint x="1445" y="382" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow17_di" bpmnElement="flow17">
+        <di:waypoint x="1470" y="357" />
+        <di:waypoint x="1530" y="377" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1491" y="342" width="18" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow18_di" bpmnElement="flow18">
+        <di:waypoint x="1445" y="332" />
+        <di:waypoint x="1445" y="140" />
+        <di:waypoint x="530" y="140" />
+        <di:waypoint x="530" y="335" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1420" y="229" width="15" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow19_di" bpmnElement="flow19">
+        <di:waypoint x="1555" y="377" />
+        <di:waypoint x="1620" y="423" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow20_di" bpmnElement="flow20">
+        <di:waypoint x="1555" y="377" />
+        <di:waypoint x="1620" y="323" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow21_di" bpmnElement="flow21">
+        <di:waypoint x="1730" y="423" />
+        <di:waypoint x="1800" y="423" />
+        <di:waypoint x="1800" y="377" />
+        <di:waypoint x="1840" y="377" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow22_di" bpmnElement="flow22">
+        <di:waypoint x="1656" y="323" />
+        <di:waypoint x="1720" y="323" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow23_di" bpmnElement="flow23">
+        <di:waypoint x="1756" y="323" />
+        <di:waypoint x="1798" y="323" />
+        <di:waypoint x="1798" y="377" />
+        <di:waypoint x="1840" y="377" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow24_di" bpmnElement="flow24">
+        <di:waypoint x="1940" y="371" />
+        <di:waypoint x="1966" y="371" />
+        <di:waypoint x="1966" y="369" />
+        <di:waypoint x="1992" y="369" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Participant_Wholesaler_di" bpmnElement="Participant_Wholesaler" isHorizontal="true">
+        <dc:Bounds x="160" y="780" width="760" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Participant_Courier_di" bpmnElement="Participant_Courier" isHorizontal="true">
+        <dc:Bounds x="960" y="780" width="900" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="asso1_di" bpmnElement="asso1">
+        <di:waypoint x="390" y="335" />
+        <di:waypoint x="370" y="285" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="asso4_di" bpmnElement="asso4">
+        <di:waypoint x="583" y="251" />
+        <di:waypoint x="529" y="335" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="asso2_di" bpmnElement="asso2">
+        <di:waypoint x="530" y="335" />
+        <di:waypoint x="600" y="265" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="asso5_di" bpmnElement="asso5">
+        <di:waypoint x="600" y="265" />
+        <di:waypoint x="675" y="335" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="asso6_di" bpmnElement="asso6">
+        <di:waypoint x="955" y="252" />
+        <di:waypoint x="730" y="356" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="asso7_di" bpmnElement="asso7">
+        <di:waypoint x="600" y="265" />
+        <di:waypoint x="925" y="335" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="asso8_di" bpmnElement="asso8">
+        <di:waypoint x="980" y="262" />
+        <di:waypoint x="925" y="333" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="asso9_di" bpmnElement="asso9">
+        <di:waypoint x="600" y="265" />
+        <di:waypoint x="790" y="512" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="asso10_di" bpmnElement="asso10">
+        <di:waypoint x="600" y="265" />
+        <di:waypoint x="1300" y="395" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ass03_di" bpmnElement="ass03">
+        <di:waypoint x="1300" y="395" />
+        <di:waypoint x="980" y="262" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="msgflow1_di" bpmnElement="msgflow1">
+        <di:waypoint x="1003" y="533" />
+        <di:waypoint x="1003" y="657" />
+        <di:waypoint x="540" y="657" />
+        <di:waypoint x="540" y="780" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="579" y="642" width="81" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="msgflow2_di" bpmnElement="msgflow2">
+        <di:waypoint x="540" y="757" />
+        <di:waypoint x="540" y="710" />
+        <di:waypoint x="1148" y="710" />
+        <di:waypoint x="1148" y="441" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="582" y="693" width="76" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="msgflow3_di" bpmnElement="msgflow3">
+        <di:waypoint x="1310" y="527" />
+        <di:waypoint x="1310" y="677" />
+        <di:waypoint x="540" y="677" />
+        <di:waypoint x="540" y="780" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="579" y="663" width="82" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="msgflow4_di" bpmnElement="msgflow4">
+        <di:waypoint x="1638" y="341" />
+        <di:waypoint x="1638" y="780" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1597" y="627" width="82" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="msgflow5_di" bpmnElement="msgflow5">
+        <di:waypoint x="1738" y="780" />
+        <di:waypoint x="1738" y="341" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1700" y="642" width="73" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

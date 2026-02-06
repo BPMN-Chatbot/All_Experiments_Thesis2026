@@ -1,0 +1,451 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:color="http://www.omg.org/spec/BPMN/non-normative/color/1.0" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:modeler="http://camunda.org/schema/modeler/1.0" xmlns:custom="http://www.example.org/custom" id="Definitions_0tfrzsr" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.21.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.20.0">
+  <bpmn:collaboration id="Collaboration_1">
+    <bpmn:participant id="Participant_pool_0" name="Bank" processRef="Process_pool_0" />
+    <bpmn:participant id="Participant_pool_1" name="Customer" processRef="Process_pool_1" />
+    <bpmn:messageFlow id="MessageFlow_0_event_7_ext_node_2" sourceRef="event_7" targetRef="ext_node_2" />
+  </bpmn:collaboration>
+  <bpmn:process id="Process_pool_0">
+    <bpmn:laneSet id="LaneSet_0">
+      <bpmn:lane id="lane_0_0" name="Risk Management">
+        <bpmn:flowNodeRef>ext_node_1</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_1</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>xor_2</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_3</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_4</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>xor_5</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>parallel_6</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>event_7</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>parallel_9</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="lane_0_1" name="Disbursement">
+        <bpmn:flowNodeRef>task_8</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>node_10</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="ext_node_1" name="Receive Credit Request">
+      <bpmn:extensionElements>
+        <camunda:executionListener expression="execution.setVariable(&#34;Credit_Request&#34;, &#34;Value_0_ext_node_1_0&#34;)" event="start" />
+      </bpmn:extensionElements>
+      <bpmn:outgoing>Flow_ext_node_1_task_1</bpmn:outgoing>
+      <bpmn:dataOutputAssociation id="DataOutputAssociation_0_ext_node_1_0">
+        <bpmn:targetRef>DataReference_0_0</bpmn:targetRef>
+      </bpmn:dataOutputAssociation>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_ext_node_1" />
+    </bpmn:startEvent>
+    <bpmn:task id="task_1" name="Assess Risk">
+      <bpmn:extensionElements>
+        <camunda:executionListener expression="${Credit_Request}" event="end" />
+        <custom:parallelBlockIndex parallelBlockIndex="0" />
+        <custom:branchNesting branchNesting="0" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_ext_node_1_task_1</bpmn:incoming>
+      <bpmn:outgoing>Flow_task_1_xor_2</bpmn:outgoing>
+      <bpmn:property id="Property_0_task_1_0" name="__targetRef_placeholder" />
+      <bpmn:dataInputAssociation id="DataInputAssociation_0_task_1_0">
+        <bpmn:sourceRef>DataReference_0_0</bpmn:sourceRef>
+        <bpmn:targetRef>Property_0_task_1_0</bpmn:targetRef>
+      </bpmn:dataInputAssociation>
+    </bpmn:task>
+    <bpmn:exclusiveGateway id="xor_2" name="Risk above threshold?">
+      <bpmn:incoming>Flow_task_1_xor_2</bpmn:incoming>
+      <bpmn:outgoing>Flow_xor_2_task_3</bpmn:outgoing>
+      <bpmn:outgoing>Flow_xor_2_task_4</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:task id="task_3" name="Advanced Risk Assessment">
+      <bpmn:extensionElements>
+        <camunda:executionListener expression="execution.setVariable(&#34;Assessment_Result&#34;, &#34;Value_0_task_3_1&#34;)" event="start" />
+        <camunda:executionListener expression="${Credit_Request}" event="end" />
+        <custom:parallelBlockIndex parallelBlockIndex="0" />
+        <custom:branchNesting branchNesting="0" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_xor_2_task_3</bpmn:incoming>
+      <bpmn:outgoing>Flow_task_3_xor_5</bpmn:outgoing>
+      <bpmn:property id="Property_0_task_3_0" name="__targetRef_placeholder" />
+      <bpmn:dataInputAssociation id="DataInputAssociation_0_task_3_0">
+        <bpmn:sourceRef>DataReference_0_0</bpmn:sourceRef>
+        <bpmn:targetRef>Property_0_task_3_0</bpmn:targetRef>
+      </bpmn:dataInputAssociation>
+      <bpmn:dataOutputAssociation id="DataOutputAssociation_0_task_3_1">
+        <bpmn:targetRef>DataReference_0_1</bpmn:targetRef>
+      </bpmn:dataOutputAssociation>
+    </bpmn:task>
+    <bpmn:task id="task_4" name="Simple Risk Assessment">
+      <bpmn:extensionElements>
+        <camunda:executionListener expression="execution.setVariable(&#34;Assessment_Result&#34;, &#34;Value_0_task_4_1&#34;)" event="start" />
+        <camunda:executionListener expression="${Credit_Request}" event="end" />
+        <custom:parallelBlockIndex parallelBlockIndex="0" />
+        <custom:branchNesting branchNesting="0" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_xor_2_task_4</bpmn:incoming>
+      <bpmn:outgoing>Flow_task_4_xor_5</bpmn:outgoing>
+      <bpmn:property id="Property_0_task_4_0" name="__targetRef_placeholder" />
+      <bpmn:dataInputAssociation id="DataInputAssociation_0_task_4_0">
+        <bpmn:sourceRef>DataReference_0_0</bpmn:sourceRef>
+        <bpmn:targetRef>Property_0_task_4_0</bpmn:targetRef>
+      </bpmn:dataInputAssociation>
+      <bpmn:dataOutputAssociation id="DataOutputAssociation_0_task_4_1">
+        <bpmn:targetRef>DataReference_0_1</bpmn:targetRef>
+      </bpmn:dataOutputAssociation>
+    </bpmn:task>
+    <bpmn:exclusiveGateway id="xor_5">
+      <bpmn:incoming>Flow_task_3_xor_5</bpmn:incoming>
+      <bpmn:incoming>Flow_task_4_xor_5</bpmn:incoming>
+      <bpmn:outgoing>Flow_xor_5_parallel_6</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:parallelGateway id="parallel_6">
+      <bpmn:incoming>Flow_xor_5_parallel_6</bpmn:incoming>
+      <bpmn:outgoing>Flow_parallel_6_event_7</bpmn:outgoing>
+      <bpmn:outgoing>Flow_parallel_6_task_8</bpmn:outgoing>
+    </bpmn:parallelGateway>
+    <bpmn:intermediateThrowEvent id="event_7" name="Notify Customer of Assessment Result">
+      <bpmn:extensionElements>
+        <camunda:executionListener expression="${Assessment_Result}" event="end" />
+        <custom:parallelBlockIndex parallelBlockIndex="0.3" />
+        <custom:branchNesting branchNesting="0.1" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_parallel_6_event_7</bpmn:incoming>
+      <bpmn:outgoing>Flow_event_7_parallel_9</bpmn:outgoing>
+      <bpmn:property id="Property_0_event_7_1" name="__targetRef_placeholder" />
+      <bpmn:dataInputAssociation id="DataInputAssociation_0_event_7_1">
+        <bpmn:sourceRef>DataReference_0_1</bpmn:sourceRef>
+        <bpmn:targetRef>Property_0_event_7_1</bpmn:targetRef>
+      </bpmn:dataInputAssociation>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_event_7" messageRef="msg_0" />
+    </bpmn:intermediateThrowEvent>
+    <bpmn:task id="task_8" name="Organize Disbursement">
+      <bpmn:extensionElements>
+        <camunda:executionListener expression="${Assessment_Result}" event="end" />
+        <custom:parallelBlockIndex parallelBlockIndex="0.3" />
+        <custom:branchNesting branchNesting="0.2" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_parallel_6_task_8</bpmn:incoming>
+      <bpmn:outgoing>Flow_task_8_parallel_9</bpmn:outgoing>
+      <bpmn:property id="Property_0_task_8_1" name="__targetRef_placeholder" />
+      <bpmn:dataInputAssociation id="DataInputAssociation_0_task_8_1">
+        <bpmn:sourceRef>DataReference_0_1</bpmn:sourceRef>
+        <bpmn:targetRef>Property_0_task_8_1</bpmn:targetRef>
+      </bpmn:dataInputAssociation>
+    </bpmn:task>
+    <bpmn:parallelGateway id="parallel_9">
+      <bpmn:incoming>Flow_event_7_parallel_9</bpmn:incoming>
+      <bpmn:incoming>Flow_task_8_parallel_9</bpmn:incoming>
+      <bpmn:outgoing>Flow_parallel_9_node_10</bpmn:outgoing>
+    </bpmn:parallelGateway>
+    <bpmn:endEvent id="node_10" name="Process Completed">
+      <bpmn:extensionElements />
+      <bpmn:incoming>Flow_parallel_9_node_10</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_ext_node_1_task_1" sourceRef="ext_node_1" targetRef="task_1" />
+    <bpmn:sequenceFlow id="Flow_task_1_xor_2" sourceRef="task_1" targetRef="xor_2" />
+    <bpmn:sequenceFlow id="Flow_xor_2_task_3" name="Yes" sourceRef="xor_2" targetRef="task_3" />
+    <bpmn:sequenceFlow id="Flow_task_3_xor_5" sourceRef="task_3" targetRef="xor_5" />
+    <bpmn:sequenceFlow id="Flow_xor_2_task_4" name="No" sourceRef="xor_2" targetRef="task_4" />
+    <bpmn:sequenceFlow id="Flow_task_4_xor_5" sourceRef="task_4" targetRef="xor_5" />
+    <bpmn:sequenceFlow id="Flow_xor_5_parallel_6" sourceRef="xor_5" targetRef="parallel_6" />
+    <bpmn:sequenceFlow id="Flow_parallel_6_event_7" sourceRef="parallel_6" targetRef="event_7" />
+    <bpmn:sequenceFlow id="Flow_event_7_parallel_9" sourceRef="event_7" targetRef="parallel_9" />
+    <bpmn:sequenceFlow id="Flow_parallel_6_task_8" sourceRef="parallel_6" targetRef="task_8" />
+    <bpmn:sequenceFlow id="Flow_task_8_parallel_9" sourceRef="task_8" targetRef="parallel_9" />
+    <bpmn:sequenceFlow id="Flow_parallel_9_node_10" sourceRef="parallel_9" targetRef="node_10" />
+    <bpmn:dataObjectReference id="DataReference_0_0" name="Credit Request" dataObjectRef="DataObject_0_0" />
+    <bpmn:dataObject id="DataObject_0_0" />
+    <bpmn:dataObjectReference id="DataReference_0_1" name="Assessment Result" dataObjectRef="DataObject_0_1" />
+    <bpmn:dataObject id="DataObject_0_1" />
+    <bpmn:textAnnotation id="TextAnnotation_ext_node_1">
+      <bpmn:text>Write to: Credit Request</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="Association_ext_node_1" associationDirection="None" sourceRef="ext_node_1" targetRef="TextAnnotation_ext_node_1" />
+    <bpmn:textAnnotation id="TextAnnotation_task_1">
+      <bpmn:text>Read from: Credit Request</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="Association_task_1" associationDirection="None" sourceRef="task_1" targetRef="TextAnnotation_task_1" />
+    <bpmn:textAnnotation id="TextAnnotation_task_3">
+      <bpmn:text>Write to: Assessment Result
+
+Read from: Credit Request</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="Association_task_3" associationDirection="None" sourceRef="task_3" targetRef="TextAnnotation_task_3" />
+    <bpmn:textAnnotation id="TextAnnotation_task_4">
+      <bpmn:text>Write to: Assessment Result
+
+Read from: Credit Request</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="Association_task_4" associationDirection="None" sourceRef="task_4" targetRef="TextAnnotation_task_4" />
+    <bpmn:textAnnotation id="TextAnnotation_event_7">
+      <bpmn:text>Read from: Assessment Result</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="Association_event_7" associationDirection="None" sourceRef="event_7" targetRef="TextAnnotation_event_7" />
+    <bpmn:textAnnotation id="TextAnnotation_task_8">
+      <bpmn:text>Read from: Assessment Result</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="Association_task_8" associationDirection="None" sourceRef="task_8" targetRef="TextAnnotation_task_8" />
+  </bpmn:process>
+  <bpmn:process id="Process_pool_1">
+    <bpmn:laneSet id="LaneSet_1">
+      <bpmn:lane id="lane_1_0" name="Customer">
+        <bpmn:flowNodeRef>ext_node_2</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>node_11</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="ext_node_2" name="Receive Assessment Result">
+      <bpmn:extensionElements>
+        <camunda:executionListener expression="execution.setVariable(&#34;Assessment_Result&#34;, &#34;Value_1_ext_node_2_0&#34;)" event="start" />
+      </bpmn:extensionElements>
+      <bpmn:outgoing>Flow_ext_node_2_node_11</bpmn:outgoing>
+      <bpmn:dataOutputAssociation id="DataOutputAssociation_1_ext_node_2_0">
+        <bpmn:targetRef>DataReference_1_0</bpmn:targetRef>
+      </bpmn:dataOutputAssociation>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_ext_node_2" messageRef="msg_0" />
+    </bpmn:startEvent>
+    <bpmn:endEvent id="node_11" name="Assessment Result Received">
+      <bpmn:extensionElements>
+        <camunda:executionListener expression="execution.removeVariable(&#34;Assessment_Result&#34;)" event="end" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_ext_node_2_node_11</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_ext_node_2_node_11" sourceRef="ext_node_2" targetRef="node_11" />
+    <bpmn:dataObjectReference id="DataReference_1_0" name="Assessment Result" dataObjectRef="DataObject_1_0" />
+    <bpmn:dataObject id="DataObject_1_0" />
+    <bpmn:textAnnotation id="TextAnnotation_ext_node_2">
+      <bpmn:text>Write to: Assessment Result</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="Association_ext_node_2" associationDirection="None" sourceRef="ext_node_2" targetRef="TextAnnotation_ext_node_2" />
+  </bpmn:process>
+  <bpmn:message id="msg_0" name="msg_0" />
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_1">
+      <bpmndi:BPMNShape id="Participant_pool_0_di" bpmnElement="Participant_pool_0" isHorizontal="true">
+        <dc:Bounds x="95" y="95" width="1605" height="995" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="lane_0_1_di" bpmnElement="lane_0_1" isHorizontal="true">
+        <dc:Bounds x="125" y="682.5" width="1575" height="407.5" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="lane_0_0_di" bpmnElement="lane_0_0" isHorizontal="true">
+        <dc:Bounds x="125" y="95" width="1575" height="587.5" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_ext_node_1" bpmnElement="ext_node_1">
+        <dc:Bounds x="235" y="172" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_task_1" bpmnElement="task_1">
+        <dc:Bounds x="341" y="142.5" width="120" height="95" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_xor_2" bpmnElement="xor_2" isMarkerVisible="true">
+        <dc:Bounds x="531" y="172" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_task_3" bpmnElement="task_3">
+        <dc:Bounds x="672" y="142.5" width="120" height="95" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_task_4" bpmnElement="task_4">
+        <dc:Bounds x="672" y="442.5" width="120" height="95" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_xor_5" bpmnElement="xor_5" isMarkerVisible="true">
+        <dc:Bounds x="862" y="172" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_parallel_6" bpmnElement="parallel_6">
+        <dc:Bounds x="968" y="172" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_event_7" bpmnElement="event_7" color:background-color="#b8ded6">
+        <dc:Bounds x="1074" y="172" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1051" y="122" width="81" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_task_8" bpmnElement="task_8">
+        <dc:Bounds x="1074" y="850" width="120" height="95" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_parallel_9" bpmnElement="parallel_9">
+        <dc:Bounds x="1264" y="172" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="_BPMNShape_node_10" bpmnElement="node_10">
+        <dc:Bounds x="1370" y="759.5" width="36" height="36" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataReference_0_0_di" bpmnElement="DataReference_0_0">
+        <dc:Bounds x="1546" y="155" width="35" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1546" y="213" width="19" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataReference_0_1_di" bpmnElement="DataReference_0_1">
+        <dc:Bounds x="1546" y="265" width="35" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1546" y="323" width="19" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TextAnnotation_ext_node_1_di" bpmnElement="TextAnnotation_ext_node_1">
+        <dc:Bounds x="235" y="280" width="89" height="53" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TextAnnotation_task_1_di" bpmnElement="TextAnnotation_task_1">
+        <dc:Bounds x="341" y="280" width="172.5" height="21" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TextAnnotation_task_3_di" bpmnElement="TextAnnotation_task_3">
+        <dc:Bounds x="672" y="280" width="172.5" height="53" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TextAnnotation_task_4_di" bpmnElement="TextAnnotation_task_4">
+        <dc:Bounds x="672" y="580" width="172.5" height="53" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TextAnnotation_event_7_di" bpmnElement="TextAnnotation_event_7">
+        <dc:Bounds x="1074" y="280" width="89" height="53" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TextAnnotation_task_8_di" bpmnElement="TextAnnotation_task_8">
+        <dc:Bounds x="1074" y="987.5" width="172.5" height="21" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_ext_node_1_task_1_di" bpmnElement="Flow_ext_node_1_task_1">
+        <di:waypoint x="271" y="190" />
+        <di:waypoint x="341" y="190" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="286" y="175" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_task_1_xor_2_di" bpmnElement="Flow_task_1_xor_2">
+        <di:waypoint x="461" y="190" />
+        <di:waypoint x="531" y="190" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="476" y="175" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_xor_2_task_3_di" bpmnElement="Flow_xor_2_task_3">
+        <di:waypoint x="567" y="190" />
+        <di:waypoint x="672" y="190" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="582" y="175" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_task_3_xor_5_di" bpmnElement="Flow_task_3_xor_5">
+        <di:waypoint x="792" y="190" />
+        <di:waypoint x="862" y="190" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="807" y="175" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_xor_2_task_4_di" bpmnElement="Flow_xor_2_task_4">
+        <di:waypoint x="549" y="208" />
+        <di:waypoint x="549" y="490" />
+        <di:waypoint x="672" y="490" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="564" y="475" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_task_4_xor_5_di" bpmnElement="Flow_task_4_xor_5">
+        <di:waypoint x="792" y="490" />
+        <di:waypoint x="880" y="490" />
+        <di:waypoint x="880" y="208" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="807" y="193" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_xor_5_parallel_6_di" bpmnElement="Flow_xor_5_parallel_6">
+        <di:waypoint x="898" y="190" />
+        <di:waypoint x="968" y="190" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="913" y="175" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_parallel_6_event_7_di" bpmnElement="Flow_parallel_6_event_7">
+        <di:waypoint x="1004" y="190" />
+        <di:waypoint x="1074" y="190" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1019" y="175" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_event_7_parallel_9_di" bpmnElement="Flow_event_7_parallel_9">
+        <di:waypoint x="1110" y="190" />
+        <di:waypoint x="1264" y="190" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1125" y="175" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_parallel_6_task_8_di" bpmnElement="Flow_parallel_6_task_8">
+        <di:waypoint x="986" y="208" />
+        <di:waypoint x="986" y="897.5" />
+        <di:waypoint x="1074" y="897.5" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1001" y="882.5" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_task_8_parallel_9_di" bpmnElement="Flow_task_8_parallel_9">
+        <di:waypoint x="1194" y="897.5" />
+        <di:waypoint x="1282" y="897.5" />
+        <di:waypoint x="1282" y="208" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1209" y="193" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_parallel_9_node_10_di" bpmnElement="Flow_parallel_9_node_10">
+        <di:waypoint x="1300" y="190" />
+        <di:waypoint x="1310" y="190" />
+        <di:waypoint x="1350" y="777.5" />
+        <di:waypoint x="1370" y="777.5" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1315" y="762.5" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Association_ext_node_1_di" bpmnElement="Association_ext_node_1">
+        <di:waypoint x="254" y="208" />
+        <di:waypoint x="236" y="280" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Association_task_1_di" bpmnElement="Association_task_1">
+        <di:waypoint x="401" y="237.5" />
+        <di:waypoint x="341" y="280" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Association_task_3_di" bpmnElement="Association_task_3">
+        <di:waypoint x="732" y="237.5" />
+        <di:waypoint x="672" y="280" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Association_task_4_di" bpmnElement="Association_task_4">
+        <di:waypoint x="732" y="537.5" />
+        <di:waypoint x="672" y="580" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Association_event_7_di" bpmnElement="Association_event_7">
+        <di:waypoint x="1093" y="208" />
+        <di:waypoint x="1075" y="280" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Association_task_8_di" bpmnElement="Association_task_8">
+        <di:waypoint x="1134" y="945" />
+        <di:waypoint x="1074" y="987.5" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Participant_pool_1_di" bpmnElement="Participant_pool_1" isHorizontal="true">
+        <dc:Bounds x="95" y="1210" width="576" height="317" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="lane_1_0_di" bpmnElement="lane_1_0" isHorizontal="true">
+        <dc:Bounds x="125" y="1210" width="546" height="317" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_ext_node_2" bpmnElement="ext_node_2" color:background-color="#b8ded6">
+        <dc:Bounds x="235" y="1287" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="_BPMNShape_node_11" bpmnElement="node_11">
+        <dc:Bounds x="341" y="1287" width="36" height="36" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataReference_1_0_di" bpmnElement="DataReference_1_0">
+        <dc:Bounds x="517" y="1270" width="35" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="517" y="1328" width="19" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TextAnnotation_ext_node_2_di" bpmnElement="TextAnnotation_ext_node_2">
+        <dc:Bounds x="235" y="1395" width="89" height="55" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_ext_node_2_node_11_di" bpmnElement="Flow_ext_node_2_node_11">
+        <di:waypoint x="271" y="1305" />
+        <di:waypoint x="341" y="1305" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="286" y="1290" width="50" height="15" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Association_ext_node_2_di" bpmnElement="Association_ext_node_2">
+        <di:waypoint x="254" y="1323" />
+        <di:waypoint x="237" y="1395" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="MessageFlow_0_event_7_ext_node_2_di" bpmnElement="MessageFlow_0_event_7_ext_node_2" color:border-color="#999999">
+        <di:waypoint x="1092" y="208" />
+        <di:waypoint x="1092" y="408" />
+        <di:waypoint x="253" y="1287" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

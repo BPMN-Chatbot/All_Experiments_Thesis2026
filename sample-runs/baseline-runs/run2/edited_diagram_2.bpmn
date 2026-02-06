@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8"?> <bpmn:definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_1" targetNamespace="http://www.example.org/bpmn20"> 
+  
+  <bpmn:collaboration id="Collaboration_1"> <bpmn:participant id="Management_Pool" name="Management" processRef="Management_Process"/> <bpmn:participant id="Accounting_Pool" name="Accounting Dept." processRef="Accounting_Process"/>
+    <!-- Message Flows Between Pools --> <bpmn:messageFlow id="msg1" name="Year &amp; Month" sourceRef="SendYearMonthEvent" targetRef="ReceiveYearMonthEvent"/> <bpmn:messageFlow id="msg2" name="Cash-out Report" sourceRef="SendReportEvent" targetRef="ReceiveReportEvent"/> 
+  </bpmn:collaboration> 
+  <!-- Management Pool --> <bpmn:process id="Management_Process" isExecutable="true"> 
+    <bpmn:laneSet> <bpmn:lane id="Management_Lane" name="Management"/> </bpmn:laneSet> <bpmn:startEvent id="StartEvent_Management" name="Start"/> <bpmn:task id="OrderCashOutReportTask" name="Order Cash-out Report"/> <intermediateThrowEvent id="SendYearMonthEvent" name="Send Year &amp; Month"> <bpmn:messageEventDefinition id="SendYearMonthMessageDef"/> </intermediateThrowEvent> <bpmn:intermediateCatchEvent id="ReceiveReportEvent" name="Receive Cash-out Report"> <bpmn:messageEventDefinition id="ReceiveReportMessageDef"/> </bpmn:intermediateCatchEvent> <bpmn:endEvent id="EndEvent_Management" name="End"/> <bpmn:sequenceFlow id="flow1" sourceRef="StartEvent_Management" targetRef="OrderCashOutReportTask"/> <bpmn:sequenceFlow id="flow2" sourceRef="OrderCashOutReportTask" targetRef="SendYearMonthEvent"/> <bpmn:sequenceFlow id="flow3" sourceRef="SendYearMonthEvent" targetRef="ReceiveReportEvent"/> <bpmn:sequenceFlow id="flow4" sourceRef="ReceiveReportEvent" targetRef="EndEvent_Management"/> </bpmn:process> 
+  <!-- Accounting Pool --> <bpmn:process id="Accounting_Process" isExecutable="true"> 
+    <bpmn:laneSet> <bpmn:lane id="Accountant_Lane" name="Accountant"/> </bpmn:laneSet> <bpmn:startEvent id="StartEvent_Accounting" name="Start"/> <bpmn:intermediateCatchEvent id="ReceiveYearMonthEvent" name="Receive Year &amp; Month"> <bpmn:messageEventDefinition id="ReceiveYearMonthMessageCatchDef"/> </bpmn:intermediateCatchEvent>  <bpmn:exclusiveGateway id="CheckIfNotEmptyGateway" name="Transactions Not Empty?"/> 
+    
+    <intermediateThrowEvent id="SendReportEvent" name="Send Cash-out Report"> <bpmn:messageEventDefinition id="SendReportMessageDef"/> </intermediateThrowEvent> <bpmn:endEvent id="EndEvent_Accounting" name="No Cash-out"/> <bpmn:endEvent id="EndEvent_Accounting2" name="End"/> <bpmn:sequenceFlow id="aflow1" sourceRef="StartEvent_Accounting" targetRef="ReceiveYearMonthEvent"/> <bpmn:sequenceFlow id="aflow2" sourceRef="ReceiveYearMonthEvent" targetRef="FilterTransactionsTask"/> <bpmn:sequenceFlow id="aflow3" sourceRef="FilterTransactionsTask" targetRef="CheckIfNotEmptyGateway"/> <bpmn:sequenceFlow id="aflow4" sourceRef="CheckIfNotEmptyGateway" targetRef="PrintReportTask"> <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression"><![CDATA[notEmpty]]></bpmn:conditionExpression> </bpmn:sequenceFlow> <bpmn:sequenceFlow id="aflow5" sourceRef="PrintReportTask" targetRef="SendReportEvent"/> <bpmn:sequenceFlow id="aflow6" sourceRef="SendReportEvent" targetRef="EndEvent_Accounting2"/> <bpmn:sequenceFlow id="aflow7" sourceRef="CheckIfNotEmptyGateway" targetRef="EndEvent_Accounting"> <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression"><![CDATA[empty]]></bpmn:conditionExpression> </bpmn:sequenceFlow> 
+
+
+    <!-- Data Store Definitions -->
+<bpmn:dataObject id="CashDatabase" name="Cash Database"/>
+<bpmn:dataObject id="FilteredTransactionsObject" name="Filtered Transactions"/>
+
+<!-- Data Store Reference -->
+<bpmn:dataStoreReference id="CashDatabaseStore" name="Cash Database" dataStoreRef="CashDatabase">
+</bpmn:dataStoreReference>
+
+<!-- Data Object Reference -->
+<bpmn:dataObjectReference id="FilteredTransactions" name="Filtered Transactions" dataObjectRef="FilteredTransactionsObject">
+</bpmn:dataObjectReference>
+
+<!-- Tasks with Data Associations -->
+<bpmn:task id="FilterTransactionsTask" name="Filter Cash Transactions">
+  <bpmn:dataInputAssociation id="FilterCashTransactionsInput">
+    <bpmn:sourceRef>CashDatabaseStore</bpmn:sourceRef>
+  </bpmn:dataInputAssociation>
+  <bpmn:dataOutputAssociation id="FilterCashTransactionsOutput">
+    <bpmn:targetRef>FilteredTransactions</bpmn:targetRef>
+  </bpmn:dataOutputAssociation>
+</bpmn:task>
+
+<bpmn:task id="PrintReportTask" name="Print Cash-out Report">
+  <bpmn:dataInputAssociation id="PrintReportInput">
+    <bpmn:sourceRef>FilteredTransactions</bpmn:sourceRef>
+  </bpmn:dataInputAssociation>
+</bpmn:task>
+
+  
+  </bpmn:process> 
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_1">
+      <bpmndi:BPMNShape id="ParticipantShape_Management" bpmnElement="Management_Pool" isHorizontal="true">
+        <dc:Bounds x="110" y="60" width="900" height="290"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="LaneShape_Management" bpmnElement="Management_Lane" isHorizontal="true">
+        <dc:Bounds x="160" y="60" width="900" height="240"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_StartEvent_Management" bpmnElement="StartEvent_Management">
+        <dc:Bounds x="200" y="160" width="36" height="36"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="206" y="196" width="24" height="14"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_OrderCashOutReportTask" bpmnElement="OrderCashOutReportTask">
+        <dc:Bounds x="290" y="150" width="100" height="56"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_SendYearMonthEvent" bpmnElement="SendYearMonthEvent">
+        <dc:Bounds x="430" y="160" width="36" height="36"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="417" y="196" width="62" height="27"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_ReceiveReportEvent" bpmnElement="ReceiveReportEvent">
+        <dc:Bounds x="560" y="160" width="36" height="36"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="534" y="196" width="88" height="27"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_EndEvent_Management" bpmnElement="EndEvent_Management">
+        <dc:Bounds x="680" y="160" width="36" height="36"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="688" y="196" width="20" height="14"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Edge_flow1" bpmnElement="flow1">
+        <di:waypoint x="236" y="178"/>
+        <di:waypoint x="290" y="178"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_flow2" bpmnElement="flow2">
+        <di:waypoint x="390" y="178"/>
+        <di:waypoint x="430" y="178"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_flow3" bpmnElement="flow3">
+        <di:waypoint x="466" y="178"/>
+        <di:waypoint x="560" y="178"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_flow4" bpmnElement="flow4">
+        <di:waypoint x="596" y="178"/>
+        <di:waypoint x="680" y="178"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ParticipantShape_Accounting" bpmnElement="Accounting_Pool" isHorizontal="true">
+        <dc:Bounds x="110" y="340" width="900" height="290"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="LaneShape_Accountant" bpmnElement="Accountant_Lane" isHorizontal="true">
+        <dc:Bounds x="160" y="340" width="900" height="280"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_StartEvent_Accounting" bpmnElement="StartEvent_Accounting">
+        <dc:Bounds x="200" y="455" width="36" height="36"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="206" y="491" width="24" height="14"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_ReceiveYearMonthEvent" bpmnElement="ReceiveYearMonthEvent">
+        <dc:Bounds x="290" y="455" width="36" height="36"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="270" y="491" width="76" height="27"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_CheckIfNotEmptyGateway" bpmnElement="CheckIfNotEmptyGateway" isMarkerVisible="true">
+        <dc:Bounds x="530" y="455" width="40" height="40"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="508" y="495" width="84" height="27"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_SendReportEvent" bpmnElement="SendReportEvent">
+        <dc:Bounds x="750" y="455" width="36" height="36"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="731" y="491" width="74" height="27"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_EndEvent_Accounting" bpmnElement="EndEvent_Accounting">
+        <dc:Bounds x="605" y="515" width="36" height="36"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="592" y="551" width="63" height="14"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_EndEvent_Accounting2" bpmnElement="EndEvent_Accounting2">
+        <dc:Bounds x="830" y="455" width="36" height="36"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="838" y="491" width="20" height="14"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_CashDatabaseStore" bpmnElement="CashDatabaseStore" isExpanded="true">
+        <dc:Bounds x="400" y="550" width="50" height="40"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="387" y="590" width="77" height="14"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_FilteredTransactions" bpmnElement="FilteredTransactions">
+        <dc:Bounds x="550" y="380" width="50" height="36"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="543" y="416" width="64" height="27"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_FilterTransactionsTask" bpmnElement="FilterTransactionsTask">
+        <dc:Bounds x="380" y="440" width="110" height="56"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_PrintReportTask" bpmnElement="PrintReportTask">
+        <dc:Bounds x="600" y="430" width="110" height="56"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Edge_aflow1" bpmnElement="aflow1">
+        <di:waypoint x="236" y="473"/>
+        <di:waypoint x="290" y="473"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_aflow2" bpmnElement="aflow2">
+        <di:waypoint x="326" y="473"/>
+        <di:waypoint x="380" y="468"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_aflow3" bpmnElement="aflow3">
+        <di:waypoint x="490" y="468"/>
+        <di:waypoint x="530" y="475"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_aflow4" bpmnElement="aflow4">
+        <di:waypoint x="570" y="475"/>
+        <di:waypoint x="600" y="458"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_aflow7" bpmnElement="aflow7">
+        <di:waypoint x="550" y="495"/>
+        <di:waypoint x="605" y="533"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_aflow5" bpmnElement="aflow5">
+        <di:waypoint x="710" y="458"/>
+        <di:waypoint x="750" y="473"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_aflow6" bpmnElement="aflow6">
+        <di:waypoint x="786" y="473"/>
+        <di:waypoint x="830" y="473"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_msg1" bpmnElement="msg1">
+        <di:waypoint x="433" y="188"/>
+        <di:waypoint x="308" y="270"/>
+        <di:waypoint x="308" y="455"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="307" y="243" width="66" height="14"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_msg2" bpmnElement="msg2">
+        <di:waypoint x="757" y="459"/>
+        <di:waypoint x="659" y="332"/>
+        <di:waypoint x="586" y="194"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="567" y="262" width="81" height="14"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_FilterCashTransactionsInput" bpmnElement="FilterCashTransactionsInput">
+        <di:waypoint x="428" y="550"/>
+        <di:waypoint x="435" y="496"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_FilterCashTransactionsOutput" bpmnElement="FilterCashTransactionsOutput">
+        <di:waypoint x="435" y="440"/>
+        <di:waypoint x="510" y="410"/>
+        <di:waypoint x="550" y="403"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_PrintReportInput" bpmnElement="PrintReportInput">
+        <di:waypoint x="600" y="398"/>
+        <di:waypoint x="655" y="430"/>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

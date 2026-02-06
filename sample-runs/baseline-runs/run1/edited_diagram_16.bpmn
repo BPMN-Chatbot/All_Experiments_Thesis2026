@@ -1,0 +1,815 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+             xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC"
+             xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI"
+             xmlns:tns="http://www.example.org/bpmn"
+             targetNamespace="http://www.example.org/bpmn">
+
+    <bpmn:collaboration id="Collaboration_1">
+  </bpmn:collaboration>
+  
+  <!-- Data Stores -->
+  <dataStore id="CustomerDatabase" name="Customer Database"/>
+  <dataStore id="CRMSystem" name="CRM System"/>
+  <dataStore id="CISSystem" name="CIS System"/>
+
+  <!-- Data Objects -->
+  <dataObject id="CustomerData" name="Customer Data"/>
+  <dataObject id="CustomerObject" name="Customer Object"/>
+  <dataObject id="ContractDocuments" name="Contract Documents"/>
+  <dataObject id="ErrorList" name="Error List"/>
+  <dataObject id="ConfirmationDocument" name="Confirmation Document"/>
+  <dataObject id="MeterData" name="Meter Data"/>
+  <dataObject id="FinalBill" name="Final Bill"/>
+  <dataObject id="ConsumptionReport" name="Consumption Report"/>
+
+  <!-- Pools -->
+  <process id="CustomerProcess" isExecutable="true">
+    <laneSet>
+      <lane id="CustomerLane" name="Customer"/>
+    </laneSet>
+    <startEvent id="CustomerStart" name="Initiate Switch-Over Request"/>
+    <task id="SendCustomerData" name="Send Customer Data"/>
+    <endEvent id="CustomerEnd" name="End"/>
+    <task id="CheckContractDetails" name="Check Contract Details"/>
+    <exclusiveGateway id="AcceptOrWithdraw" name="Accept or Withdraw?"/>
+    <intermediateThrowEvent id="SendConfirmation" name="Send Confirmation">
+      <messageEventDefinition/>
+    </intermediateThrowEvent>
+    <intermediateThrowEvent id="SendWithdrawal" name="Send Withdrawal">
+      <messageEventDefinition/>
+    </intermediateThrowEvent>
+    <timerEventDefinition id="WithdrawTimerEvent"/>
+    <intermediateCatchEvent id="WaitForContract" name="Wait for Contract">
+      <messageEventDefinition/>
+    </intermediateCatchEvent>
+    <intermediateCatchEvent id="WaitForFinalBill" name="Wait for Final Bill">
+      <messageEventDefinition/>
+    </intermediateCatchEvent>
+    <intermediateCatchEvent id="WaitForConsumptionReport" name="Wait for Consumption Report">
+      <messageEventDefinition/>
+    </intermediateCatchEvent>
+    <sequenceFlow id="c1" sourceRef="CustomerStart" targetRef="SendCustomerData"/>
+    <sequenceFlow id="c2" sourceRef="SendCustomerData" targetRef="CustomerEnd"/>
+    <sequenceFlow id="c3" sourceRef="WaitForContract" targetRef="CheckContractDetails"/>
+    <sequenceFlow id="c4" sourceRef="CheckContractDetails" targetRef="AcceptOrWithdraw"/>
+    <sequenceFlow id="c5" sourceRef="AcceptOrWithdraw" targetRef="SendConfirmation">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[accept]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="c6" sourceRef="AcceptOrWithdraw" targetRef="SendWithdrawal">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[withdraw]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="c7" sourceRef="SendConfirmation" targetRef="CustomerEnd"/>
+    <sequenceFlow id="c8" sourceRef="SendWithdrawal" targetRef="CustomerEnd"/>
+    <boundaryEvent id="WithdrawDeadline" attachedToRef="CheckContractDetails">
+      <timerEventDefinition>
+        <timeDuration>PT7D</timeDuration>
+      </timerEventDefinition>
+    </boundaryEvent>
+    <sequenceFlow id="c9" sourceRef="WithdrawDeadline" targetRef="SendConfirmation"/>
+    <sequenceFlow id="c10" sourceRef="WaitForFinalBill" targetRef="CustomerEnd"/>
+    <sequenceFlow id="c11" sourceRef="WaitForConsumptionReport" targetRef="CustomerEnd"/>
+  </process>
+
+  <process id="CompanyProcess" isExecutable="true">
+    <laneSet>
+      <lane id="CustomerServiceLane" name="Customer Service"/>
+      <lane id="SalesLane" name="Sales"/>
+      <lane id="DistributionLane" name="Distribution"/>
+    </laneSet>
+    <startEvent id="CompanyStart" name="Receive Switch-Over Request">
+      <messageEventDefinition/>
+    </startEvent>
+    <task id="ReceiveCustomerData" name="Receive Customer Data"/>
+    <task id="EnterCustomerData" name="Enter Customer Data"/>
+    <dataInputAssociation id="d1">
+      <sourceRef>ReceiveCustomerData</sourceRef>
+      <targetRef>CustomerData</targetRef>
+    </dataInputAssociation>
+    <task id="CompareWithDatabase" name="Compare with Customer Database"/>
+    <dataInputAssociation id="d2">
+      <sourceRef>EnterCustomerData</sourceRef>
+      <targetRef>CustomerData</targetRef>
+    </dataInputAssociation>
+    <dataInputAssociation id="d3">
+      <sourceRef>CompareWithDatabase</sourceRef>
+      <targetRef>CustomerDatabase</targetRef>
+    </dataInputAssociation>
+    <exclusiveGateway id="CustomerExistsGateway" name="Customer Exists?"/>
+    <task id="CorrectErrors" name="Correct Errors"/>
+    <dataInputAssociation id="d4">
+      <sourceRef>CompareWithDatabase</sourceRef>
+      <targetRef>ErrorList</targetRef>
+    </dataInputAssociation>
+    <sequenceFlow id="s1" sourceRef="CompanyStart" targetRef="ReceiveCustomerData"/>
+    <sequenceFlow id="s2" sourceRef="ReceiveCustomerData" targetRef="EnterCustomerData"/>
+    <sequenceFlow id="s3" sourceRef="EnterCustomerData" targetRef="CompareWithDatabase"/>
+    <sequenceFlow id="s4" sourceRef="CompareWithDatabase" targetRef="CustomerExistsGateway"/>
+    <sequenceFlow id="s5" sourceRef="CustomerExistsGateway" targetRef="CorrectErrors">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[errorsFound]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="s6" sourceRef="CorrectErrors" targetRef="CompareWithDatabase"/>
+    <sequenceFlow id="s7" sourceRef="CustomerExistsGateway" targetRef="PrepareContractDocuments">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[noErrors]]></conditionExpression>
+    </sequenceFlow>
+    <task id="PrepareContractDocuments" name="Prepare Contract Documents"/>
+    <dataInputAssociation id="d5">
+      <sourceRef>CustomerObject</sourceRef>
+      <targetRef>PrepareContractDocuments</targetRef>
+    </dataInputAssociation>
+    <task id="AutomatedCheckContract" name="Automated Check of Contract Documents"/>
+    <dataInputAssociation id="d6">
+      <sourceRef>ContractDocuments</sourceRef>
+      <targetRef>AutomatedCheckContract</targetRef>
+    </dataInputAssociation>
+    <exclusiveGateway id="ContractCheckGateway" name="Contract Documents OK?"/>
+    <task id="AnalyzeResolveIssues" name="Analyze and Resolve Issues"/>
+    <sequenceFlow id="s8" sourceRef="PrepareContractDocuments" targetRef="AutomatedCheckContract"/>
+    <sequenceFlow id="s9" sourceRef="AutomatedCheckContract" targetRef="ContractCheckGateway"/>
+    <sequenceFlow id="s10" sourceRef="ContractCheckGateway" targetRef="AnalyzeResolveIssues">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[notOK]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="s11" sourceRef="AnalyzeResolveIssues" targetRef="PrepareContractDocuments"/>
+    <sequenceFlow id="s12" sourceRef="ContractCheckGateway" targetRef="SendConfirmationDocument">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[OK]]></conditionExpression>
+    </sequenceFlow>
+    <task id="SendConfirmationDocument" name="Send Confirmation Document"/>
+    <dataOutputAssociation id="d7">
+      <sourceRef>SendConfirmationDocument</sourceRef>
+      <targetRef>ConfirmationDocument</targetRef>
+    </dataOutputAssociation>
+    <intermediateThrowEvent id="ThrowConfirmationToCustomer" name="Send Confirmation to Customer">
+      <messageEventDefinition/>
+    </intermediateThrowEvent>
+    <sequenceFlow id="s13" sourceRef="SendConfirmationDocument" targetRef="ThrowConfirmationToCustomer"/>
+    <intermediateThrowEvent id="SendRequestToGridOperator" name="Send Request to Grid Operator">
+      <messageEventDefinition/>
+    </intermediateThrowEvent>
+    <sequenceFlow id="s14" sourceRef="ThrowConfirmationToCustomer" targetRef="SendRequestToGridOperator"/>
+    <intermediateCatchEvent id="ReceiveGridOperatorResponse" name="Receive Grid Operator Response">
+      <messageEventDefinition/>
+    </intermediateCatchEvent>
+    <exclusiveGateway id="SupplierConcurrenceGateway" name="Supplier Concurrence?"/>
+    <sequenceFlow id="s15" sourceRef="SendRequestToGridOperator" targetRef="ReceiveGridOperatorResponse"/>
+    <sequenceFlow id="s16" sourceRef="ReceiveGridOperatorResponse" targetRef="SupplierConcurrenceGateway"/>
+    <task id="CreateCISContract" name="Create CIS Contract"/>
+    <sequenceFlow id="s17" sourceRef="SupplierConcurrenceGateway" targetRef="CreateCISContract">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[noConcurrence]]></conditionExpression>
+    </sequenceFlow>
+    <endEvent id="CompanyEnd" name="End"/>
+    <sequenceFlow id="s18" sourceRef="CreateCISContract" targetRef="SendContractToCustomer"/>
+    <intermediateThrowEvent id="SendContractToCustomer" name="Send Contract to Customer">
+      <messageEventDefinition/>
+    </intermediateThrowEvent>
+    <intermediateCatchEvent id="ReceiveCustomerConfirmation" name="Receive Customer Confirmation">
+      <messageEventDefinition/>
+    </intermediateCatchEvent>
+    <intermediateCatchEvent id="ReceiveCustomerWithdrawal" name="Receive Customer Withdrawal">
+      <messageEventDefinition/>
+    </intermediateCatchEvent>
+    <eventBasedGateway id="WaitForCustomerResponse" name="Wait for Customer Response"/>
+    <sequenceFlow id="s19" sourceRef="SendContractToCustomer" targetRef="WaitForCustomerResponse"/>
+    <sequenceFlow id="s20" sourceRef="WaitForCustomerResponse" targetRef="ReceiveCustomerConfirmation"/>
+    <sequenceFlow id="s21" sourceRef="WaitForCustomerResponse" targetRef="ReceiveCustomerWithdrawal"/>
+    <boundaryEvent id="CustomerResponseTimer" attachedToRef="WaitForCustomerResponse">
+      <timerEventDefinition>
+        <timeDuration>PT7D</timeDuration>
+      </timerEventDefinition>
+    </boundaryEvent>
+    <sequenceFlow id="s22" sourceRef="CustomerResponseTimer" targetRef="ContinueAfterTimeout"/>
+    <task id="ContinueAfterTimeout" name="Continue After Timeout"/>
+    <sequenceFlow id="s23" sourceRef="ReceiveCustomerConfirmation" targetRef="ContinueAfterTimeout"/>
+    <sequenceFlow id="s24" sourceRef="ContinueAfterTimeout" targetRef="CompanyEnd"/>
+    <sequenceFlow id="s25" sourceRef="ReceiveCustomerWithdrawal" targetRef="CompanyEnd"/>
+    <intermediateCatchEvent id="ReceiveMeterData" name="Receive Meter Data">
+      <messageEventDefinition/>
+    </intermediateCatchEvent>
+    <sequenceFlow id="s26" sourceRef="ContinueAfterTimeout" targetRef="ReceiveMeterData"/>
+    <task id="ImportMeterData" name="Import Meter Data"/>
+    <sequenceFlow id="s27" sourceRef="ReceiveMeterData" targetRef="ImportMeterData"/>
+    <sequenceFlow id="s28" sourceRef="ImportMeterData" targetRef="CompanyEnd"/>
+  </process>
+
+  <process id="GridOperatorProcess" isExecutable="true">
+    <laneSet>
+      <lane id="GridOperatorLane" name="Grid Operator"/>
+    </laneSet>
+    <startEvent id="GridOperatorStart" name="Receive Request from Company">
+      <messageEventDefinition/>
+    </startEvent>
+    <task id="CheckSupplierConcurrence" name="Check Supplier Concurrence"/>
+    <exclusiveGateway id="ConcurrenceGateway" name="Supplier Concurrence?"/>
+    <intermediateThrowEvent id="SendConcurrenceResponse" name="Send Concurrence Response">
+      <messageEventDefinition/>
+    </intermediateThrowEvent>
+    <task id="InformSuppliers" name="Inform Suppliers and Demand Resolution"/>
+    <task id="TerminateOldAgreement" name="Terminate Old Sales Agreement"/>
+    <sequenceFlow id="g1" sourceRef="GridOperatorStart" targetRef="CheckSupplierConcurrence"/>
+    <sequenceFlow id="g2" sourceRef="CheckSupplierConcurrence" targetRef="ConcurrenceGateway"/>
+    <sequenceFlow id="g3" sourceRef="ConcurrenceGateway" targetRef="SendConcurrenceResponse">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[noConcurrence]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="g4" sourceRef="ConcurrenceGateway" targetRef="InformSuppliers">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[concurrence]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="g5" sourceRef="InformSuppliers" targetRef="TerminateOldAgreement"/>
+    <sequenceFlow id="g6" sourceRef="TerminateOldAgreement" targetRef="SendConcurrenceResponse"/>
+    <endEvent id="GridOperatorEnd" name="End"/>
+    <intermediateThrowEvent id="SendMeterData" name="Send Meter Data">
+      <messageEventDefinition/>
+    </intermediateThrowEvent>
+    <intermediateThrowEvent id="SendConsumptionReport" name="Send Consumption Report">
+      <messageEventDefinition/>
+    </intermediateThrowEvent>
+    <task id="ComputeFinalBilling" name="Compute Final Billing"/>
+    <intermediateThrowEvent id="SendFinalBillingToOldSupplier" name="Send Final Billing to Old Supplier">
+      <messageEventDefinition/>
+    </intermediateThrowEvent>
+    <sequenceFlow id="g7" sourceRef="SendConcurrenceResponse" targetRef="SendMeterData"/>
+    <sequenceFlow id="g8" sourceRef="SendMeterData" targetRef="SendConsumptionReport"/>
+    <sequenceFlow id="g9" sourceRef="SendConsumptionReport" targetRef="ComputeFinalBilling"/>
+    <sequenceFlow id="g10" sourceRef="ComputeFinalBilling" targetRef="SendFinalBillingToOldSupplier"/>
+    <sequenceFlow id="g11" sourceRef="SendFinalBillingToOldSupplier" targetRef="GridOperatorEnd"/>
+  </process>
+
+  <process id="OldSupplierProcess" isExecutable="true">
+    <laneSet>
+      <lane id="OldSupplierLane" name="Old Supplier"/>
+    </laneSet>
+    <startEvent id="OldSupplierStart" name="Receive Notification from Grid Operator">
+      <messageEventDefinition/>
+    </startEvent>
+    <intermediateCatchEvent id="ReceiveFinalBilling" name="Receive Final Billing">
+      <messageEventDefinition/>
+    </intermediateCatchEvent>
+    <task id="CreateFinalBill" name="Create Final Bill"/>
+    <intermediateThrowEvent id="SendFinalBillToCustomer" name="Send Final Bill to Customer">
+      <messageEventDefinition/>
+    </intermediateThrowEvent>
+    <endEvent id="OldSupplierEnd" name="End"/>
+    <sequenceFlow id="o1" sourceRef="OldSupplierStart" targetRef="ReceiveFinalBilling"/>
+    <sequenceFlow id="o2" sourceRef="ReceiveFinalBilling" targetRef="CreateFinalBill"/>
+    <sequenceFlow id="o3" sourceRef="CreateFinalBill" targetRef="SendFinalBillToCustomer"/>
+    <sequenceFlow id="o4" sourceRef="SendFinalBillToCustomer" targetRef="OldSupplierEnd"/>
+  </process>
+
+  <!-- Message Flows -->
+  <messageFlow id="m1" name="Switch-Over Request" sourceRef="SendCustomerData" targetRef="CompanyStart"/>
+  <messageFlow id="m2" name="Confirmation Document" sourceRef="ThrowConfirmationToCustomer" targetRef="WaitForContract"/>
+  <messageFlow id="m3" name="Contract to Customer" sourceRef="SendContractToCustomer" targetRef="WaitForContract"/>
+  <messageFlow id="m4" name="Customer Confirmation" sourceRef="SendConfirmation" targetRef="ReceiveCustomerConfirmation"/>
+  <messageFlow id="m5" name="Customer Withdrawal" sourceRef="SendWithdrawal" targetRef="ReceiveCustomerWithdrawal"/>
+  <messageFlow id="m6" name="Request to Grid Operator" sourceRef="SendRequestToGridOperator" targetRef="GridOperatorStart"/>
+  <messageFlow id="m7" name="Grid Operator Response" sourceRef="SendConcurrenceResponse" targetRef="ReceiveGridOperatorResponse"/>
+  <messageFlow id="m8" name="Notification to Old Supplier" sourceRef="InformSuppliers" targetRef="OldSupplierStart"/>
+  <messageFlow id="m9" name="Meter Data" sourceRef="SendMeterData" targetRef="ReceiveMeterData"/>
+  <messageFlow id="m10" name="Consumption Report" sourceRef="SendConsumptionReport" targetRef="WaitForConsumptionReport"/>
+  <messageFlow id="m11" name="Final Billing" sourceRef="SendFinalBillingToOldSupplier" targetRef="ReceiveFinalBilling"/>
+  <messageFlow id="m12" name="Final Bill to Customer" sourceRef="SendFinalBillToCustomer" targetRef="WaitForFinalBill"/>
+
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+  <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_1">
+    <!-- Pools -->
+    <bpmndi:BPMNShape id="CustomerPool_di" bpmnElement="CustomerProcess" isHorizontal="true">
+      <omgdc:Bounds x="50" y="50" width="2050" height="180"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="CompanyPool_di" bpmnElement="CompanyProcess" isHorizontal="true">
+      <omgdc:Bounds x="50" y="260" width="2050" height="260"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="GridOperatorPool_di" bpmnElement="GridOperatorProcess" isHorizontal="true">
+      <omgdc:Bounds x="50" y="540" width="2050" height="120"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="OldSupplierPool_di" bpmnElement="OldSupplierProcess" isHorizontal="true">
+      <omgdc:Bounds x="50" y="680" width="2050" height="100"/>
+    </bpmndi:BPMNShape>
+    <!-- Lanes Company -->
+    <bpmndi:BPMNShape id="CustomerServiceLane_di" bpmnElement="CustomerServiceLane">
+      <omgdc:Bounds x="50" y="260" width="2050" height="75"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="SalesLane_di" bpmnElement="SalesLane">
+      <omgdc:Bounds x="50" y="335" width="2050" height="100"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="DistributionLane_di" bpmnElement="DistributionLane">
+      <omgdc:Bounds x="50" y="435" width="2050" height="85"/>
+    </bpmndi:BPMNShape>
+    <!-- Lanes other pools -->
+    <bpmndi:BPMNShape id="CustomerLane_di" bpmnElement="CustomerLane">
+      <omgdc:Bounds x="50" y="50" width="2050" height="180"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="GridOperatorLane_di" bpmnElement="GridOperatorLane">
+      <omgdc:Bounds x="50" y="540" width="2050" height="120"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="OldSupplierLane_di" bpmnElement="OldSupplierLane">
+      <omgdc:Bounds x="50" y="680" width="2050" height="100"/>
+    </bpmndi:BPMNShape>
+
+    <!-- CUSTOMER POOL ELEMENTS -->
+    <bpmndi:BPMNShape id="CustomerStart_di" bpmnElement="CustomerStart">
+      <omgdc:Bounds x="100" y="120" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="SendCustomerData_di" bpmnElement="SendCustomerData">
+      <omgdc:Bounds x="180" y="108" width="100" height="60"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="CustomerEnd_di" bpmnElement="CustomerEnd">
+      <omgdc:Bounds x="1850" y="120" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="WaitForContract_di" bpmnElement="WaitForContract">
+      <omgdc:Bounds x="340" y="120" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="CheckContractDetails_di" bpmnElement="CheckContractDetails">
+      <omgdc:Bounds x="410" y="108" width="100" height="60"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="AcceptOrWithdraw_di" bpmnElement="AcceptOrWithdraw">
+      <omgdc:Bounds x="540" y="122" width="50" height="50"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="SendConfirmation_di" bpmnElement="SendConfirmation">
+      <omgdc:Bounds x="650" y="120" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="SendWithdrawal_di" bpmnElement="SendWithdrawal">
+      <omgdc:Bounds x="650" y="80" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="WithdrawDeadline_di" bpmnElement="WithdrawDeadline">
+      <omgdc:Bounds x="480" y="160" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="WaitForFinalBill_di" bpmnElement="WaitForFinalBill">
+      <omgdc:Bounds x="1650" y="80" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="WaitForConsumptionReport_di" bpmnElement="WaitForConsumptionReport">
+      <omgdc:Bounds x="1650" y="170" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+
+    <!-- COMPANY POOL ELEMENTS (flow, see corresponding lanes by y offset) -->
+    <bpmndi:BPMNShape id="CompanyStart_di" bpmnElement="CompanyStart">
+      <omgdc:Bounds x="300" y="273" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="ReceiveCustomerData_di" bpmnElement="ReceiveCustomerData">
+      <omgdc:Bounds x="380" y="264" width="100" height="55"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="EnterCustomerData_di" bpmnElement="EnterCustomerData">
+      <omgdc:Bounds x="500" y="264" width="100" height="55"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="CompareWithDatabase_di" bpmnElement="CompareWithDatabase">
+      <omgdc:Bounds x="640" y="264" width="100" height="55"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="CustomerExistsGateway_di" bpmnElement="CustomerExistsGateway">
+      <omgdc:Bounds x="800" y="274" width="50" height="50"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="CorrectErrors_di" bpmnElement="CorrectErrors">
+      <omgdc:Bounds x="900" y="220" width="100" height="55"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="PrepareContractDocuments_di" bpmnElement="PrepareContractDocuments">
+      <omgdc:Bounds x="900" y="325" width="120" height="55"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="AutomatedCheckContract_di" bpmnElement="AutomatedCheckContract">
+      <omgdc:Bounds x="1080" y="325" width="120" height="55"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="ContractCheckGateway_di" bpmnElement="ContractCheckGateway">
+      <omgdc:Bounds x="1260" y="335" width="50" height="50"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="AnalyzeResolveIssues_di" bpmnElement="AnalyzeResolveIssues">
+      <omgdc:Bounds x="1350" y="265" width="120" height="55"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="SendConfirmationDocument_di" bpmnElement="SendConfirmationDocument">
+      <omgdc:Bounds x="1350" y="375" width="120" height="55"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="ThrowConfirmationToCustomer_di" bpmnElement="ThrowConfirmationToCustomer">
+      <omgdc:Bounds x="1490" y="390" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="SendRequestToGridOperator_di" bpmnElement="SendRequestToGridOperator">
+      <omgdc:Bounds x="1580" y="390" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="ReceiveGridOperatorResponse_di" bpmnElement="ReceiveGridOperatorResponse">
+      <omgdc:Bounds x="1660" y="390" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="SupplierConcurrenceGateway_di" bpmnElement="SupplierConcurrenceGateway">
+      <omgdc:Bounds x="1750" y="400" width="50" height="50"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="CreateCISContract_di" bpmnElement="CreateCISContract">
+      <omgdc:Bounds x="1850" y="390" width="100" height="55"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="SendContractToCustomer_di" bpmnElement="SendContractToCustomer">
+      <omgdc:Bounds x="1970" y="390" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="WaitForCustomerResponse_di" bpmnElement="WaitForCustomerResponse">
+      <omgdc:Bounds x="2040" y="390" width="50" height="50"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="ReceiveCustomerConfirmation_di" bpmnElement="ReceiveCustomerConfirmation">
+      <omgdc:Bounds x="2140" y="435" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="ReceiveCustomerWithdrawal_di" bpmnElement="ReceiveCustomerWithdrawal">
+      <omgdc:Bounds x="2140" y="380" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="CustomerResponseTimer_di" bpmnElement="CustomerResponseTimer" isMarkerVisible="true">
+      <omgdc:Bounds x="2100" y="405" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="ContinueAfterTimeout_di" bpmnElement="ContinueAfterTimeout">
+      <omgdc:Bounds x="2200" y="390" width="100" height="55"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="CompanyEnd_di" bpmnElement="CompanyEnd">
+      <omgdc:Bounds x="2350" y="400" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="ReceiveMeterData_di" bpmnElement="ReceiveMeterData">
+      <omgdc:Bounds x="2320" y="450" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="ImportMeterData_di" bpmnElement="ImportMeterData">
+      <omgdc:Bounds x="2400" y="450" width="100" height="55"/>
+    </bpmndi:BPMNShape>
+
+    <!-- GRID OPERATOR POOL ELEMENTS -->
+    <bpmndi:BPMNShape id="GridOperatorStart_di" bpmnElement="GridOperatorStart">
+      <omgdc:Bounds x="220" y="590" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="CheckSupplierConcurrence_di" bpmnElement="CheckSupplierConcurrence">
+      <omgdc:Bounds x="300" y="580" width="100" height="55"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="ConcurrenceGateway_di" bpmnElement="ConcurrenceGateway">
+      <omgdc:Bounds x="430" y="590" width="50" height="50"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="SendConcurrenceResponse_di" bpmnElement="SendConcurrenceResponse">
+      <omgdc:Bounds x="520" y="590" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="InformSuppliers_di" bpmnElement="InformSuppliers">
+      <omgdc:Bounds x="520" y="540" width="100" height="55"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="TerminateOldAgreement_di" bpmnElement="TerminateOldAgreement">
+      <omgdc:Bounds x="650" y="540" width="120" height="55"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="SendMeterData_di" bpmnElement="SendMeterData">
+      <omgdc:Bounds x="600" y="650" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="SendConsumptionReport_di" bpmnElement="SendConsumptionReport">
+      <omgdc:Bounds x="680" y="650" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="ComputeFinalBilling_di" bpmnElement="ComputeFinalBilling">
+      <omgdc:Bounds x="760" y="650" width="100" height="55"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="SendFinalBillingToOldSupplier_di" bpmnElement="SendFinalBillingToOldSupplier">
+      <omgdc:Bounds x="900" y="650" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="GridOperatorEnd_di" bpmnElement="GridOperatorEnd">
+      <omgdc:Bounds x="990" y="650" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+
+    <!-- OLD SUPPLIER POOL ELEMENTS -->
+    <bpmndi:BPMNShape id="OldSupplierStart_di" bpmnElement="OldSupplierStart">
+      <omgdc:Bounds x="650" y="720" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="ReceiveFinalBilling_di" bpmnElement="ReceiveFinalBilling">
+      <omgdc:Bounds x="730" y="720" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="CreateFinalBill_di" bpmnElement="CreateFinalBill">
+      <omgdc:Bounds x="790" y="715" width="100" height="45"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="SendFinalBillToCustomer_di" bpmnElement="SendFinalBillToCustomer">
+      <omgdc:Bounds x="920" y="720" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="OldSupplierEnd_di" bpmnElement="OldSupplierEnd">
+      <omgdc:Bounds x="1010" y="720" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+
+    <!-- DATA STORES (Placed outside for clarity) -->
+    <bpmndi:BPMNShape id="CustomerDatabase_di" bpmnElement="CustomerDatabase">
+      <omgdc:Bounds x="80" y="330" width="50" height="40"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="CRMSystem_di" bpmnElement="CRMSystem">
+      <omgdc:Bounds x="80" y="380" width="50" height="40"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="CISSystem_di" bpmnElement="CISSystem">
+      <omgdc:Bounds x="80" y="430" width="50" height="40"/>
+    </bpmndi:BPMNShape>
+
+    <!-- DATA OBJECTS (placed near relevant tasks) -->
+    <bpmndi:BPMNShape id="CustomerData_di" bpmnElement="CustomerData">
+      <omgdc:Bounds x="580" y="286" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="CustomerObject_di" bpmnElement="CustomerObject">
+      <omgdc:Bounds x="995" y="225" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="ContractDocuments_di" bpmnElement="ContractDocuments">
+      <omgdc:Bounds x="1125" y="390" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="ErrorList_di" bpmnElement="ErrorList">
+      <omgdc:Bounds x="730" y="220" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="ConfirmationDocument_di" bpmnElement="ConfirmationDocument">
+      <omgdc:Bounds x="1350" y="335" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="MeterData_di" bpmnElement="MeterData">
+      <omgdc:Bounds x="680" y="701" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="FinalBill_di" bpmnElement="FinalBill">
+      <omgdc:Bounds x="950" y="755" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="ConsumptionReport_di" bpmnElement="ConsumptionReport">
+      <omgdc:Bounds x="720" y="701" width="36" height="36"/>
+    </bpmndi:BPMNShape>
+
+    <!-- CUSTOMER SEQUENCE FLOWS -->
+    <bpmndi:BPMNEdge id="c1_di" bpmnElement="c1">
+      <omgdi:waypoint x="136" y="138"/>
+      <omgdi:waypoint x="180" y="138"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="c2_di" bpmnElement="c2">
+      <omgdi:waypoint x="280" y="138"/>
+      <omgdi:waypoint x="1850" y="138"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="c3_di" bpmnElement="c3">
+      <omgdi:waypoint x="376" y="138"/>
+      <omgdi:waypoint x="410" y="138"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="c4_di" bpmnElement="c4">
+      <omgdi:waypoint x="510" y="138"/>
+      <omgdi:waypoint x="540" y="147"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="c5_di" bpmnElement="c5">
+      <omgdi:waypoint x="590" y="147"/>
+      <omgdi:waypoint x="650" y="138"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="c6_di" bpmnElement="c6">
+      <omgdi:waypoint x="590" y="147"/>
+      <omgdi:waypoint x="650" y="98"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="c7_di" bpmnElement="c7">
+      <omgdi:waypoint x="686" y="138"/>
+      <omgdi:waypoint x="1850" y="138"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="c8_di" bpmnElement="c8">
+      <omgdi:waypoint x="686" y="98"/>
+      <omgdi:waypoint x="1850" y="138"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="c9_di" bpmnElement="c9">
+      <omgdi:waypoint x="516" y="178"/>
+      <omgdi:waypoint x="650" y="138"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="c10_di" bpmnElement="c10">
+      <omgdi:waypoint x="1686" y="98"/>
+      <omgdi:waypoint x="1850" y="138"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="c11_di" bpmnElement="c11">
+      <omgdi:waypoint x="1686" y="188"/>
+      <omgdi:waypoint x="1850" y="138"/>
+    </bpmndi:BPMNEdge>
+
+    <!-- COMPANY SEQUENCE FLOWS -->
+    <bpmndi:BPMNEdge id="s1_di" bpmnElement="s1">
+      <omgdi:waypoint x="336" y="291"/>
+      <omgdi:waypoint x="380" y="291"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="s2_di" bpmnElement="s2">
+      <omgdi:waypoint x="480" y="291"/>
+      <omgdi:waypoint x="500" y="291"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="s3_di" bpmnElement="s3">
+      <omgdi:waypoint x="600" y="291"/>
+      <omgdi:waypoint x="640" y="291"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="s4_di" bpmnElement="s4">
+      <omgdi:waypoint x="740" y="291"/>
+      <omgdi:waypoint x="800" y="299"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="s5_di" bpmnElement="s5">
+      <omgdi:waypoint x="850" y="299"/>
+      <omgdi:waypoint x="950" y="248"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="s6_di" bpmnElement="s6">
+      <omgdi:waypoint x="1000" y="248"/>
+      <omgdi:waypoint x="640" y="291"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="s7_di" bpmnElement="s7">
+      <omgdi:waypoint x="850" y="299"/>
+      <omgdi:waypoint x="900" y="352"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="s8_di" bpmnElement="s8">
+      <omgdi:waypoint x="1020" y="352"/>
+      <omgdi:waypoint x="1080" y="352"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="s9_di" bpmnElement="s9">
+      <omgdi:waypoint x="1200" y="352"/>
+      <omgdi:waypoint x="1260" y="360"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="s10_di" bpmnElement="s10">
+      <omgdi:waypoint x="1310" y="360"/>
+      <omgdi:waypoint x="1350" y="292"/>
+      <omgdi:waypoint x="1350" y="292"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="s11_di" bpmnElement="s11">
+      <omgdi:waypoint x="1470" y="292"/>
+      <omgdi:waypoint x="900" y="352"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="s12_di" bpmnElement="s12">
+      <omgdi:waypoint x="1310" y="360"/>
+      <omgdi:waypoint x="1350" y="402"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="s13_di" bpmnElement="s13">
+      <omgdi:waypoint x="1470" y="402"/>
+      <omgdi:waypoint x="1490" y="408"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="s14_di" bpmnElement="s14">
+      <omgdi:waypoint x="1526" y="408"/>
+      <omgdi:waypoint x="1580" y="408"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="s15_di" bpmnElement="s15">
+      <omgdi:waypoint x="1616" y="408"/>
+      <omgdi:waypoint x="1660" y="408"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="s16_di" bpmnElement="s16">
+      <omgdi:waypoint x="1696" y="408"/>
+      <omgdi:waypoint x="1750" y="425"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="s17_di" bpmnElement="s17">
+      <omgdi:waypoint x="1800" y="425"/>
+      <omgdi:waypoint x="1850" y="417"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="s18_di" bpmnElement="s18">
+      <omgdi:waypoint x="1950" y="417"/>
+      <omgdi:waypoint x="1970" y="408"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="s19_di" bpmnElement="s19">
+      <omgdi:waypoint x="2006" y="408"/>
+      <omgdi:waypoint x="2040" y="415"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="s20_di" bpmnElement="s20">
+      <omgdi:waypoint x="2090" y="415"/>
+      <omgdi:waypoint x="2140" y="453"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="s21_di" bpmnElement="s21">
+      <omgdi:waypoint x="2090" y="415"/>
+      <omgdi:waypoint x="2140" y="398"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="s22_di" bpmnElement="s22">
+      <omgdi:waypoint x="2136" y="423"/>
+      <omgdi:waypoint x="2200" y="417"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="s23_di" bpmnElement="s23">
+      <omgdi:waypoint x="2176" y="453"/>
+      <omgdi:waypoint x="2200" y="417"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="s24_di" bpmnElement="s24">
+      <omgdi:waypoint x="2300" y="417"/>
+      <omgdi:waypoint x="2350" y="418"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="s25_di" bpmnElement="s25">
+      <omgdi:waypoint x="2176" y="398"/>
+      <omgdi:waypoint x="2350" y="418"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="s26_di" bpmnElement="s26">
+      <omgdi:waypoint x="2300" y="417"/>
+      <omgdi:waypoint x="2320" y="468"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="s27_di" bpmnElement="s27">
+      <omgdi:waypoint x="2356" y="468"/>
+      <omgdi:waypoint x="2400" y="477"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="s28_di" bpmnElement="s28">
+      <omgdi:waypoint x="2500" y="477"/>
+      <omgdi:waypoint x="2350" y="418"/>
+    </bpmndi:BPMNEdge>
+
+    <!-- GRID OPERATOR SEQUENCE FLOWS -->
+    <bpmndi:BPMNEdge id="g1_di" bpmnElement="g1">
+      <omgdi:waypoint x="256" y="608"/>
+      <omgdi:waypoint x="300" y="607"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="g2_di" bpmnElement="g2">
+      <omgdi:waypoint x="400" y="607"/>
+      <omgdi:waypoint x="430" y="615"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="g3_di" bpmnElement="g3">
+      <omgdi:waypoint x="480" y="615"/>
+      <omgdi:waypoint x="520" y="608"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="g4_di" bpmnElement="g4">
+      <omgdi:waypoint x="480" y="615"/>
+      <omgdi:waypoint x="570" y="567"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="g5_di" bpmnElement="g5">
+      <omgdi:waypoint x="620" y="567"/>
+      <omgdi:waypoint x="650" y="567"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="g6_di" bpmnElement="g6">
+      <omgdi:waypoint x="770" y="567"/>
+      <omgdi:waypoint x="538" y="607"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="g7_di" bpmnElement="g7">
+      <omgdi:waypoint x="556" y="608"/>
+      <omgdi:waypoint x="600" y="668"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="g8_di" bpmnElement="g8">
+      <omgdi:waypoint x="636" y="668"/>
+      <omgdi:waypoint x="680" y="668"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="g9_di" bpmnElement="g9">
+      <omgdi:waypoint x="716" y="668"/>
+      <omgdi:waypoint x="760" y="677"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="g10_di" bpmnElement="g10">
+      <omgdi:waypoint x="860" y="677"/>
+      <omgdi:waypoint x="900" y="668"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="g11_di" bpmnElement="g11">
+      <omgdi:waypoint x="936" y="668"/>
+      <omgdi:waypoint x="990" y="668"/>
+    </bpmndi:BPMNEdge>
+
+    <!-- OLD SUPPLIER SEQUENCE FLOWS -->
+    <bpmndi:BPMNEdge id="o1_di" bpmnElement="o1">
+      <omgdi:waypoint x="686" y="738"/>
+      <omgdi:waypoint x="730" y="738"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="o2_di" bpmnElement="o2">
+      <omgdi:waypoint x="766" y="738"/>
+      <omgdi:waypoint x="790" y="738"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="o3_di" bpmnElement="o3">
+      <omgdi:waypoint x="890" y="738"/>
+      <omgdi:waypoint x="920" y="738"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="o4_di" bpmnElement="o4">
+      <omgdi:waypoint x="956" y="738"/>
+      <omgdi:waypoint x="1010" y="738"/>
+    </bpmndi:BPMNEdge>
+
+    <!-- MESSAGE FLOWS -->
+    <bpmndi:BPMNEdge id="m1_di" bpmnElement="m1">
+      <omgdi:waypoint x="280" y="138"/>
+      <omgdi:waypoint x="318" y="291"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="m2_di" bpmnElement="m2">
+      <omgdi:waypoint x="1508" y="408"/>
+      <omgdi:waypoint x="340" y="138"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="m3_di" bpmnElement="m3">
+      <omgdi:waypoint x="1988" y="408"/>
+      <omgdi:waypoint x="340" y="138"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="m4_di" bpmnElement="m4">
+      <omgdi:waypoint x="668" y="138"/>
+      <omgdi:waypoint x="2140" y="453"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="m5_di" bpmnElement="m5">
+      <omgdi:waypoint x="668" y="98"/>
+      <omgdi:waypoint x="2140" y="398"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="m6_di" bpmnElement="m6">
+      <omgdi:waypoint x="1616" y="408"/>
+      <omgdi:waypoint x="220" y="608"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="m7_di" bpmnElement="m7">
+      <omgdi:waypoint x="556" y="608"/>
+      <omgdi:waypoint x="1660" y="408"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="m8_di" bpmnElement="m8">
+      <omgdi:waypoint x="570" y="567"/>
+      <omgdi:waypoint x="650" y="738"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="m9_di" bpmnElement="m9">
+      <omgdi:waypoint x="636" y="668"/>
+      <omgdi:waypoint x="2320" y="468"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="m10_di" bpmnElement="m10">
+      <omgdi:waypoint x="716" y="668"/>
+      <omgdi:waypoint x="1650" y="188"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="m11_di" bpmnElement="m11">
+      <omgdi:waypoint x="936" y="668"/>
+      <omgdi:waypoint x="730" y="738"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="m12_di" bpmnElement="m12">
+      <omgdi:waypoint x="956" y="738"/>
+      <omgdi:waypoint x="1650" y="98"/>
+    </bpmndi:BPMNEdge>
+
+    <!-- DATA ASSOCIATIONS -->
+    <bpmndi:BPMNEdge id="d1_di" bpmnElement="d1">
+      <omgdi:waypoint x="430" y="291"/>
+      <omgdi:waypoint x="580" y="304"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="d2_di" bpmnElement="d2">
+      <omgdi:waypoint x="550" y="291"/>
+      <omgdi:waypoint x="580" y="304"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="d3_di" bpmnElement="d3">
+      <omgdi:waypoint x="690" y="288"/>
+      <omgdi:waypoint x="100" y="350"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="d4_di" bpmnElement="d4">
+      <omgdi:waypoint x="740" y="264"/>
+      <omgdi:waypoint x="748" y="238"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="d5_di" bpmnElement="d5">
+      <omgdi:waypoint x="1011" y="242"/>
+      <omgdi:waypoint x="1020" y="352"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="d6_di" bpmnElement="d6">
+      <omgdi:waypoint x="1143" y="408"/>
+      <omgdi:waypoint x="1200" y="352"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="d7_di" bpmnElement="d7">
+      <omgdi:waypoint x="1350" y="402"/>
+      <omgdi:waypoint x="1368" y="353"/>
+    </bpmndi:BPMNEdge>
+  </bpmndi:BPMNPlane>
+</bpmndi:BPMNDiagram>
+</definitions>

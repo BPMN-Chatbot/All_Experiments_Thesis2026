@@ -1,0 +1,484 @@
+<?xml version="1.0" encoding="UTF-8"?> <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" id="Definitions_1" targetNamespace="http://bpmn.io/schema/bpmn"> 
+
+  <bpmn:collaboration id="Collaboration_1">
+  <bpmn:participant id="Participant_OrderFulfillment" name="Order Fulfillment" processRef="Order_Fulfillment_Process"/>
+  <bpmn:participant id="Participant_Wholesaler" name="Wholesaler" processRef="Wholesaler_Process"/>
+
+      <!-- Message flows between pools --> <messageFlow id="MF_Reorder" sourceRef="Event_Reorder" targetRef="Wholesaler_ReceiveOrder"/> <messageFlow id="MF_ProductArrived" sourceRef="Wholesaler_DeliverProduct" targetRef="Event_ProductArrived"/> <messageFlow id="MF_Penalty" sourceRef="Event_Penalty" targetRef="Wholesaler_ReceivePenalty"/> <messageFlow id="MF_ProductArrived_AfterPenalty" sourceRef="Wholesaler_DeliverProductAfterPenalty" targetRef="Event_ProductArrived_AfterPenalty"/> 
+</bpmn:collaboration>
+
+  <process id="Order_Fulfillment_Process" isExecutable="true"> 
+    <!-- Lanes --> <bpmn:laneSet id="LaneSet_1">
+     
+      <lane id="Lane_OrderManagement"> <flowNodeRef>Task_ReadOrder</flowNodeRef> <flowNodeRef>Task_SelectProduct</flowNodeRef> <flowNodeRef>Task_SelectNextProduct</flowNodeRef> <flowNodeRef>Task_RequestCourier</flowNodeRef> </lane> 
+    <lane id="Lane_Warehouse"> <flowNodeRef>Task_CheckStock</flowNodeRef> <flowNodeRef>Task_WithdrawFromWarehouse</flowNodeRef> <flowNodeRef>Task_PackProducts</flowNodeRef> <flowNodeRef>Task_ShipProducts</flowNodeRef> </lane> 
+    <lane id="Lane_StockManagement"> <flowNodeRef>Task_RegisterStock</flowNodeRef> <flowNodeRef>Task_RegisterStockAfterPenalty</flowNodeRef> </lane>
+    
+    </bpmn:laneSet> <!-- Data Objects and Stores --> 
+    <dataObject id="DataObject_DataStore_Stock"/> 
+  <dataStoreReference id="DataStore_Stock" dataStoreRef="DataObject_DataStore_Stock" name="Stock Management System"/> 
+  <dataObject id="DataObject_Order" /> 
+  <dataObject id="DataObject_Product" /> 
+  <dataObject id="DataObject_PackingList" /> 
+
+   <!-- References to Data Objects -->
+  <dataObjectReference id="ref_Order" dataObjectRef="DataObject_Order" name="Order" />
+  <dataObjectReference id="ref_Product" dataObjectRef="DataObject_Product" name="Product"/>
+  <dataObjectReference id="ref_PackingList" dataObjectRef="DataObject_PackingList" name="Packing List"/>
+  
+  <!-- Start Event --> <startEvent id="StartEvent" name="Order Received"> 
+    <outgoing>Flow_ReadOrder</outgoing> </startEvent> 
+    
+    <!-- Read Order Task (Order Management) --> <task id="Task_ReadOrder" name="Read Order from Automatic Order Management System"> 
+      <incoming>Flow_ReadOrder</incoming> <outgoing>Flow_SelectProduct</outgoing> <dataInputAssociation id="DataInput_ReadOrder"> <sourceRef>ref_Order</sourceRef>  </dataInputAssociation> </task>  
+    <!-- Select Product (Order Management) --> <task id="Task_SelectProduct" name="Select Product From Order"> <incoming>Flow_SelectProduct</incoming> <outgoing>Flow_CheckStock</outgoing> <dataInputAssociation id="DataInput_SelectProduct"> <sourceRef>ref_Order</sourceRef> </dataInputAssociation> </task> 
+    
+    <!-- Check Stock (Warehouse) --> <task id="Task_CheckStock" name="Check Product in Stock">
+      <incoming>Flow_CheckStock</incoming> <outgoing>Flow_Gateway_InStock</outgoing> <dataInputAssociation id="DataInput_CheckStock"> <sourceRef>ref_Product</sourceRef>  </dataInputAssociation> <dataInputAssociation id="DataInput_CheckStock_DS"> <sourceRef>DataStore_Stock</sourceRef> </dataInputAssociation> </task>
+    
+    <!-- Decision Gateway: Product in Stock? --> <exclusiveGateway id="Gateway_ProductInStock" name="Product in Stock?"> 
+      <incoming>Flow_Gateway_InStock</incoming> <outgoing>Flow_InStock</outgoing> <outgoing>Flow_NotInStock</outgoing> </exclusiveGateway> 
+    <!-- In Stock Path - Withdraw from Warehouse --> <task id="Task_WithdrawFromWarehouse" name="Withdraw Product from Warehouse" >
+      <incoming>Flow_InStock</incoming> <outgoing>Flow_CheckComplete</outgoing>  <dataInputAssociation id="DA_WithdrawProduct"> <sourceRef>ref_Product</sourceRef> </dataInputAssociation> <dataOutputAssociation id="DO_WithdrawProduct"> <targetRef>ref_PackingList</targetRef> </dataOutputAssociation> <dataOutputAssociation id="DO_RemoveStock"> <targetRef>DataStore_Stock</targetRef> </dataOutputAssociation>  </task>
+    <!-- Not in Stock Path - Reorder from Wholesaler --> <intermediateThrowEvent id="Event_Reorder" name="Reorder from Wholesaler"> <incoming>Flow_NotInStock</incoming> <outgoing>Flow_ReorderSent</outgoing> <messageEventDefinition id="ReorderMessage" /> </intermediateThrowEvent> 
+    <!-- Message Catch Event: Await Arrival from Wholesaler --> <intermediateCatchEvent id="Event_ProductArrived" name="Product Arrival from Wholesaler"> <incoming>Flow_ReorderSent</incoming> <outgoing>Flow_ReorderOrTimeout</outgoing> <messageEventDefinition id="MsgProductArrived" /> </intermediateCatchEvent> 
+    <!-- Timer Event: Wait for 10 days --> <intermediateCatchEvent id="Event_10DaysWait" name="Wait 10 Days"> <incoming>Flow_ToTimeout</incoming> <outgoing>Flow_DelayPenalty</outgoing> <timerEventDefinition /> </intermediateCatchEvent> 
+    <!-- Event Based Gateway: Wait for Arrival or Timeout --> <eventBasedGateway id="Gateway_ArrivalOrTimeout" name="Arrival or Timeout?"> <incoming>Flow_ReorderOrTimeout</incoming> <outgoing>Flow_ToArrived</outgoing> <outgoing>Flow_ToTimeout</outgoing> </eventBasedGateway> 
+    <!-- Delivery Delay Penalty to Wholesaler --> <intermediateThrowEvent id="Event_Penalty" name="Demand Delivery Delay Penalty"> <incoming>Flow_DelayPenalty</incoming> <outgoing>Flow_WaitForProduct</outgoing> <messageEventDefinition id="PenaltyMessage"/> </intermediateThrowEvent>
+    <!-- Still Wait for Product After Penalty: Awaiting Arrival --> <intermediateCatchEvent id="Event_ProductArrived_AfterPenalty" name="Product Arrived After Penalty"> <incoming>Flow_WaitForProduct</incoming> <outgoing>Flow_RegisterStockAfterPenalty</outgoing> <messageEventDefinition id="MsgProductArrived_AfterPenalty"/> </intermediateCatchEvent> 
+    <!-- Register Product in Stock (Stock Management) --> <task id="Task_RegisterStock" name="Register Product in Stock Management System" > <incoming>Flow_ToArrived</incoming> <outgoing>Flow_CheckComplete</outgoing> <dataOutputAssociation id="DA_RegisterStock"> <targetRef>DataStore_Stock</targetRef> </dataOutputAssociation> </task> 
+    <!-- Register Product After Penalty (Stock Management) --> <task id="Task_RegisterStockAfterPenalty" name="Register Product in Stock Management System" > <incoming>Flow_RegisterStockAfterPenalty</incoming> <outgoing>Flow_CheckComplete</outgoing> <dataOutputAssociation id="DA_RegisterStockAfterPenalty"> <targetRef>DataStore_Stock</targetRef> </dataOutputAssociation> </task> 
+    <!-- Gateway: Is Order Ready for Shipment? --> <exclusiveGateway id="Gateway_OrderReady" name="Order Ready for Shipment?"> <incoming>Flow_CheckComplete</incoming> <incoming>Flow_CheckComplete2</incoming> <outgoing>Flow_OrderReady_Yes</outgoing> <outgoing>Flow_OrderReady_No</outgoing> </exclusiveGateway> 
+    <!-- If Not Ready: Loop to Next Product --> <task id="Task_SelectNextProduct" name="Select Next Product" > <incoming>Flow_OrderReady_No</incoming> <outgoing>Flow_CheckStock</outgoing> <dataInputAssociation id="DI_SelectNextProduct"> <sourceRef>ref_Order</sourceRef> </dataInputAssociation> </task>  
+    <!-- If Ready: Parallel Packing and Courier Request --> <parallelGateway id="Gateway_ParallelPacking" name="Pack and Request Courier"> <incoming>Flow_OrderReady_Yes</incoming> <outgoing>Flow_ToPacking</outgoing> <outgoing>Flow_ToCourier</outgoing> </parallelGateway> 
+
+  <!-- Task: Pack Products --> 
+<task id="Task_PackProducts" name="Pack Products"> 
+  <incoming>Flow_ToPacking</incoming> 
+  <outgoing>Flow_ToParallelJoin</outgoing> 
+  <dataInputAssociation id="DI_PackProducts"> 
+    <sourceRef>ref_PackingList</sourceRef> 
+  </dataInputAssociation> 
+  <dataOutputAssociation id="DO_PackProducts"> 
+    <targetRef>ref_PackingList</targetRef> 
+  </dataOutputAssociation> 
+</task>
+
+<!-- Task: Request Courier --> 
+<task id="Task_RequestCourier" name="Request Courier"> 
+  <incoming>Flow_ToCourier</incoming> 
+  <outgoing>Flow_ToParallelJoin2</outgoing> 
+</task>
+
+<!-- Parallel Join before Shipment --> 
+<parallelGateway id="Gateway_JoinShipment" name="Both Ready To Ship"> 
+  <incoming>Flow_ToParallelJoin</incoming> 
+  <incoming>Flow_ToParallelJoin2</incoming> 
+  <outgoing>Flow_ToShip</outgoing> 
+</parallelGateway>
+
+<!-- Task: Ship Products --> 
+<task id="Task_ShipProducts" name="Ship Products"> 
+  <incoming>Flow_ToShip</incoming> 
+  <outgoing>Flow_End</outgoing> 
+</task>
+
+<!-- End Event --> 
+<endEvent id="EndEvent" name="Order Shipped"> 
+  <incoming>Flow_End</incoming> 
+</endEvent>
+
+
+    
+    <!-- Sequence Flows --> <sequenceFlow id="Flow_ReadOrder" sourceRef="StartEvent" targetRef="Task_ReadOrder"/> <sequenceFlow id="Flow_SelectProduct" sourceRef="Task_ReadOrder" targetRef="Task_SelectProduct"/> <sequenceFlow id="Flow_CheckStock" sourceRef="Task_SelectProduct" targetRef="Task_CheckStock"/> <sequenceFlow id="Flow_Gateway_InStock" sourceRef="Task_CheckStock" targetRef="Gateway_ProductInStock"/> <sequenceFlow id="Flow_InStock" sourceRef="Gateway_ProductInStock" targetRef="Task_WithdrawFromWarehouse"/> <sequenceFlow id="Flow_NotInStock" sourceRef="Gateway_ProductInStock" targetRef="Event_Reorder"/> <sequenceFlow id="Flow_ReorderSent" sourceRef="Event_Reorder" targetRef="Event_ProductArrived"/> <sequenceFlow id="Flow_ReorderOrTimeout" sourceRef="Event_ProductArrived" targetRef="Gateway_ArrivalOrTimeout"/> <sequenceFlow id="Flow_ToArrived" sourceRef="Gateway_ArrivalOrTimeout" targetRef="Task_RegisterStock"/> <sequenceFlow id="Flow_ToTimeout" sourceRef="Gateway_ArrivalOrTimeout" targetRef="Event_10DaysWait"/> <sequenceFlow id="Flow_DelayPenalty" sourceRef="Event_10DaysWait" targetRef="Event_Penalty"/> <sequenceFlow id="Flow_WaitForProduct" sourceRef="Event_Penalty" targetRef="Event_ProductArrived_AfterPenalty"/> <sequenceFlow id="Flow_RegisterStockAfterPenalty" sourceRef="Event_ProductArrived_AfterPenalty" targetRef="Task_RegisterStockAfterPenalty"/> <sequenceFlow id="Flow_CheckComplete" sourceRef="Task_WithdrawFromWarehouse" targetRef="Gateway_OrderReady"/> <sequenceFlow id="Flow_CheckComplete2" sourceRef="Task_RegisterStock" targetRef="Gateway_OrderReady"/> <sequenceFlow id="Flow_CheckComplete2_alt" sourceRef="Task_RegisterStockAfterPenalty" targetRef="Gateway_OrderReady"/> <sequenceFlow id="Flow_OrderReady_Yes" sourceRef="Gateway_OrderReady" targetRef="Gateway_ParallelPacking"/> <sequenceFlow id="Flow_OrderReady_No" sourceRef="Gateway_OrderReady" targetRef="Task_SelectNextProduct"/> <sequenceFlow id="Flow_ToPacking" sourceRef="Gateway_ParallelPacking" targetRef="Task_PackProducts"/> <sequenceFlow id="Flow_ToCourier" sourceRef="Gateway_ParallelPacking" targetRef="Task_RequestCourier"/> <sequenceFlow id="Flow_ToParallelJoin" sourceRef="Task_PackProducts" targetRef="Gateway_JoinShipment"/> <sequenceFlow id="Flow_ToParallelJoin2" sourceRef="Task_RequestCourier" targetRef="Gateway_JoinShipment"/> <sequenceFlow id="Flow_ToShip" sourceRef="Gateway_JoinShipment" targetRef="Task_ShipProducts"/> <sequenceFlow id="Flow_End" sourceRef="Task_ShipProducts" targetRef="EndEvent"/> <sequenceFlow id="Flow_NextProduct" sourceRef="Task_SelectNextProduct" targetRef="Task_CheckStock"/> 
+    <!-- Lane Assignments --> 
+     <!-- End of Main Process --> </process> 
+  
+  <!-- Wholesaler Pool with message events only --> <process id="Wholesaler_Process" isExecutable="false"> <startEvent id="Wholesaler_Start" name="Start"/> <intermediateCatchEvent id="Wholesaler_ReceiveOrder" name="Receive Reorder"> <messageEventDefinition messageRef="ReorderMessage"/> </intermediateCatchEvent> <intermediateThrowEvent id="Wholesaler_DeliverProduct" name="Deliver Product"> <messageEventDefinition messageRef="MsgProductArrived"/> </intermediateThrowEvent> <intermediateCatchEvent id="Wholesaler_ReceivePenalty" name="Receive Delay Penalty"> <messageEventDefinition messageRef="PenaltyMessage"/> </intermediateCatchEvent> <intermediateThrowEvent id="Wholesaler_DeliverProductAfterPenalty" name="Deliver (After Penalty)"> <messageEventDefinition messageRef="MsgProductArrived_AfterPenalty"/> </intermediateThrowEvent> </process> 
+  
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_1">
+      <bpmndi:BPMNShape id="Participant_OrderFulfillment_di" bpmnElement="Participant_OrderFulfillment" isHorizontal="true">
+        <dc:Bounds x="120" y="120" width="2340" height="610" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_OrderManagement_di" bpmnElement="Lane_OrderManagement" isHorizontal="true">
+        <dc:Bounds x="140" y="120" width="2300" height="220" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Warehouse_di" bpmnElement="Lane_Warehouse" isHorizontal="true">
+        <dc:Bounds x="140" y="340" width="2300" height="190" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_StockManagement_di" bpmnElement="Lane_StockManagement" isHorizontal="true">
+        <dc:Bounds x="140" y="530" width="2300" height="200" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="StartEvent_di" bpmnElement="StartEvent">
+        <dc:Bounds x="240" y="260" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="219" y="296" width="78" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_ReadOrder_di" bpmnElement="Task_ReadOrder">
+        <dc:Bounds x="320" y="245" width="110" height="70" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_SelectProduct_di" bpmnElement="Task_SelectProduct">
+        <dc:Bounds x="470" y="245" width="110" height="70" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_CheckStock_di" bpmnElement="Task_CheckStock">
+        <dc:Bounds x="620" y="365" width="110" height="70" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_ProductInStock_di" bpmnElement="Gateway_ProductInStock" isMarkerVisible="true">
+        <dc:Bounds x="750" y="270" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="731" y="246" width="87" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_Reorder_di" bpmnElement="Event_Reorder">
+        <dc:Bounds x="900" y="260" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="886" y="296" width="65" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_ProductArrived_di" bpmnElement="Event_ProductArrived">
+        <dc:Bounds x="1040" y="260" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1017" y="222.5" width="81" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_10DaysWait_di" bpmnElement="Event_10DaysWait">
+        <dc:Bounds x="1220" y="260" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1206" y="296" width="65" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_ArrivalOrTimeout_di" bpmnElement="Gateway_ArrivalOrTimeout" isMarkerVisible="true">
+        <dc:Bounds x="1120" y="340" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1122" y="390" width="46" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_Penalty_di" bpmnElement="Event_Penalty">
+        <dc:Bounds x="1320" y="260" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1295" y="222.5" width="85" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_ProductArrived_AfterPenalty_di" bpmnElement="Event_ProductArrived_AfterPenalty">
+        <dc:Bounds x="1420" y="260" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1400" y="222.5" width="76" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_OrderReady_di" bpmnElement="Gateway_OrderReady" isMarkerVisible="true">
+        <dc:Bounds x="1500" y="380" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1560" y="391.5" width="80" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_SelectNextProduct_di" bpmnElement="Task_SelectNextProduct">
+        <dc:Bounds x="1670" y="245" width="110" height="70" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_RequestCourier_di" bpmnElement="Task_RequestCourier">
+        <dc:Bounds x="1970" y="245" width="110" height="70" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ref_Order_di" bpmnElement="ref_Order">
+        <dc:Bounds x="452" y="155" width="36" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="455" y="131" width="30" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ref_Product_di" bpmnElement="ref_Product">
+        <dc:Bounds x="602" y="235" width="36" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="601" y="285" width="39" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_RegisterStock_di" bpmnElement="Task_RegisterStock">
+        <dc:Bounds x="1240" y="570" width="110" height="70" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_PackProducts_di" bpmnElement="Task_PackProducts">
+        <dc:Bounds x="1915" y="370" width="110" height="70" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_ParallelPacking_di" bpmnElement="Gateway_ParallelPacking">
+        <dc:Bounds x="1800" y="352" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1839" y="340" width="82" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_JoinShipment_di" bpmnElement="Gateway_JoinShipment">
+        <dc:Bounds x="2090" y="352" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2006.5" y="363" width="73" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_ShipProducts_di" bpmnElement="Task_ShipProducts">
+        <dc:Bounds x="2215" y="355" width="110" height="70" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_di" bpmnElement="EndEvent">
+        <dc:Bounds x="2372" y="382" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2354" y="418" width="72" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ref_PackingList_di" bpmnElement="ref_PackingList">
+        <dc:Bounds x="1807" y="445" width="36" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1800" y="495" width="60" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_WithdrawFromWarehouse_di" bpmnElement="Task_WithdrawFromWarehouse">
+        <dc:Bounds x="800" y="369" width="110" height="70" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataStore_Stock_di" bpmnElement="DataStore_Stock">
+        <dc:Bounds x="475" y="620" width="50" height="40" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="468" y="660" width="65" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_RegisterStockAfterPenalty_di" bpmnElement="Task_RegisterStockAfterPenalty">
+        <dc:Bounds x="1615" y="595" width="110" height="70" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_ReadOrder_di" bpmnElement="Flow_ReadOrder">
+        <di:waypoint x="276" y="278" />
+        <di:waypoint x="320" y="280" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_SelectProduct_di" bpmnElement="Flow_SelectProduct">
+        <di:waypoint x="430" y="280" />
+        <di:waypoint x="470" y="280" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_CheckStock_di" bpmnElement="Flow_CheckStock">
+        <di:waypoint x="580" y="280" />
+        <di:waypoint x="620" y="400" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Gateway_InStock_di" bpmnElement="Flow_Gateway_InStock">
+        <di:waypoint x="675" y="365" />
+        <di:waypoint x="675" y="295" />
+        <di:waypoint x="750" y="295" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_InStock_di" bpmnElement="Flow_InStock">
+        <di:waypoint x="775" y="320" />
+        <di:waypoint x="775" y="404" />
+        <di:waypoint x="800" y="404" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_NotInStock_di" bpmnElement="Flow_NotInStock">
+        <di:waypoint x="800" y="295" />
+        <di:waypoint x="850" y="295" />
+        <di:waypoint x="850" y="276" />
+        <di:waypoint x="900" y="276" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_ReorderSent_di" bpmnElement="Flow_ReorderSent">
+        <di:waypoint x="936" y="278" />
+        <di:waypoint x="1040" y="278" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_ReorderOrTimeout_di" bpmnElement="Flow_ReorderOrTimeout">
+        <di:waypoint x="1076" y="278" />
+        <di:waypoint x="1145" y="278" />
+        <di:waypoint x="1145" y="340" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_ToArrived_di" bpmnElement="Flow_ToArrived">
+        <di:waypoint x="1170" y="365" />
+        <di:waypoint x="1190" y="365" />
+        <di:waypoint x="1190" y="605" />
+        <di:waypoint x="1240" y="605" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_ToTimeout_di" bpmnElement="Flow_ToTimeout">
+        <di:waypoint x="1170" y="365" />
+        <di:waypoint x="1190" y="365" />
+        <di:waypoint x="1190" y="276" />
+        <di:waypoint x="1220" y="276" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_DelayPenalty_di" bpmnElement="Flow_DelayPenalty">
+        <di:waypoint x="1256" y="278" />
+        <di:waypoint x="1320" y="278" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_WaitForProduct_di" bpmnElement="Flow_WaitForProduct">
+        <di:waypoint x="1356" y="278" />
+        <di:waypoint x="1420" y="278" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_RegisterStockAfterPenalty_di" bpmnElement="Flow_RegisterStockAfterPenalty">
+        <di:waypoint x="1456" y="278" />
+        <di:waypoint x="1620" y="280" />
+        <di:waypoint x="1620" y="596" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_CheckComplete_di" bpmnElement="Flow_CheckComplete">
+        <di:waypoint x="910" y="404" />
+        <di:waypoint x="1205" y="404" />
+        <di:waypoint x="1205" y="405" />
+        <di:waypoint x="1500" y="405" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_CheckComplete2_di" bpmnElement="Flow_CheckComplete2">
+        <di:waypoint x="1350" y="605" />
+        <di:waypoint x="1525" y="605" />
+        <di:waypoint x="1525" y="430" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_CheckComplete2_alt_di" bpmnElement="Flow_CheckComplete2_alt">
+        <di:waypoint x="1615" y="631" />
+        <di:waypoint x="1540" y="632" />
+        <di:waypoint x="1540" y="415" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_OrderReady_Yes_di" bpmnElement="Flow_OrderReady_Yes">
+        <di:waypoint x="1544" y="411" />
+        <di:waypoint x="1675" y="411" />
+        <di:waypoint x="1675" y="377" />
+        <di:waypoint x="1800" y="377" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_OrderReady_No_di" bpmnElement="Flow_OrderReady_No">
+        <di:waypoint x="1525" y="380" />
+        <di:waypoint x="1525" y="360" />
+        <di:waypoint x="1725" y="360" />
+        <di:waypoint x="1725" y="315" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_ToPacking_di" bpmnElement="Flow_ToPacking">
+        <di:waypoint x="1825" y="402" />
+        <di:waypoint x="1825" y="430" />
+        <di:waypoint x="1915" y="430" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_ToCourier_di" bpmnElement="Flow_ToCourier">
+        <di:waypoint x="1825" y="352" />
+        <di:waypoint x="1825" y="280" />
+        <di:waypoint x="1970" y="280" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_ToParallelJoin_di" bpmnElement="Flow_ToParallelJoin">
+        <di:waypoint x="2025" y="427" />
+        <di:waypoint x="2115" y="427" />
+        <di:waypoint x="2115" y="402" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_ToParallelJoin2_di" bpmnElement="Flow_ToParallelJoin2">
+        <di:waypoint x="2080" y="280" />
+        <di:waypoint x="2115" y="280" />
+        <di:waypoint x="2115" y="352" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_ToShip_di" bpmnElement="Flow_ToShip">
+        <di:waypoint x="2140" y="377" />
+        <di:waypoint x="2170" y="377" />
+        <di:waypoint x="2170" y="400" />
+        <di:waypoint x="2215" y="400" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_End_di" bpmnElement="Flow_End">
+        <di:waypoint x="2325" y="403" />
+        <di:waypoint x="2372" y="403" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_NextProduct_di" bpmnElement="Flow_NextProduct">
+        <di:waypoint x="1725" y="245" />
+        <di:waypoint x="1725" y="160" />
+        <di:waypoint x="675" y="160" />
+        <di:waypoint x="675" y="365" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Participant_Wholesaler_di" bpmnElement="Participant_Wholesaler" isHorizontal="true">
+        <dc:Bounds x="120" y="750" width="2340" height="160" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Wholesaler_Start_di" bpmnElement="Wholesaler_Start">
+        <dc:Bounds x="350" y="810" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="356" y="846" width="24" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Wholesaler_ReceiveOrder_di" bpmnElement="Wholesaler_ReceiveOrder">
+        <dc:Bounds x="750" y="810" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="726" y="846" width="84" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Wholesaler_DeliverProduct_di" bpmnElement="Wholesaler_DeliverProduct">
+        <dc:Bounds x="1000" y="810" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="980" y="846" width="76" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Wholesaler_ReceivePenalty_di" bpmnElement="Wholesaler_ReceivePenalty">
+        <dc:Bounds x="1260" y="810" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1242" y="846" width="72" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Wholesaler_DeliverProductAfterPenalty_di" bpmnElement="Wholesaler_DeliverProductAfterPenalty">
+        <dc:Bounds x="1450" y="810" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1435" y="846" width="66" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="DataInput_ReadOrder_di" bpmnElement="DataInput_ReadOrder">
+        <di:waypoint x="452" y="196" />
+        <di:waypoint x="397" y="245" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataInput_SelectProduct_di" bpmnElement="DataInput_SelectProduct">
+        <di:waypoint x="486" y="205" />
+        <di:waypoint x="512" y="245" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataInput_CheckStock_di" bpmnElement="DataInput_CheckStock">
+        <di:waypoint x="630" y="285" />
+        <di:waypoint x="663" y="365" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataInput_CheckStock_DS_di" bpmnElement="DataInput_CheckStock_DS">
+        <di:waypoint x="520" y="620" />
+        <di:waypoint x="666" y="435" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DA_WithdrawProduct_di" bpmnElement="DA_WithdrawProduct">
+        <di:waypoint x="638" y="270" />
+        <di:waypoint x="808" y="370" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DO_WithdrawProduct_di" bpmnElement="DO_WithdrawProduct">
+        <di:waypoint x="855" y="439" />
+        <di:waypoint x="1807" y="469" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DO_RemoveStock_di" bpmnElement="DO_RemoveStock">
+        <di:waypoint x="847" y="439" />
+        <di:waypoint x="525" y="629" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DA_RegisterStock_di" bpmnElement="DA_RegisterStock">
+        <di:waypoint x="1240" y="608" />
+        <di:waypoint x="525" y="639" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DA_RegisterStockAfterPenalty_di" bpmnElement="DA_RegisterStockAfterPenalty">
+        <di:waypoint x="1615" y="631" />
+        <di:waypoint x="525" y="640" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DI_SelectNextProduct_di" bpmnElement="DI_SelectNextProduct">
+        <di:waypoint x="488" y="181" />
+        <di:waypoint x="1670" y="261" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DI_PackProducts_di" bpmnElement="DI_PackProducts">
+        <di:waypoint x="1843" y="455" />
+        <di:waypoint x="1915" y="394" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DO_PackProducts_di" bpmnElement="DO_PackProducts">
+        <di:waypoint x="1925" y="440" />
+        <di:waypoint x="1843" y="465" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="MF_Reorder_di" bpmnElement="MF_Reorder">
+        <di:waypoint x="924" y="295" />
+        <di:waypoint x="924" y="553" />
+        <di:waypoint x="762" y="553" />
+        <di:waypoint x="762" y="811" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="MF_ProductArrived_di" bpmnElement="MF_ProductArrived">
+        <di:waypoint x="1016" y="810" />
+        <di:waypoint x="1016" y="553" />
+        <di:waypoint x="1060" y="553" />
+        <di:waypoint x="1060" y="296" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="MF_Penalty_di" bpmnElement="MF_Penalty">
+        <di:waypoint x="1340" y="296" />
+        <di:waypoint x="1340" y="553" />
+        <di:waypoint x="1276" y="553" />
+        <di:waypoint x="1276" y="810" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="MF_ProductArrived_AfterPenalty_di" bpmnElement="MF_ProductArrived_AfterPenalty">
+        <di:waypoint x="1469" y="810" />
+        <di:waypoint x="1469" y="553" />
+        <di:waypoint x="1437" y="553" />
+        <di:waypoint x="1437" y="296" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

@@ -1,0 +1,435 @@
+<?xml version="1.0" encoding="UTF-8"?> <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:tns="http://www.example.org/PoliceCarService" targetNamespace="http://www.example.org/PoliceCarService"> 
+
+  <!-- Message Definitions -->
+  <bpmn:message id="MsgServiceReminder" name="Service Reminder"/>
+  <bpmn:message id="MsgCarOwnerHasServiced" name="Car Owner Serviced Car"/>
+
+  <!-- Collaboration -->
+  <bpmn:collaboration id="ServiceReminderCollaboration">
+    <bpmn:participant id="PolicePool" name="Police" processRef="PoliceProcess"/>
+    <bpmn:participant id="CarOwnerPool" name="Car Owner" processRef="CarOwnerProcess"/>
+    <bpmn:participant id="ServicePool" name="Car Service Facility" processRef="CarServiceProcess"/>
+
+    <!-- Message Flows -->
+    <bpmn:messageFlow id="mf1" name="Service Reminder" sourceRef="SendServiceReminder" targetRef="ReceiveServiceReminderEvent"/>
+    <bpmn:messageFlow id="mf2" name="Car Owner Has Serviced" sourceRef="SendServiceCompletedMessage" targetRef="ReceiveServiceCompletedMessage"/>
+  </bpmn:collaboration>
+  
+  <!-- Police Pool -->   
+  <process id="PoliceProcess" isExecutable="true"> <laneSet> <lane id="AppSystemLane" name="App System"/> <lane id="FinesLane" name="Fines Department"/> </laneSet> <startEvent id="PoliceProcessStartEvent" name="Service Completed"> <outgoing>seq1</outgoing> </startEvent> <!-- Reminder for next service --> <task id="CheckServiceNecessary" name="Check if Service is Necessary"> <incoming>seq1</incoming> <outgoing>seq2</outgoing> </task> 
+  <task id="CheckCarRegistered" name="Check if Car Still Registered"> <incoming>seq2</incoming> <outgoing>seq3</outgoing> 
+      <bpmn:property id="Input_CheckCarRegistered" name="__targetRef_placeholder" />
+
+      <bpmn:dataInputAssociation id="assoc3"> <sourceRef>DataObjectReference_RegistrationRecord</sourceRef> <targetRef>Input_CheckCarRegistered</targetRef> </bpmn:dataInputAssociation> 
+
+  </task> 
+  <exclusiveGateway id="IsCarRegisteredGateway" name="Car Registered?"> <incoming>seq3</incoming> <outgoing>seq4a</outgoing> <outgoing>seq4b</outgoing> </exclusiveGateway> 
+  <task id="SendServiceReminder" name="Notify Car Owner: Service Due"> <incoming>seq4a</incoming> <outgoing>seq5</outgoing> 
+  <bpmn:property id="Input_SendServiceReminder" name="__targetRef_placeholder" />
+        <bpmn:dataInputAssociation id="assoc1"> <sourceRef>DataObjectReference_ServiceReminderData</sourceRef>  </bpmn:dataInputAssociation> 
+
+  </task> 
+
+  
+  <endEvent id="EndProcessIfNotRegistered" name="End (Car Not Registered)"> <incoming>seq4b</incoming> </endEvent> <!-- Wait for Car Owner response or timeout --> <eventBasedGateway id="WaitForServiceActionEG" name="Wait for Service or Timeout"> <incoming>seq5</incoming> <outgoing>seq6</outgoing> <outgoing>seq7</outgoing> </eventBasedGateway> <intermediateCatchEvent id="ReceiveServiceCompletedMessage" name="Service Completed"> <incoming>seq6</incoming> <messageEventDefinition messageRef="MsgCarOwnerHasServiced"/> <outgoing>seq8</outgoing> </intermediateCatchEvent> <intermediateCatchEvent id="Timer30Days" name="No Service After 30 Days"> <incoming>seq7</incoming> <timerEventDefinition> <timeDuration>PT30D</timeDuration> </timerEventDefinition> <outgoing>seq9</outgoing> </intermediateCatchEvent> <endEvent id="EndProcessOwnerServiced" name="End (Car Owner Serviced)"> <incoming>seq8</incoming> </endEvent> <!-- If timeout, fine the car owner --> 
+  <task id="CreateFine" name="Create Fine for Car Owner"> <incoming>seq9</incoming> <outgoing>seq10</outgoing> 
+    <bpmn:dataInputAssociation id="assoc2"> <sourceRef>DataObjectReference_FineData</sourceRef> </bpmn:dataInputAssociation>
+
+  </task> 
+  <endEvent id="EndFineProcess" name="End (Fine Issued)"> <incoming>seq10</incoming> </endEvent> 
+<bpmn:dataObjectReference id="DataObjectReference_ServiceReminderData" name="Service Reminder" dataObjectRef="ServiceReminderData"/>
+<bpmn:dataObjectReference id="DataObjectReference_FineData" name="Fine" dataObjectRef="FineData"/>
+<bpmn:dataObjectReference id="DataObjectReference_RegistrationRecord" name="Registration Record" dataObjectRef="RegistrationRecord"/>
+
+<bpmn:dataObject id="ServiceReminderData" name="Service Reminder"/> 
+<bpmn:dataObject id="FineData" name="Fine"/> 
+<bpmn:dataObject id="RegistrationRecord" name="Registration Record"/>
+
+    <!-- Sequence Flows --> <sequenceFlow id="seq1" sourceRef="PoliceProcessStartEvent" targetRef="CheckServiceNecessary"/> <sequenceFlow id="seq2" sourceRef="CheckServiceNecessary" targetRef="CheckCarRegistered"/> <sequenceFlow id="seq3" sourceRef="CheckCarRegistered" targetRef="IsCarRegisteredGateway"/> <sequenceFlow id="seq4a" sourceRef="IsCarRegisteredGateway" targetRef="SendServiceReminder" name="Yes"/> <sequenceFlow id="seq4b" sourceRef="IsCarRegisteredGateway" targetRef="EndProcessIfNotRegistered" name="No"/> <sequenceFlow id="seq5" sourceRef="SendServiceReminder" targetRef="WaitForServiceActionEG"/> <sequenceFlow id="seq6" sourceRef="WaitForServiceActionEG" targetRef="ReceiveServiceCompletedMessage"/> <sequenceFlow id="seq7" sourceRef="WaitForServiceActionEG" targetRef="Timer30Days"/> <sequenceFlow id="seq8" sourceRef="ReceiveServiceCompletedMessage" targetRef="EndProcessOwnerServiced"/> <sequenceFlow id="seq9" sourceRef="Timer30Days" targetRef="CreateFine"/> <sequenceFlow id="seq10" sourceRef="CreateFine" targetRef="EndFineProcess"/> 
+  <!-- Data Associations --> 
+
+</process> 
+  
+  <!-- Car Owner Pool -->  
+  <process id="CarOwnerProcess" isExecutable="true"> 
+    <laneSet> <lane id="OwnerAppLane" name="App User"/> </laneSet> <startEvent id="ReceiveServiceReminderEvent" name="Receive Service Reminder"> <messageEventDefinition messageRef="MsgServiceReminder"/> <outgoing>co_seq1</outgoing> </startEvent> <task id="DecideAndArrangeService" name="Arrange and Go to Car Service"> <incoming>co_seq1</incoming> <outgoing>co_seq2</outgoing> </task> <endEvent id="EndOwnerProcess" name="End (Arranged Service)"> <incoming>co_seq2</incoming> </endEvent> <!-- Message Throw after service --> <intermediateThrowEvent id="SendServiceCompletedMessage" name="Notify Police: Service Completed"> <messageEventDefinition messageRef="MsgCarOwnerHasServiced"/> <outgoing>co_seq3</outgoing> </intermediateThrowEvent> <sequenceFlow id="co_seq1" sourceRef="ReceiveServiceReminderEvent" targetRef="DecideAndArrangeService"/> <sequenceFlow id="co_seq2" sourceRef="DecideAndArrangeService" targetRef="SendServiceCompletedMessage"/> <sequenceFlow id="co_seq3" sourceRef="SendServiceCompletedMessage" targetRef="EndOwnerProcess"/> </process> 
+  
+  <!-- Car Service Facility Pool --> 
+  <process id="CarServiceProcess" isExecutable="true">
+    <laneSet> <lane id="MechanicLane" name="Mechanic"/> </laneSet> 
+    <startEvent id="ServiceStartEvent" name="Car Arrives for Service"> <outgoing>sv_seq1</outgoing> </startEvent> 
+    
+
+
+    <!-- Tasks with data input associations inside -->
+<bpmn:task id="EnterProblemsTask" name="Enter Car Problems">
+  <bpmn:incoming>sv_seq1</bpmn:incoming>
+  <bpmn:outgoing>sv_seq2</bpmn:outgoing>
+  <bpmn:dataInputAssociation id="svc_assoc1">
+    <bpmn:sourceRef>DataObjectReference_ProblemReportData</bpmn:sourceRef>
+    <bpmn:targetRef>EnterProblemsTask</bpmn:targetRef>
+  </bpmn:dataInputAssociation>
+</bpmn:task>
+
+<bpmn:task id="PerformRepairTask" name="Repair Car">
+  <bpmn:incoming>sv_seq2</bpmn:incoming>
+  <bpmn:outgoing>sv_seq3</bpmn:outgoing>
+</bpmn:task>
+
+<bpmn:task id="SendStatusUpdateTask" name="Send Status Update Email">
+  <bpmn:incoming>sv_seq3</bpmn:incoming>
+  <bpmn:outgoing>sv_seq4</bpmn:outgoing>
+  <bpmn:dataInputAssociation id="svc_assoc2">
+    <bpmn:sourceRef>DataObjectReference_RepairStatusData</bpmn:sourceRef>
+    <bpmn:targetRef>SendStatusUpdateTask</bpmn:targetRef>
+  </bpmn:dataInputAssociation>
+</bpmn:task>
+
+<bpmn:task id="EnterRepairResultTask" name="Enter Repair Success and Give Pickerl">
+  <bpmn:incoming>sv_seq4</bpmn:incoming>
+  <bpmn:outgoing>sv_seq5</bpmn:outgoing>
+  <bpmn:dataInputAssociation id="svc_assoc3">
+    <bpmn:sourceRef>DataObjectReference_PickerlData</bpmn:sourceRef>
+    <bpmn:targetRef>EnterRepairResultTask</bpmn:targetRef>
+  </bpmn:dataInputAssociation>
+</bpmn:task>
+
+<bpmn:task id="EnterNextServiceTimeTask" name="Enter Time for Next Service">
+  <bpmn:incoming>sv_seq5</bpmn:incoming>
+  <bpmn:outgoing>sv_seq6</bpmn:outgoing>
+  <bpmn:dataInputAssociation id="svc_assoc4">
+    <bpmn:sourceRef>DataObjectReference_NextServiceTimeData</bpmn:sourceRef>
+    <bpmn:targetRef>EnterNextServiceTimeTask</bpmn:targetRef>
+  </bpmn:dataInputAssociation>
+</bpmn:task>
+
+<bpmn:endEvent id="ServiceEndEvent" name="End (Service Complete)">
+  <bpmn:incoming>sv_seq6</bpmn:incoming>
+</bpmn:endEvent>
+    <!-- Data Objects --> 
+    <dataObject id="ProblemReportData" name="Problem Report"/> 
+    <dataObject id="RepairStatusData" name="Repair Status"/> 
+    <dataObject id="PickerlData" name="Pickerl Document"/> 
+    <dataObject id="NextServiceTimeData" name="Next Service Time"/> 
+
+    <!-- Data Object References -->
+<bpmn:dataObjectReference id="DataObjectReference_ProblemReportData" dataObjectRef="ProblemReportData" name="Problem Report"/>
+<bpmn:dataObjectReference id="DataObjectReference_RepairStatusData" dataObjectRef="RepairStatusData" name="Repair Status"/>
+<bpmn:dataObjectReference id="DataObjectReference_PickerlData" dataObjectRef="PickerlData" name="Pickerl Document"/>
+<bpmn:dataObjectReference id="DataObjectReference_NextServiceTimeData" dataObjectRef="NextServiceTimeData" name="Next Service Time"/>
+
+    
+    <!-- Sequence Flows --> <sequenceFlow id="sv_seq1" sourceRef="ServiceStartEvent" targetRef="EnterProblemsTask"/> <sequenceFlow id="sv_seq2" sourceRef="EnterProblemsTask" targetRef="PerformRepairTask"/> <sequenceFlow id="sv_seq3" sourceRef="PerformRepairTask" targetRef="SendStatusUpdateTask"/> <sequenceFlow id="sv_seq4" sourceRef="SendStatusUpdateTask" targetRef="EnterRepairResultTask"/> <sequenceFlow id="sv_seq5" sourceRef="EnterRepairResultTask" targetRef="EnterNextServiceTimeTask"/> <sequenceFlow id="sv_seq6" sourceRef="EnterNextServiceTimeTask" targetRef="ServiceEndEvent"/> 
+
+    
+  </process> 
+  
+  <bpmndi:BPMNDiagram id="BPMNDiagram_ServiceReminder">
+    <bpmndi:BPMNPlane id="BPMNPlane_ServiceReminder" bpmnElement="ServiceReminderCollaboration">
+      <bpmndi:BPMNShape id="PolicePool_shape" bpmnElement="PolicePool" isHorizontal="true">
+        <dc:Bounds x="160" y="80" width="1850" height="450" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="FinesLane_shape" bpmnElement="FinesLane" isHorizontal="true">
+        <dc:Bounds x="180" y="390" width="1810" height="120" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="AppSystemLane_shape" bpmnElement="AppSystemLane" isHorizontal="true">
+        <dc:Bounds x="180" y="100" width="1810" height="290" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="PoliceProcessStartEvent_shape" bpmnElement="PoliceProcessStartEvent">
+        <dc:Bounds x="210" y="220" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="201" y="256" width="54" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CheckServiceNecessary_shape" bpmnElement="CheckServiceNecessary">
+        <dc:Bounds x="290" y="210" width="100" height="56" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CheckCarRegistered_shape" bpmnElement="CheckCarRegistered">
+        <dc:Bounds x="420" y="210" width="120" height="56" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="SendServiceReminder_shape" bpmnElement="SendServiceReminder">
+        <dc:Bounds x="640" y="210" width="140" height="56" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="WaitForServiceActionEG_shape" bpmnElement="WaitForServiceActionEG">
+        <dc:Bounds x="810" y="223" width="40" height="40" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="791" y="185.5" width="78" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ReceiveServiceCompletedMessage_shape" bpmnElement="ReceiveServiceCompletedMessage">
+        <dc:Bounds x="900" y="210" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="891" y="246" width="54" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Timer30Days_shape" bpmnElement="Timer30Days">
+        <dc:Bounds x="900" y="270" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="878" y="306" width="81" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndProcessOwnerServiced_shape" bpmnElement="EndProcessOwnerServiced">
+        <dc:Bounds x="980" y="210" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="958" y="246" width="81" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CreateFine_shape" bpmnElement="CreateFine">
+        <dc:Bounds x="990" y="400" width="100" height="56" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndFineProcess_shape" bpmnElement="EndFineProcess">
+        <dc:Bounds x="1120" y="415" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1094" y="451" width="88" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataObjectReference_RegistrationRecord_shape" bpmnElement="DataObjectReference_RegistrationRecord">
+        <dc:Bounds x="440" y="280" width="36" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="429" y="330" width="59" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataObjectReference_FineData_shape" bpmnElement="DataObjectReference_FineData">
+        <dc:Bounds x="882" y="425" width="36" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="889" y="475" width="22" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataObjectReference_ServiceReminderData_shape" bpmnElement="DataObjectReference_ServiceReminderData">
+        <dc:Bounds x="542" y="305" width="36" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="516" y="355" width="89" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndProcessIfNotRegistered_shape" bpmnElement="EndProcessIfNotRegistered">
+        <dc:Bounds x="692" y="122" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="678" y="158" width="65" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="IsCarRegisteredGateway_shape" bpmnElement="IsCarRegisteredGateway" isMarkerVisible="true">
+        <dc:Bounds x="575" y="160" width="40" height="40" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="625" y="173" width="81" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="seq1_edge" bpmnElement="seq1">
+        <di:waypoint x="246" y="238" />
+        <di:waypoint x="290" y="238" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="seq2_edge" bpmnElement="seq2">
+        <di:waypoint x="390" y="238" />
+        <di:waypoint x="420" y="238" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="seq3_edge" bpmnElement="seq3">
+        <di:waypoint x="480" y="210" />
+        <di:waypoint x="480" y="183" />
+        <di:waypoint x="578" y="183" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="seq4a_edge" bpmnElement="seq4a">
+        <di:waypoint x="595" y="200" />
+        <di:waypoint x="595" y="224" />
+        <di:waypoint x="640" y="224" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="601" y="209" width="18" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="seq4b_edge" bpmnElement="seq4b">
+        <di:waypoint x="595" y="160" />
+        <di:waypoint x="595" y="140" />
+        <di:waypoint x="692" y="140" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="658" y="125" width="15" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="seq5_edge" bpmnElement="seq5">
+        <di:waypoint x="780" y="238" />
+        <di:waypoint x="810" y="243" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="seq6_edge" bpmnElement="seq6">
+        <di:waypoint x="850" y="243" />
+        <di:waypoint x="900" y="228" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="seq7_edge" bpmnElement="seq7">
+        <di:waypoint x="830" y="263" />
+        <di:waypoint x="830" y="288" />
+        <di:waypoint x="900" y="288" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="seq8_edge" bpmnElement="seq8">
+        <di:waypoint x="936" y="228" />
+        <di:waypoint x="980" y="228" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="seq9_edge" bpmnElement="seq9">
+        <di:waypoint x="936" y="288" />
+        <di:waypoint x="1040" y="400" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="seq10_edge" bpmnElement="seq10">
+        <di:waypoint x="1090" y="428" />
+        <di:waypoint x="1120" y="433" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="CarOwnerPool_shape" bpmnElement="CarOwnerPool" isHorizontal="true">
+        <dc:Bounds x="160" y="560" width="950" height="160" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="OwnerAppLane_shape" bpmnElement="OwnerAppLane" isHorizontal="true">
+        <dc:Bounds x="180" y="580" width="910" height="120" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ReceiveServiceReminderEvent_shape" bpmnElement="ReceiveServiceReminderEvent">
+        <dc:Bounds x="230" y="620" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="208" y="656" width="81" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DecideAndArrangeService_shape" bpmnElement="DecideAndArrangeService">
+        <dc:Bounds x="320" y="610" width="120" height="56" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndOwnerProcess_shape" bpmnElement="EndOwnerProcess">
+        <dc:Bounds x="540" y="620" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="522" y="656" width="72" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="SendServiceCompletedMessage_shape" bpmnElement="SendServiceCompletedMessage">
+        <dc:Bounds x="470" y="610" width="40" height="40" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="458" y="650" width="65" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="co_seq1_edge" bpmnElement="co_seq1">
+        <di:waypoint x="266" y="638" />
+        <di:waypoint x="320" y="638" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="co_seq2_edge" bpmnElement="co_seq2">
+        <di:waypoint x="440" y="638" />
+        <di:waypoint x="470" y="630" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="co_seq3_edge" bpmnElement="co_seq3">
+        <di:waypoint x="510" y="630" />
+        <di:waypoint x="540" y="638" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ServicePool_shape" bpmnElement="ServicePool" isHorizontal="true">
+        <dc:Bounds x="1160" y="560" width="990" height="220" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="MechanicLane_shape" bpmnElement="MechanicLane" isHorizontal="true">
+        <dc:Bounds x="1180" y="580" width="950" height="190" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceStartEvent_shape" bpmnElement="ServiceStartEvent">
+        <dc:Bounds x="1210" y="620" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1192" y="656" width="72" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EnterProblemsTask_shape" bpmnElement="EnterProblemsTask">
+        <dc:Bounds x="1290" y="610" width="120" height="56" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="PerformRepairTask_shape" bpmnElement="PerformRepairTask">
+        <dc:Bounds x="1430" y="610" width="120" height="56" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="SendStatusUpdateTask_shape" bpmnElement="SendStatusUpdateTask">
+        <dc:Bounds x="1570" y="610" width="120" height="56" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EnterRepairResultTask_shape" bpmnElement="EnterRepairResultTask">
+        <dc:Bounds x="1710" y="610" width="140" height="56" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EnterNextServiceTimeTask_shape" bpmnElement="EnterNextServiceTimeTask">
+        <dc:Bounds x="1870" y="610" width="120" height="56" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceEndEvent_shape" bpmnElement="ServiceEndEvent">
+        <dc:Bounds x="2010" y="620" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1996" y="656" width="64" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataObjectReference_ProblemReportData_shape" bpmnElement="DataObjectReference_ProblemReportData">
+        <dc:Bounds x="1290" y="690" width="36" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1269" y="740" width="78" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataObjectReference_RepairStatusData_shape" bpmnElement="DataObjectReference_RepairStatusData">
+        <dc:Bounds x="1590" y="690" width="36" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1574" y="740" width="68" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataObjectReference_PickerlData_shape" bpmnElement="DataObjectReference_PickerlData">
+        <dc:Bounds x="1740" y="690" width="36" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1715" y="740" width="87" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataObjectReference_NextServiceTimeData_shape" bpmnElement="DataObjectReference_NextServiceTimeData">
+        <dc:Bounds x="1890" y="690" width="36" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1863" y="740" width="90" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="sv_seq1_edge" bpmnElement="sv_seq1">
+        <di:waypoint x="1246" y="638" />
+        <di:waypoint x="1290" y="638" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sv_seq2_edge" bpmnElement="sv_seq2">
+        <di:waypoint x="1410" y="638" />
+        <di:waypoint x="1430" y="638" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sv_seq3_edge" bpmnElement="sv_seq3">
+        <di:waypoint x="1550" y="638" />
+        <di:waypoint x="1570" y="638" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sv_seq4_edge" bpmnElement="sv_seq4">
+        <di:waypoint x="1690" y="638" />
+        <di:waypoint x="1710" y="638" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sv_seq5_edge" bpmnElement="sv_seq5">
+        <di:waypoint x="1850" y="638" />
+        <di:waypoint x="1870" y="638" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sv_seq6_edge" bpmnElement="sv_seq6">
+        <di:waypoint x="1990" y="638" />
+        <di:waypoint x="2010" y="638" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="assoc3_edge" bpmnElement="assoc3">
+        <di:waypoint x="458" y="280" />
+        <di:waypoint x="480" y="260" />
+        <di:waypoint x="530" y="238" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="assoc1_edge" bpmnElement="assoc1">
+        <di:waypoint x="578" y="338" />
+        <di:waypoint x="652" y="266" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="assoc2_edge" bpmnElement="assoc2">
+        <di:waypoint x="918" y="449" />
+        <di:waypoint x="990" y="428" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="svc_assoc1_edge" bpmnElement="svc_assoc1">
+        <di:waypoint x="1308" y="690" />
+        <di:waypoint x="1308" y="666" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="svc_assoc2_edge" bpmnElement="svc_assoc2">
+        <di:waypoint x="1608" y="690" />
+        <di:waypoint x="1608" y="666" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="svc_assoc3_edge" bpmnElement="svc_assoc3">
+        <di:waypoint x="1758" y="690" />
+        <di:waypoint x="1758" y="666" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="svc_assoc4_edge" bpmnElement="svc_assoc4">
+        <di:waypoint x="1908" y="690" />
+        <di:waypoint x="1908" y="666" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="mf1_edge" bpmnElement="mf1">
+        <di:waypoint x="780" y="238" />
+        <di:waypoint x="248" y="638" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="470" y="413" width="89" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="mf2_edge" bpmnElement="mf2">
+        <di:waypoint x="490" y="630" />
+        <di:waypoint x="918" y="228" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="666" y="404" width="77" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

@@ -1,0 +1,373 @@
+<?xml version="1.0" encoding="UTF-8"?> <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_1" targetNamespace="http://example.com/bpmn20">
+  
+  <process id="SportsInstituteCourseRegistration" isExecutable="true"> 
+  
+  <laneSet>
+    <lane id="Lane_Participant" name="Participant"> <flowNodeRef>StartEvent_Participant</flowNodeRef> <flowNodeRef>Task_SelectCourse</flowNodeRef> <flowNodeRef>MessageCatch_CourseList</flowNodeRef> <flowNodeRef>Task_ChooseCourseDate</flowNodeRef> <flowNodeRef>ExclusiveGateway_HasAccount</flowNodeRef> <flowNodeRef>ExclusiveGateway_RegisteredAtUniversity</flowNodeRef> <flowNodeRef>MessageThrow_ActivationRequest</flowNodeRef> <flowNodeRef>MessageCatch_ActivationResponse</flowNodeRef> <flowNodeRef>Task_RegisterAccount</flowNodeRef> <flowNodeRef>Task_Login</flowNodeRef> <flowNodeRef>Task_TweetToFriends</flowNodeRef> <flowNodeRef>Task_CompleteRegistration</flowNodeRef> <flowNodeRef>DataObject_PaymentInfo</flowNodeRef> <flowNodeRef>MessageCatch_CourseTicket</flowNodeRef> <flowNodeRef>EndEvent_Participant</flowNodeRef> </lane> <lane id="Lane_SportsInstituteSystem" name="Sports Institute System"> <flowNodeRef>MessageCatch_CourseRequest</flowNodeRef> <flowNodeRef>Task_CheckSlots</flowNodeRef> <flowNodeRef>MessageThrow_CourseList</flowNodeRef> <flowNodeRef>MessageCatch_ActivationRequest</flowNodeRef> <flowNodeRef>ExclusiveGateway_Eligibility</flowNodeRef> <flowNodeRef>MessageThrow_ActivationResponse</flowNodeRef> <flowNodeRef>Task_CreateAccount</flowNodeRef> <flowNodeRef>MessageCatch_CompleteRegistration</flowNodeRef> <flowNodeRef>Task_GenerateCourseTicket</flowNodeRef> <flowNodeRef>MessageThrow_CourseTicket</flowNodeRef> </lane> </laneSet> 
+  
+  <!-- PARTICIPANT POOL FLOW --> <startEvent id="StartEvent_Participant" name="Start Registration"/> <task id="Task_SelectCourse" name="Select a Course"/> 
+  
+<bpmn:intermediateThrowEvent id="MessageThrow_CourseRequest" name="Request Course List">
+  <bpmn:messageEventDefinition/>
+  <bpmn:outgoing>Flow_PT1</bpmn:outgoing>
+</bpmn:intermediateThrowEvent>
+
+
+    
+    <sequenceFlow id="Flow_P1" sourceRef="StartEvent_Participant" targetRef="Task_SelectCourse"/> <sequenceFlow id="Flow_P2" sourceRef="Task_SelectCourse" targetRef="MessageThrow_CourseRequest"/> <!-- SYSTEM RESPONSE-->
+<bpmn:intermediateCatchEvent id="MessageCatch_CourseList" name="Receive Available Courses">
+  <bpmn:messageEventDefinition/>
+</bpmn:intermediateCatchEvent>
+<sequenceFlow id="Flow_PT1" sourceRef="MessageThrow_CourseRequest" targetRef="MessageCatch_CourseList"/> <task id="Task_ChooseCourseDate" name="Select Course Date"/> <sequenceFlow id="Flow_P3" sourceRef="MessageCatch_CourseList" targetRef="Task_ChooseCourseDate"/> <exclusiveGateway id="ExclusiveGateway_HasAccount" name="Do you have an account?"/> <sequenceFlow id="Flow_P4" sourceRef="Task_ChooseCourseDate" targetRef="ExclusiveGateway_HasAccount"/> <!-- ACCOUNT PATHS --> <sequenceFlow id="Flow_P5a" sourceRef="ExclusiveGateway_HasAccount" targetRef="Task_Login"> <conditionExpression xsi:type="tFormalExpression"><![CDATA[hasAccount]]></conditionExpression> </sequenceFlow> <sequenceFlow id="Flow_P5b" sourceRef="ExclusiveGateway_HasAccount" targetRef="ExclusiveGateway_RegisteredAtUniversity"> <conditionExpression xsi:type="tFormalExpression"><![CDATA[!hasAccount]]></conditionExpression> </sequenceFlow> <exclusiveGateway id="ExclusiveGateway_RegisteredAtUniversity" name="Registered at Eligible University?"/> <sequenceFlow id="Flow_P6a" sourceRef="ExclusiveGateway_RegisteredAtUniversity" targetRef="Task_RegisterAccount"> <conditionExpression xsi:type="tFormalExpression"><![CDATA[isUniversityMember]]></conditionExpression> </sequenceFlow> <sequenceFlow id="Flow_P6b" sourceRef="ExclusiveGateway_RegisteredAtUniversity" targetRef="MessageThrow_ActivationRequest"> <conditionExpression xsi:type="tFormalExpression"><![CDATA[!isUniversityMember]]></conditionExpression> </sequenceFlow> <task id="Task_RegisterAccount" name="Register Account"/> <sequenceFlow id="Flow_P7" sourceRef="Task_RegisterAccount" targetRef="Task_Login"/> 
+  
+<bpmn:intermediateThrowEvent id="MessageThrow_ActivationRequest" name="Request Activation">
+  <bpmn:messageEventDefinition/>
+</bpmn:intermediateThrowEvent>
+    
+<bpmn:intermediateCatchEvent id="MessageCatch_ActivationResponse" name="Wait Activation Response">
+  <bpmn:messageEventDefinition/>
+</bpmn:intermediateCatchEvent>
+
+  <sequenceFlow id="Flow_P8" sourceRef="MessageCatch_ActivationResponse" targetRef="Task_Login"/> <task id="Task_Login" name="Log Into Account"/> <!-- TWEET TO FRIENDS --> <task id="Task_TweetToFriends" name="Tweet to Friends"/> <sequenceFlow id="Flow_P10" sourceRef="Task_Login" targetRef="Task_TweetToFriends"/> <!-- REGISTRATION & PAYMENT --> <task id="Task_CompleteRegistration" name="Complete Registration & Provide Payment"> <dataInputAssociation id="DataAssociation_Payment" sourceRef="Task_CompleteRegistration" targetRef="DataRef_PaymentInfo"/>  </task> 
+  <dataObject id="DataObject_PaymentInfo" /> 
+  <bpmn:dataObjectReference id="DataRef_PaymentInfo" dataObjectRef="DataObject_PaymentInfo" name="Payment Info"/>
+
+  
+  <sequenceFlow id="Flow_P11" sourceRef="Task_TweetToFriends" targetRef="Task_CompleteRegistration"/> 
+<bpmn:intermediateThrowEvent id="MessageThrow_CompleteRegistration" name="Send Registration">
+  <bpmn:messageEventDefinition/>
+</bpmn:intermediateThrowEvent>
+
+    
+    <sequenceFlow id="Flow_P12" sourceRef="Task_CompleteRegistration" targetRef="MessageThrow_CompleteRegistration"/> 
+<bpmn:intermediateCatchEvent id="MessageCatch_CourseTicket" name="Receive Course Ticket">
+  <bpmn:messageEventDefinition/>
+</bpmn:intermediateCatchEvent>
+  <sequenceFlow id="Flow_P13" sourceRef="MessageThrow_CompleteRegistration" targetRef="MessageCatch_CourseTicket"/> <endEvent id="EndEvent_Participant" name="Registration Complete"/> <sequenceFlow id="Flow_P14" sourceRef="MessageCatch_CourseTicket" targetRef="EndEvent_Participant"/> <!-- SYSTEM POOL FLOW --> 
+<bpmn:intermediateCatchEvent id="MessageCatch_CourseRequest" name="Receive Course Request">
+  <bpmn:messageEventDefinition/>
+</bpmn:intermediateCatchEvent>
+  <task id="Task_CheckSlots" name="Check Free Slots"/> <sequenceFlow id="Flow_S1" sourceRef="MessageCatch_CourseRequest" targetRef="Task_CheckSlots"/> 
+<bpmn:intermediateThrowEvent id="MessageThrow_CourseList" name="Send Available Courses">
+  <bpmn:messageEventDefinition/>
+</bpmn:intermediateThrowEvent>
+  <sequenceFlow id="Flow_S2" sourceRef="Task_CheckSlots" targetRef="MessageThrow_CourseList"/> 
+<bpmn:intermediateCatchEvent id="MessageCatch_ActivationRequest" name="Receive Activation Request">
+  <bpmn:messageEventDefinition/>
+</bpmn:intermediateCatchEvent>
+
+  
+  <exclusiveGateway id="ExclusiveGateway_Eligibility" name="Eligible University?"/> <sequenceFlow id="Flow_S4" sourceRef="MessageCatch_ActivationRequest" targetRef="ExclusiveGateway_Eligibility"/> <sequenceFlow id="Flow_S5a" sourceRef="ExclusiveGateway_Eligibility" targetRef="Task_CreateAccount"> <conditionExpression xsi:type="tFormalExpression"><![CDATA[isEligible]]></conditionExpression> </sequenceFlow> <sequenceFlow id="Flow_S5b" sourceRef="ExclusiveGateway_Eligibility" targetRef="MessageThrow_ActivationResponse"> <conditionExpression xsi:type="tFormalExpression"><![CDATA[!isEligible]]></conditionExpression> </sequenceFlow> <task id="Task_CreateAccount" name="Create Account"/> 
+<bpmn:intermediateThrowEvent id="MessageThrow_ActivationResponse" name="Send Activation Response">
+  <bpmn:messageEventDefinition/>
+</bpmn:intermediateThrowEvent>
+
+  
+  <sequenceFlow id="Flow_S6" sourceRef="Task_CreateAccount" targetRef="MessageThrow_ActivationResponse"/> <sequenceFlow id="Flow_S7" sourceRef="ExclusiveGateway_Eligibility" targetRef="MessageThrow_ActivationResponse"/> 
+<bpmn:intermediateCatchEvent id="MessageCatch_CompleteRegistration" name="Receive Registration">
+  <bpmn:messageEventDefinition/>
+</bpmn:intermediateCatchEvent>
+  <task id="Task_GenerateCourseTicket" name="Generate Course Ticket"/> <sequenceFlow id="Flow_S8" sourceRef="MessageCatch_CompleteRegistration" targetRef="Task_GenerateCourseTicket"/> 
+<bpmn:intermediateThrowEvent id="MessageThrow_CourseTicket" name="Send Course Ticket">
+  <bpmn:messageEventDefinition/>
+</bpmn:intermediateThrowEvent>
+  <sequenceFlow id="Flow_S9" sourceRef="Task_GenerateCourseTicket" targetRef="MessageThrow_CourseTicket"/> </process> 
+  
+  <collaboration id="Collab_SportsInstitute_CourseReg"> <participant id="Participant_Applicant" name="Applicant" processRef="SportsInstituteCourseRegistration"/> <participant id="Participant_SportsInstitute" name="Sports Institute" /> <messageFlow id="MF_RequestCourses" sourceRef="MessageThrow_CourseRequest" targetRef="MessageCatch_CourseRequest"/> <messageFlow id="MF_CourseList" sourceRef="MessageThrow_CourseList" targetRef="MessageCatch_CourseList"/> <messageFlow id="MF_ActivationRequest" sourceRef="MessageThrow_ActivationRequest" targetRef="MessageCatch_ActivationRequest"/> <messageFlow id="MF_ActivationResponse" sourceRef="MessageThrow_ActivationResponse" targetRef="MessageCatch_ActivationResponse"/> <messageFlow id="MF_CompleteRegistration" sourceRef="MessageThrow_CompleteRegistration" targetRef="MessageCatch_CompleteRegistration"/> <messageFlow id="MF_CourseTicket" sourceRef="MessageThrow_CourseTicket" targetRef="MessageCatch_CourseTicket"/> 
+
+    
+      <messageFlow id="MessageFlow_RequestCourses" sourceRef="MessageThrow_CourseRequest" targetRef="MessageCatch_CourseRequest"/>
+      <messageFlow id="MessageFlow_CourseList" sourceRef="MessageThrow_CourseList" targetRef="MessageCatch_CourseList"/> 
+  <messageFlow id="MessageFlow_ActivationRequest" sourceRef="MessageThrow_ActivationRequest" targetRef="MessageCatch_ActivationRequest"/> 
+<messageFlow id="MessageFlow_ActivationResponse" sourceRef="MessageThrow_ActivationResponse" targetRef="MessageCatch_ActivationResponse"/> 
+  <messageFlow id="MessageFlow_CompleteRegistration" sourceRef="MessageThrow_CompleteRegistration" targetRef="MessageCatch_CompleteRegistration"/> 
+    <messageFlow id="MessageFlow_CourseTicket" sourceRef="MessageThrow_CourseTicket" targetRef="MessageCatch_CourseTicket"/> 
+  </collaboration> 
+  
+  <bpmndi:BPMNDiagram id="BPMNDiagram_SportsInstitute_CourseReg">
+    <bpmndi:BPMNPlane id="BPMNPlane_SportsInstitute_CourseReg" bpmnElement="Collab_SportsInstitute_CourseReg">
+      <bpmndi:BPMNShape id="Participant_Applicant_di" bpmnElement="Participant_Applicant" isHorizontal="true">
+        <dc:Bounds x="160" y="60" width="1800" height="560" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_SportsInstituteSystem_di" bpmnElement="Lane_SportsInstituteSystem" isHorizontal="true">
+        <dc:Bounds x="190" y="356" width="1740" height="244" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Participant_di" bpmnElement="Lane_Participant" isHorizontal="true">
+        <dc:Bounds x="190" y="80" width="1740" height="276" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="StartEvent_Participant_di" bpmnElement="StartEvent_Participant">
+        <dc:Bounds x="235" y="193" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="211" y="229" width="85" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_SelectCourse_di" bpmnElement="Task_SelectCourse">
+        <dc:Bounds x="310" y="180" width="100" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="MessageThrow_CourseRequest_di" bpmnElement="MessageThrow_CourseRequest">
+        <dc:Bounds x="440" y="195" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="417" y="157.5" width="81" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="MessageCatch_CourseList_di" bpmnElement="MessageCatch_CourseList">
+        <dc:Bounds x="520" y="195" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="494" y="231" width="88" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_ChooseCourseDate_di" bpmnElement="Task_ChooseCourseDate">
+        <dc:Bounds x="600" y="180" width="110" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ExclusiveGateway_HasAccount_di" bpmnElement="ExclusiveGateway_HasAccount" isMarkerVisible="true">
+        <dc:Bounds x="740" y="193" width="40" height="40" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="781" y="199.5" width="78" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ExclusiveGateway_RegisteredAtUniversity_di" bpmnElement="ExclusiveGateway_RegisteredAtUniversity" isMarkerVisible="true">
+        <dc:Bounds x="820" y="233" width="40" height="40" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="767" y="280" width="66" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_RegisterAccount_di" bpmnElement="Task_RegisterAccount">
+        <dc:Bounds x="920" y="225" width="110" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="MessageThrow_ActivationRequest_di" bpmnElement="MessageThrow_ActivationRequest">
+        <dc:Bounds x="920" y="285" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="914" y="321" width="48" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="MessageCatch_ActivationResponse_di" bpmnElement="MessageCatch_ActivationResponse">
+        <dc:Bounds x="1020" y="285" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1002" y="321" width="72" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="MessageThrow_CompleteRegistration_di" bpmnElement="MessageThrow_CompleteRegistration">
+        <dc:Bounds x="1330" y="155" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1304" y="191" width="88" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="MessageCatch_CourseTicket_di" bpmnElement="MessageCatch_CourseTicket">
+        <dc:Bounds x="1420" y="155" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1399" y="191" width="79" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="MessageCatch_CourseRequest_di" bpmnElement="MessageCatch_CourseRequest">
+        <dc:Bounds x="440" y="420" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="419" y="456" width="79" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_CheckSlots_di" bpmnElement="Task_CheckSlots">
+        <dc:Bounds x="520" y="410" width="130" height="56" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="MessageThrow_CourseList_di" bpmnElement="MessageThrow_CourseList">
+        <dc:Bounds x="680" y="422" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="661" y="458" width="74" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="MessageCatch_ActivationRequest_di" bpmnElement="MessageCatch_ActivationRequest">
+        <dc:Bounds x="960" y="470" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="954" y="506" width="48" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ExclusiveGateway_Eligibility_di" bpmnElement="ExclusiveGateway_Eligibility" isMarkerVisible="true">
+        <dc:Bounds x="1050" y="468" width="40" height="40" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1042" y="430.5" width="55" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="MessageThrow_ActivationResponse_di" bpmnElement="MessageThrow_ActivationResponse">
+        <dc:Bounds x="1290" y="468" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1352" y="485.5" width="76" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="MessageCatch_CompleteRegistration_di" bpmnElement="MessageCatch_CompleteRegistration">
+        <dc:Bounds x="1355" y="390" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1344" y="426" width="59" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_GenerateCourseTicket_di" bpmnElement="Task_GenerateCourseTicket">
+        <dc:Bounds x="1435" y="380" width="110" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="MessageThrow_CourseTicket_di" bpmnElement="MessageThrow_CourseTicket">
+        <dc:Bounds x="1570" y="395" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1556" y="431" width="65" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_CreateAccount_di" bpmnElement="Task_CreateAccount">
+        <dc:Bounds x="1140" y="458" width="120" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_Login_di" bpmnElement="Task_Login">
+        <dc:Bounds x="820" y="120" width="100" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_TweetToFriends_di" bpmnElement="Task_TweetToFriends">
+        <dc:Bounds x="988" y="100" width="100" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_CompleteRegistration_di" bpmnElement="Task_CompleteRegistration">
+        <dc:Bounds x="1167" y="110" width="145" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataRef_PaymentInfo_di" bpmnElement="DataRef_PaymentInfo" isExpanded="true">
+        <dc:Bounds x="1232" y="228" width="36" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1217" y="278" width="66" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_Participant_di" bpmnElement="EndEvent_Participant">
+        <dc:Bounds x="1522" y="150" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1511" y="186" width="59" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_P1_di" bpmnElement="Flow_P1">
+        <di:waypoint x="271" y="211" />
+        <di:waypoint x="310" y="210" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_P2_di" bpmnElement="Flow_P2">
+        <di:waypoint x="410" y="210" />
+        <di:waypoint x="440" y="213" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_PT1_di" bpmnElement="Flow_PT1">
+        <di:waypoint x="476" y="213" />
+        <di:waypoint x="520" y="213" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_P3_di" bpmnElement="Flow_P3">
+        <di:waypoint x="556" y="213" />
+        <di:waypoint x="600" y="210" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_P4_di" bpmnElement="Flow_P4">
+        <di:waypoint x="710" y="210" />
+        <di:waypoint x="740" y="213" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_P5a_di" bpmnElement="Flow_P5a">
+        <di:waypoint x="760" y="193" />
+        <di:waypoint x="760" y="150" />
+        <di:waypoint x="820" y="150" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_P5b_di" bpmnElement="Flow_P5b">
+        <di:waypoint x="760" y="233" />
+        <di:waypoint x="760" y="263" />
+        <di:waypoint x="830" y="263" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_P6a_di" bpmnElement="Flow_P6a">
+        <di:waypoint x="860" y="250" />
+        <di:waypoint x="920" y="250" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_P6b_di" bpmnElement="Flow_P6b">
+        <di:waypoint x="840" y="273" />
+        <di:waypoint x="840" y="303" />
+        <di:waypoint x="920" y="303" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_P7_di" bpmnElement="Flow_P7">
+        <di:waypoint x="960" y="225" />
+        <di:waypoint x="960" y="203" />
+        <di:waypoint x="870" y="203" />
+        <di:waypoint x="870" y="180" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_P8_di" bpmnElement="Flow_P8">
+        <di:waypoint x="1038" y="285" />
+        <di:waypoint x="1038" y="170" />
+        <di:waypoint x="920" y="170" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_P10_di" bpmnElement="Flow_P10">
+        <di:waypoint x="920" y="130" />
+        <di:waypoint x="988" y="130" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_P11_di" bpmnElement="Flow_P11">
+        <di:waypoint x="1088" y="130" />
+        <di:waypoint x="1167" y="130" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_P12_di" bpmnElement="Flow_P12">
+        <di:waypoint x="1312" y="134" />
+        <di:waypoint x="1348" y="134" />
+        <di:waypoint x="1348" y="155" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_P13_di" bpmnElement="Flow_P13">
+        <di:waypoint x="1366" y="173" />
+        <di:waypoint x="1420" y="173" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_P14_di" bpmnElement="Flow_P14">
+        <di:waypoint x="1456" y="170" />
+        <di:waypoint x="1489" y="170" />
+        <di:waypoint x="1489" y="171" />
+        <di:waypoint x="1522" y="171" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_S1_di" bpmnElement="Flow_S1">
+        <di:waypoint x="476" y="438" />
+        <di:waypoint x="520" y="438" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_S2_di" bpmnElement="Flow_S2">
+        <di:waypoint x="650" y="438" />
+        <di:waypoint x="680" y="440" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_S4_di" bpmnElement="Flow_S4">
+        <di:waypoint x="996" y="488" />
+        <di:waypoint x="1050" y="488" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_S5a_di" bpmnElement="Flow_S5a">
+        <di:waypoint x="1090" y="488" />
+        <di:waypoint x="1140" y="488" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_S5b_di" bpmnElement="Flow_S5b">
+        <di:waypoint x="1070" y="508" />
+        <di:waypoint x="1070" y="550" />
+        <di:waypoint x="1308" y="550" />
+        <di:waypoint x="1308" y="504" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_S6_di" bpmnElement="Flow_S6">
+        <di:waypoint x="1260" y="488" />
+        <di:waypoint x="1290" y="488" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_S8_di" bpmnElement="Flow_S8">
+        <di:waypoint x="1391" y="408" />
+        <di:waypoint x="1435" y="410" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_S9_di" bpmnElement="Flow_S9">
+        <di:waypoint x="1545" y="410" />
+        <di:waypoint x="1570" y="413" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataAssociation_Payment_di" bpmnElement="DataAssociation_Payment">
+        <di:waypoint x="1291" y="170" />
+        <di:waypoint x="1250" y="230" />
+        <di:waypoint x="1291" y="170" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0mesu4g_di" bpmnElement="Flow_0mesu4g">
+        <di:waypoint x="458" y="231" />
+        <di:waypoint x="458" y="420" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1iapngp_di" bpmnElement="Flow_1iapngp">
+        <di:waypoint x="688" y="425" />
+        <di:waypoint x="548" y="228" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0na2up3_di" bpmnElement="Flow_0na2up3">
+        <di:waypoint x="942" y="320" />
+        <di:waypoint x="974" y="471" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0oed0am_di" bpmnElement="Flow_0oed0am">
+        <di:waypoint x="1293" y="476" />
+        <di:waypoint x="1053" y="313" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_00o651l_di" bpmnElement="Flow_00o651l">
+        <di:waypoint x="1366" y="173" />
+        <di:waypoint x="1372" y="390" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_06jwn00_di" bpmnElement="Flow_06jwn00">
+        <di:waypoint x="1579" y="398" />
+        <di:waypoint x="1447" y="188" />
+      </bpmndi:BPMNEdge>
+
+      <!-- MESSAGE FLOWS --> <!-- RequestCourseRequest --> <bpmndi:BPMNEdge id="MF_RequestCourses_di" bpmnElement="MF_RequestCourses" messageVisibleKind="initiating"> <di:waypoint x="458" y="213"/> <di:waypoint x="448" y="420"/> </bpmndi:BPMNEdge> <!-- Response: CourseList --> <bpmndi:BPMNEdge id="MF_CourseList_di" bpmnElement="MF_CourseList" messageVisibleKind="non-initiating"> <di:waypoint x="698" y="440"/> <di:waypoint x="538" y="213"/> </bpmndi:BPMNEdge> <!-- ActivationRequest --> <bpmndi:BPMNEdge id="MF_ActivationRequest_di" bpmnElement="MF_ActivationRequest"> <di:waypoint x="938" y="303"/> <di:waypoint x="978" y="488"/> </bpmndi:BPMNEdge> <!-- ActivationResponse --> <bpmndi:BPMNEdge id="MF_ActivationResponse_di" bpmnElement="MF_ActivationResponse"> <di:waypoint x="1308" y="486"/> <di:waypoint x="1028" y="303"/> </bpmndi:BPMNEdge> <!-- CompleteRegistration --> <bpmndi:BPMNEdge id="MF_CompleteRegistration_di" bpmnElement="MF_CompleteRegistration"> <di:waypoint x="1366" y="173"/> <di:waypoint x="1373" y="408"/> </bpmndi:BPMNEdge> <!-- CourseTicket --> <bpmndi:BPMNEdge id="MF_CourseTicket_di" bpmnElement="MF_CourseTicket"> <di:waypoint x="1598" y="413"/> <di:waypoint x="1438" y="173"/> </bpmndi:BPMNEdge> 
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

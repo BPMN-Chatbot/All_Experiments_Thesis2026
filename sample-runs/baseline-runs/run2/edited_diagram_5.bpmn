@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_1" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.34.0">
+      <bpmn:collaboration id="Collaboration_1">
+  <!-- Tribunal Pool --> <participant id="Pool_Tribunal" name="Tribunal" processRef="TribunalCompensationAssessment"/> 
+  <!-- Owner Pool --> <participant id="Pool_Owner" name="Owner"/>
+<!-- Message Flows (Pool-to-Pool Communication) --> <messageFlow id="mf1" sourceRef="StartEvent_OwnerBegin" targetRef="StartEvent_RequestReceived"/> <messageFlow id="mf2" sourceRef="ThrowEvent_SendFeesNotice" targetRef="CatchEvent_ReceiveFeesNotice"/> <messageFlow id="mf3" sourceRef="ThrowEvent_PayFees" targetRef="CatchEvent_FeesPaid"/> 
+</bpmn:collaboration>
+  
+  <process id="TribunalCompensationAssessment" name="Tribunal Compensation Assessment" isExecutable="true"> <laneSet> <lane id="Lane_Cashier" name="Cashier"/> <lane id="Lane_Owner" name="Owner"/> </laneSet> 
+    
+ <!-- Tribunal Lane: Cashier --> 
+<!-- Tribunal Lane: Cashier -->
+
+<bpmn:startEvent id="StartEvent_RequestReceived" name="Request Received">
+  <bpmn:messageEventDefinition/>
+</bpmn:startEvent>
+
+<bpmn:task id="Task_RetrieveFile" name="Retrieve File"/>
+
+<bpmn:task id="Task_CheckRequest" name="Check Request Acceptability and Compliance">
+  <bpmn:dataInputAssociation id="asso1">
+    <bpmn:sourceRef>DataRef_Request</bpmn:sourceRef>
+  </bpmn:dataInputAssociation>
+  <bpmn:dataInputAssociation id="asso2">
+    <bpmn:sourceRef>DataRef_File</bpmn:sourceRef>
+  </bpmn:dataInputAssociation>
+</bpmn:task>
+
+<bpmn:exclusiveGateway id="Gateway_FeesPaidDecision" name="Fees Paid?"/>
+
+<bpmn:task id="Task_AllocateHearingDate" name="Allocate Hearing Date"/>
+
+<bpmn:endEvent id="EndEvent_ProcessComplete" name="Process Complete"/>
+
+<bpmn:task id="Task_ProduceFeesNotice" name="Produce Fees Notice">
+  <bpmn:dataOutputAssociation>
+    <bpmn:sourceRef>Task_ProduceFeesNotice</bpmn:sourceRef>
+    <bpmn:targetRef>DataRef_FeesNotice</bpmn:targetRef>
+  </bpmn:dataOutputAssociation>
+</bpmn:task>
+
+<bpmn:intermediateThrowEvent id="ThrowEvent_SendFeesNotice" name="Send Fees Notice">
+  <bpmn:messageEventDefinition/>
+  <bpmn:dataInputAssociation id="asso3">
+    <bpmn:sourceRef>DataRef_FeesNotice</bpmn:sourceRef>
+  </bpmn:dataInputAssociation>
+</bpmn:intermediateThrowEvent>
+
+<bpmn:intermediateCatchEvent id="CatchEvent_FeesPaid" name="Wait for Fees Payment">
+  <bpmn:messageEventDefinition/>
+</bpmn:intermediateCatchEvent>
+
+<!-- Data Objects -->
+<bpmn:dataObject id="DataObject_Request" />
+<bpmn:dataObject id="DataObject_File" />
+<bpmn:dataObject id="DataObject_FeesNotice" />
+
+<!-- Data Object References -->
+<bpmn:dataObjectReference id="DataRef_Request" dataObjectRef="DataObject_Request" name="Request Document"/>
+<bpmn:dataObjectReference id="DataRef_File" dataObjectRef="DataObject_File" name="Premises File"/>
+<bpmn:dataObjectReference id="DataRef_FeesNotice" dataObjectRef="DataObject_FeesNotice" name="Fees Notice"/>
+
+
+    
+    <!-- Sequence flows for Tribunal process --> <sequenceFlow id="flow1" sourceRef="StartEvent_RequestReceived" targetRef="Task_RetrieveFile"/> <sequenceFlow id="flow2" sourceRef="Task_RetrieveFile" targetRef="Task_CheckRequest"/> <sequenceFlow id="flow3" sourceRef="Task_CheckRequest" targetRef="Gateway_FeesPaidDecision"/> <sequenceFlow id="flow4" sourceRef="Gateway_FeesPaidDecision" targetRef="Task_AllocateHearingDate"> <conditionExpression xsi:type="tFormalExpression">feesPaid</conditionExpression> </sequenceFlow> <sequenceFlow id="flow5" sourceRef="Task_AllocateHearingDate" targetRef="EndEvent_ProcessComplete"/> <sequenceFlow id="flow6" sourceRef="Gateway_FeesPaidDecision" targetRef="Task_ProduceFeesNotice"> <conditionExpression xsi:type="tFormalExpression">!feesPaid</conditionExpression> </sequenceFlow> <sequenceFlow id="flow7" sourceRef="Task_ProduceFeesNotice" targetRef="ThrowEvent_SendFeesNotice"/> <sequenceFlow id="flow8" sourceRef="ThrowEvent_SendFeesNotice" targetRef="CatchEvent_FeesPaid"/> <sequenceFlow id="flow9" sourceRef="CatchEvent_FeesPaid" targetRef="Task_CheckRequest"/> 
+
+    
+    <!-- Owner Pool: External participant, not modeled in detail --> <startEvent id="StartEvent_OwnerBegin" name="Submit Compensation Request" isInterrupting="true"> <messageEventDefinition/> </startEvent> <intermediateCatchEvent id="CatchEvent_ReceiveFeesNotice" name="Receive Fees Notice"> <messageEventDefinition/> </intermediateCatchEvent> <intermediateThrowEvent id="ThrowEvent_PayFees" name="Pay Fees"> <messageEventDefinition/> </intermediateThrowEvent> <!-- Owner sequence (for completeness) --> <sequenceFlow id="of1" sourceRef="StartEvent_OwnerBegin" targetRef="CatchEvent_ReceiveFeesNotice"/> <sequenceFlow id="of2" sourceRef="CatchEvent_ReceiveFeesNotice" targetRef="ThrowEvent_PayFees"/> </process> 
+  
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_1">
+      <bpmndi:BPMNShape id="Pool_Tribunal_di" bpmnElement="Pool_Tribunal" isHorizontal="true">
+        <dc:Bounds x="183" y="100" width="1027" height="800" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Owner_di" bpmnElement="Lane_Owner" isHorizontal="true">
+        <dc:Bounds x="183" y="490" width="1027" height="410" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Cashier_di" bpmnElement="Lane_Cashier" isHorizontal="true">
+        <dc:Bounds x="183" y="100" width="1027" height="390" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="StartEvent_RequestReceived_di" bpmnElement="StartEvent_RequestReceived">
+        <dc:Bounds x="260" y="255" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="233" y="231" width="90" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_RetrieveFile_di" bpmnElement="Task_RetrieveFile">
+        <dc:Bounds x="340" y="245" width="100" height="56" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_CheckRequest_di" bpmnElement="Task_CheckRequest">
+        <dc:Bounds x="480" y="245" width="120" height="56" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_FeesPaidDecision_di" bpmnElement="Gateway_FeesPaidDecision" isMarkerVisible="true">
+        <dc:Bounds x="660" y="248" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="657" y="224" width="56" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_AllocateHearingDate_di" bpmnElement="Task_AllocateHearingDate">
+        <dc:Bounds x="790" y="245" width="130" height="56" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_ProcessComplete_di" bpmnElement="EndEvent_ProcessComplete">
+        <dc:Bounds x="980" y="255" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="974" y="291" width="48" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_ProduceFeesNotice_di" bpmnElement="Task_ProduceFeesNotice">
+        <dc:Bounds x="710" y="340" width="120" height="56" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ThrowEvent_SendFeesNotice_di" bpmnElement="ThrowEvent_SendFeesNotice">
+        <dc:Bounds x="880" y="350" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="854" y="393" width="88" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CatchEvent_FeesPaid_di" bpmnElement="CatchEvent_FeesPaid">
+        <dc:Bounds x="980" y="350" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="965" y="396" width="65" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataRef_Request_di" bpmnElement="DataRef_Request" isExpanded="true">
+        <dc:Bounds x="492" y="135" width="36" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="485" y="185" width="51" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataRef_File_di" bpmnElement="DataRef_File" isExpanded="true">
+        <dc:Bounds x="615" y="155" width="36" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="599" y="205" width="68" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataRef_FeesNotice_di" bpmnElement="DataRef_FeesNotice" isExpanded="true">
+        <dc:Bounds x="822" y="415" width="36" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="810" y="465" width="60" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="StartEvent_OwnerBegin_di" bpmnElement="StartEvent_OwnerBegin">
+        <dc:Bounds x="260" y="800" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="243" y="836" width="71" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CatchEvent_ReceiveFeesNotice_di" bpmnElement="CatchEvent_ReceiveFeesNotice">
+        <dc:Bounds x="380" y="800" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="364" y="836" width="68" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ThrowEvent_PayFees_di" bpmnElement="ThrowEvent_PayFees">
+        <dc:Bounds x="530" y="800" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="525" y="836" width="47" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="flow1_di" bpmnElement="flow1">
+        <di:waypoint x="296" y="273" />
+        <di:waypoint x="340" y="273" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow2_di" bpmnElement="flow2">
+        <di:waypoint x="440" y="273" />
+        <di:waypoint x="480" y="273" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow3_di" bpmnElement="flow3">
+        <di:waypoint x="600" y="266" />
+        <di:waypoint x="630" y="266" />
+        <di:waypoint x="630" y="276" />
+        <di:waypoint x="663" y="276" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow4_di" bpmnElement="flow4">
+        <di:waypoint x="708" y="275" />
+        <di:waypoint x="750" y="275" />
+        <di:waypoint x="750" y="267" />
+        <di:waypoint x="790" y="267" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow5_di" bpmnElement="flow5">
+        <di:waypoint x="920" y="273" />
+        <di:waypoint x="980" y="273" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow6_di" bpmnElement="flow6">
+        <di:waypoint x="685" y="298" />
+        <di:waypoint x="685" y="368" />
+        <di:waypoint x="710" y="368" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow7_di" bpmnElement="flow7">
+        <di:waypoint x="830" y="368" />
+        <di:waypoint x="880" y="368" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow8_di" bpmnElement="flow8">
+        <di:waypoint x="916" y="368" />
+        <di:waypoint x="980" y="368" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow9_di" bpmnElement="flow9">
+        <di:waypoint x="1016" y="368" />
+        <di:waypoint x="1050" y="368" />
+        <di:waypoint x="1050" y="130" />
+        <di:waypoint x="540" y="130" />
+        <di:waypoint x="540" y="245" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="of1_di" bpmnElement="of1">
+        <di:waypoint x="296" y="818" />
+        <di:waypoint x="380" y="818" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="of2_di" bpmnElement="of2">
+        <di:waypoint x="416" y="818" />
+        <di:waypoint x="530" y="818" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_13tmobr_di" bpmnElement="mf2">
+        <di:waypoint x="885" y="380" />
+        <di:waypoint x="560" y="680" />
+        <di:waypoint x="412" y="806" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_13tmoby_di" bpmnElement="mf3">
+                <di:waypoint x="542" y="806" />
+        <di:waypoint x="670" y="680" />
+               <di:waypoint x="995" y="380" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Pool_Owner_di" bpmnElement="Pool_Owner" isHorizontal="true">
+        <dc:Bounds x="160" y="970" width="1030" height="170" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="asso1_di" bpmnElement="asso1">
+        <di:waypoint x="528" y="160" />
+        <di:waypoint x="534" y="245" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="asso2_di" bpmnElement="asso2">
+        <di:waypoint x="615" y="200" />
+        <di:waypoint x="573" y="245" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="asso3_di" bpmnElement="asso3">
+        <di:waypoint x="858" y="418" />
+        <di:waypoint x="887" y="382" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="mf1_di" bpmnElement="mf1">
+        <di:waypoint x="278" y="800" />
+        <di:waypoint x="278" y="291" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

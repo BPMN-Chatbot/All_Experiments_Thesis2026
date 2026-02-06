@@ -1,0 +1,318 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_1" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.34.0">
+  <collaboration id="Collaboration_1t3211d" />
+  <process id="Process_Employee" isExecutable="true">
+    <laneSet>
+      <lane id="Lane_Employee" name="Employee/Insured Person" />
+    </laneSet>
+    <startEvent id="StartEvent_Employee" name="Accident or Incident Occurs" />
+    <task id="Task_AssessIncident" name="Assess Incident (Accident, Near Miss, Risk, Defect)" />
+    <exclusiveGateway id="Gateway_IncidentType" name="Type of Incident?" />
+    <task id="Task_ReportAccident" name="Report Work Accident" />
+    <task id="Task_ReportNearMiss" name="Report Near Miss" />
+    <task id="Task_ReportRisk" name="Report Serious Risk" />
+    <task id="Task_ReportDefect" name="Report Defect in Protection System" />
+    <endEvent id="EndEvent_Employee" name="Reported" />
+    <sequenceFlow id="Flow1" sourceRef="StartEvent_Employee" targetRef="Task_AssessIncident" />
+    <sequenceFlow id="Flow2" sourceRef="Task_AssessIncident" targetRef="Gateway_IncidentType" />
+    <sequenceFlow id="Flow3" sourceRef="Gateway_IncidentType" targetRef="Task_ReportAccident">
+      <conditionExpression xsi:type="tFormalExpression">incidentType == 'accident'</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="Flow4" sourceRef="Gateway_IncidentType" targetRef="Task_ReportNearMiss">
+      <conditionExpression xsi:type="tFormalExpression">incidentType == 'near_miss'</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="Flow5" sourceRef="Gateway_IncidentType" targetRef="Task_ReportRisk">
+      <conditionExpression xsi:type="tFormalExpression">incidentType == 'risk'</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="Flow6" sourceRef="Gateway_IncidentType" targetRef="Task_ReportDefect">
+      <conditionExpression xsi:type="tFormalExpression">incidentType == 'defect'</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="Flow7" sourceRef="Task_ReportAccident" targetRef="EndEvent_Employee" />
+    <sequenceFlow id="Flow8" sourceRef="Task_ReportNearMiss" targetRef="EndEvent_Employee" />
+    <sequenceFlow id="Flow9" sourceRef="Task_ReportRisk" targetRef="EndEvent_Employee" />
+    <sequenceFlow id="Flow10" sourceRef="Task_ReportDefect" targetRef="EndEvent_Employee" />
+    <intermediateThrowEvent id="MessageThrow_Employer" name="Notify Employer">
+      <messageEventDefinition messageRef="Message_NotifyEmployer" />
+    </intermediateThrowEvent>
+    <sequenceFlow id="Flow11" sourceRef="Task_ReportAccident" targetRef="MessageThrow_Employer" />
+    <sequenceFlow id="Flow12" sourceRef="Task_ReportNearMiss" targetRef="MessageThrow_Employer" />
+    <sequenceFlow id="Flow13" sourceRef="Task_ReportRisk" targetRef="MessageThrow_Employer" />
+    <sequenceFlow id="Flow14" sourceRef="Task_ReportDefect" targetRef="MessageThrow_Employer" />
+    <sequenceFlow id="Flow15" sourceRef="MessageThrow_Employer" targetRef="EndEvent_Employee" />
+    <dataObject id="DataObject_IncidentReport" name="Incident Report" />
+  </process>
+  <process id="Process_Employer" isExecutable="true">
+    <laneSet>
+      <lane id="Lane_HR" name="HR/Management" />
+      <lane id="Lane_Safety" name="Safety Officer" />
+    </laneSet>
+    <startEvent id="StartEvent_Employer" name="" />
+    <intermediateCatchEvent id="MessageCatch_IncidentReport" name="Receive Incident Report">
+      <messageEventDefinition messageRef="Message_NotifyEmployer" />
+    </intermediateCatchEvent>
+    <task id="Task_RecordIncident" name="Record Incident" />
+    <exclusiveGateway id="Gateway_IncidentSeverity" name="Is it a fatality or serious injury?" />
+    <task id="Task_NotifyLabourInspectorate" name="Report to Labour Inspectorate" />
+    <task id="Task_NotifyInsurance" name="Report to Accident Insurance Provider" />
+    <endEvent id="EndEvent_Employer" name="Reporting Complete" />
+    <sequenceFlow id="Flow21" sourceRef="StartEvent_Employer" targetRef="MessageCatch_IncidentReport" />
+    <sequenceFlow id="Flow22" sourceRef="MessageCatch_IncidentReport" targetRef="Task_RecordIncident" />
+    <sequenceFlow id="Flow23" sourceRef="Task_RecordIncident" targetRef="Gateway_IncidentSeverity" />
+    <sequenceFlow id="Flow24" sourceRef="Gateway_IncidentSeverity" targetRef="Task_NotifyLabourInspectorate">
+      <conditionExpression xsi:type="tFormalExpression">severity == 'fatality_or_serious'</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="Flow25" sourceRef="Gateway_IncidentSeverity" targetRef="Task_NotifyInsurance">
+      <conditionExpression xsi:type="tFormalExpression">severity == 'not_serious'</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="Flow26" sourceRef="Task_NotifyLabourInspectorate" targetRef="Task_NotifyInsurance" />
+    <sequenceFlow id="Flow27" sourceRef="Task_NotifyInsurance" targetRef="EndEvent_Employer" />
+    <dataObject id="DataObject_IncidentReport_Employer" name="Incident Report" />
+  </process>
+  <process id="Process_Insurance" isExecutable="true">
+    <laneSet>
+      <lane id="Lane_Insurance" name="Accident Insurance Provider" />
+    </laneSet>
+    <startEvent id="StartEvent_Insurance" name="" />
+    <intermediateCatchEvent id="MessageCatch_InsuranceReport" name="Receive Accident Report">
+      <messageEventDefinition messageRef="Message_NotifyInsurance" />
+    </intermediateCatchEvent>
+    <task id="Task_ProcessClaim" name="Process Accident Claim" />
+    <endEvent id="EndEvent_Insurance" name="Claim Processed" />
+    <sequenceFlow id="Flow31" sourceRef="StartEvent_Insurance" targetRef="MessageCatch_InsuranceReport" />
+    <sequenceFlow id="Flow32" sourceRef="MessageCatch_InsuranceReport" targetRef="Task_ProcessClaim" />
+    <sequenceFlow id="Flow33" sourceRef="Task_ProcessClaim" targetRef="EndEvent_Insurance" />
+    <dataObject id="DataObject_AccidentReport" name="Accident Report" />
+  </process>
+  <process id="Process_LabourInspectorate" isExecutable="true">
+    <laneSet>
+      <lane id="Lane_Inspectorate" name="Labour Inspectorate" />
+    </laneSet>
+    <startEvent id="StartEvent_Inspectorate" name="" />
+    <intermediateCatchEvent id="MessageCatch_LabourInspectorate" name="Receive Serious Accident Report">
+      <messageEventDefinition messageRef="Message_NotifyLabourInspectorate" />
+    </intermediateCatchEvent>
+    <task id="Task_InvestigateAccident" name="Investigate Accident" />
+    <endEvent id="EndEvent_Inspectorate" name="Investigation Complete" />
+    <sequenceFlow id="Flow41" sourceRef="StartEvent_Inspectorate" targetRef="MessageCatch_LabourInspectorate" />
+    <sequenceFlow id="Flow42" sourceRef="MessageCatch_LabourInspectorate" targetRef="Task_InvestigateAccident" />
+    <sequenceFlow id="Flow43" sourceRef="Task_InvestigateAccident" targetRef="EndEvent_Inspectorate" />
+    <dataObject id="DataObject_SeriousAccidentReport" name="Serious Accident Report" />
+  </process>
+  <message id="Message_NotifyEmployer" name="Incident Report" />
+  <message id="Message_NotifyInsurance" name="Accident Report" />
+  <message id="Message_NotifyLabourInspectorate" name="Serious Accident Report" />
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_1t3211d">
+      <bpmndi:BPMNShape id="LaneShape_Inspectorate" bpmnElement="Lane_Inspectorate" isHorizontal="true">
+        <dc:Bounds x="120" y="940" width="1660" height="140" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="LaneShape_Insurance" bpmnElement="Lane_Insurance" isHorizontal="true">
+        <dc:Bounds x="120" y="720" width="1660" height="140" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="LaneShape_Safety" bpmnElement="Lane_Safety" isHorizontal="true">
+        <dc:Bounds x="120" y="500" width="1660" height="140" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="LaneShape_HR" bpmnElement="Lane_HR" isHorizontal="true">
+        <dc:Bounds x="120" y="360" width="1660" height="140" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="LaneShape_Employee" bpmnElement="Lane_Employee" isHorizontal="true">
+        <dc:Bounds x="120" y="120" width="1660" height="180" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_StartEvent_Employee" bpmnElement="StartEvent_Employee">
+        <dc:Bounds x="160" y="185" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Task_AssessIncident" bpmnElement="Task_AssessIncident">
+        <dc:Bounds x="240" y="172" width="110" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Gateway_IncidentType" bpmnElement="Gateway_IncidentType" isMarkerVisible="true">
+        <dc:Bounds x="370" y="182" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Task_ReportAccident" bpmnElement="Task_ReportAccident">
+        <dc:Bounds x="480" y="120" width="120" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Task_ReportNearMiss" bpmnElement="Task_ReportNearMiss">
+        <dc:Bounds x="480" y="200" width="120" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Task_ReportRisk" bpmnElement="Task_ReportRisk">
+        <dc:Bounds x="480" y="270" width="120" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Task_ReportDefect" bpmnElement="Task_ReportDefect">
+        <dc:Bounds x="480" y="340" width="120" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_EndEvent_Employee" bpmnElement="EndEvent_Employee">
+        <dc:Bounds x="750" y="185" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_MessageThrow_Employer" bpmnElement="MessageThrow_Employer">
+        <dc:Bounds x="650" y="185" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="629" y="221" width="79" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_StartEvent_Employer" bpmnElement="StartEvent_Employer">
+        <dc:Bounds x="160" y="405" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_MessageCatch_IncidentReport" bpmnElement="MessageCatch_IncidentReport">
+        <dc:Bounds x="250" y="405" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Task_RecordIncident" bpmnElement="Task_RecordIncident">
+        <dc:Bounds x="350" y="395" width="110" height="60" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Gateway_IncidentSeverity" bpmnElement="Gateway_IncidentSeverity" isMarkerVisible="true">
+        <dc:Bounds x="480" y="405" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Task_NotifyLabourInspectorate" bpmnElement="Task_NotifyLabourInspectorate">
+        <dc:Bounds x="600" y="367" width="110" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Task_NotifyInsurance" bpmnElement="Task_NotifyInsurance">
+        <dc:Bounds x="760" y="405" width="110" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_EndEvent_Employer" bpmnElement="EndEvent_Employer">
+        <dc:Bounds x="900" y="424" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_StartEvent_Insurance" bpmnElement="StartEvent_Insurance">
+        <dc:Bounds x="160" y="775" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_MessageCatch_InsuranceReport" bpmnElement="MessageCatch_InsuranceReport">
+        <dc:Bounds x="250" y="775" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Task_ProcessClaim" bpmnElement="Task_ProcessClaim">
+        <dc:Bounds x="350" y="765" width="110" height="60" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_EndEvent_Insurance" bpmnElement="EndEvent_Insurance">
+        <dc:Bounds x="500" y="783" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_StartEvent_Inspectorate" bpmnElement="StartEvent_Inspectorate">
+        <dc:Bounds x="160" y="995" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_MessageCatch_LabourInspectorate" bpmnElement="MessageCatch_LabourInspectorate">
+        <dc:Bounds x="250" y="995" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="228" y="1031" width="81" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Task_InvestigateAccident" bpmnElement="Task_InvestigateAccident">
+        <dc:Bounds x="350" y="985" width="110" height="60" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_EndEvent_Inspectorate" bpmnElement="EndEvent_Inspectorate">
+        <dc:Bounds x="500" y="1003" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Edge_Flow1" bpmnElement="Flow1">
+        <di:waypoint x="196" y="203" />
+        <di:waypoint x="240" y="202" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow2" bpmnElement="Flow2">
+        <di:waypoint x="350" y="202" />
+        <di:waypoint x="370" y="207" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow3" bpmnElement="Flow3">
+        <di:waypoint x="395" y="182" />
+        <di:waypoint x="495" y="150" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow4" bpmnElement="Flow4">
+        <di:waypoint x="420" y="207" />
+        <di:waypoint x="480" y="230" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow5" bpmnElement="Flow5">
+        <di:waypoint x="395" y="232" />
+        <di:waypoint x="495" y="300" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow6" bpmnElement="Flow6">
+        <di:waypoint x="420" y="232" />
+        <di:waypoint x="480" y="370" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow7" bpmnElement="Flow7">
+        <di:waypoint x="600" y="150" />
+        <di:waypoint x="768" y="203" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow8" bpmnElement="Flow8">
+        <di:waypoint x="600" y="230" />
+        <di:waypoint x="768" y="203" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow9" bpmnElement="Flow9">
+        <di:waypoint x="600" y="300" />
+        <di:waypoint x="768" y="203" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow10" bpmnElement="Flow10">
+        <di:waypoint x="600" y="370" />
+        <di:waypoint x="768" y="203" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow11" bpmnElement="Flow11">
+        <di:waypoint x="600" y="150" />
+        <di:waypoint x="650" y="203" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow12" bpmnElement="Flow12">
+        <di:waypoint x="600" y="230" />
+        <di:waypoint x="650" y="203" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow13" bpmnElement="Flow13">
+        <di:waypoint x="600" y="300" />
+        <di:waypoint x="650" y="203" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow14" bpmnElement="Flow14">
+        <di:waypoint x="600" y="370" />
+        <di:waypoint x="650" y="203" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow15" bpmnElement="Flow15">
+        <di:waypoint x="686" y="203" />
+        <di:waypoint x="750" y="203" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow21" bpmnElement="Flow21">
+        <di:waypoint x="196" y="423" />
+        <di:waypoint x="250" y="423" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow22" bpmnElement="Flow22">
+        <di:waypoint x="286" y="423" />
+        <di:waypoint x="350" y="425" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow23" bpmnElement="Flow23">
+        <di:waypoint x="460" y="425" />
+        <di:waypoint x="480" y="430" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow24" bpmnElement="Flow24">
+        <di:waypoint x="505" y="405" />
+        <di:waypoint x="600" y="397" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow25" bpmnElement="Flow25">
+        <di:waypoint x="530" y="430" />
+        <di:waypoint x="760" y="430" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow26" bpmnElement="Flow26">
+        <di:waypoint x="710" y="397" />
+        <di:waypoint x="760" y="430" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow27" bpmnElement="Flow27">
+        <di:waypoint x="870" y="443" />
+        <di:waypoint x="900" y="443" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow31" bpmnElement="Flow31">
+        <di:waypoint x="196" y="793" />
+        <di:waypoint x="250" y="793" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow32" bpmnElement="Flow32">
+        <di:waypoint x="286" y="793" />
+        <di:waypoint x="350" y="795" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow33" bpmnElement="Flow33">
+        <di:waypoint x="460" y="795" />
+        <di:waypoint x="500" y="801" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow41" bpmnElement="Flow41">
+        <di:waypoint x="196" y="1013" />
+        <di:waypoint x="250" y="1013" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow42" bpmnElement="Flow42">
+        <di:waypoint x="286" y="1013" />
+        <di:waypoint x="350" y="1015" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow43" bpmnElement="Flow43">
+        <di:waypoint x="460" y="1015" />
+        <di:waypoint x="500" y="1021" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>
